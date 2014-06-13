@@ -9,7 +9,8 @@ int main(int argc, char **argv) {
 	// Engine
 	enable_relative_paths(argv);
 	
-	initBuffering();
+	if(initBuffering())
+		exit(0);
 	
 	buildGameLUTs();
 	

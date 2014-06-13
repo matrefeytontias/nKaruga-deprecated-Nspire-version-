@@ -1,5 +1,8 @@
 #include "common.h"
-#include "../gfx/testMidSize/gfx.h"
+// Use 3:4 sprite set
+#include "../gfx/gfx.h"
+// Use 1:2 sprite set
+//#include "../gfx/testMidSize/gfx.h"
 #include "patterns.h"
 
 unsigned short *image_entries[NB_IMAGES];

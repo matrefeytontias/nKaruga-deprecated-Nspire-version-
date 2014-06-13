@@ -8,6 +8,12 @@ Building
 
 To build the executable, you'll need everything that is in the nKaruga/src and nKaruga/gfx folder. Just build in nKaruga/src using your favorite tool (CLI or Ndless SDK). nKaruga.tns will be generated in the main folder, ready to be sent to your TI-Nspire (any TI-Nspire).
 
+**Building using alternative graphics**
+
+Two sets of sprites are available to build nKaruga, sprite at resolution 3:4 or 1:2. To change the sprite set, uncomment the corresponding #include line in nKaruga/src/buildGameLUTs.cpp :
+* ../gfx/gfx.h holds the 3:4 sprite set
+* ../gfx/testMidSize/gfx.h holds the 1:2 sprite set
+
 Running on a TI-Nspire
 ======================
 

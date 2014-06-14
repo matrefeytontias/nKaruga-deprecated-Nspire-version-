@@ -100,8 +100,10 @@ void Pattern_1_5(Enemy *e, Player *p)
 		Fixed cura;
 		for(int i = 0; i < 4; i++)
 		{
-			e->bArray.add(e->x - itofix(e->img[0]), e->y, fixcos((i << 6) + e->getInternal(0)) << 1, fixsin((i << 6) + e->getInternal(0)), e->getPolarity());
-			e->bArray.add(e->x + itofix(e->img[0]), e->y, fixcos((i << 6) + e->getInternal(0)) << 1, fixsin((i << 6) + e->getInternal(0)), e->getPolarity());
+			cura = ~((i << 6) + e->getInternal(0));
+			e->bArray.add(e->x - itofix(e->img[0]), e->y, fixcos(cura) << 1, fixsin(cura), e->getPolarity());
+			cura = ~cura;
+			e->bArray.add(e->x + itofix(e->img[0]), e->y, fixcos(cura) << 1, fixsin(cura), e->getPolarity());
 			cura = angle + (rand() % 32) - 16;
 			e->bArray.add(e->x, e->y, fixcos(cura) << 1, fixsin(cura) << 1, e->getPolarity());
 		}

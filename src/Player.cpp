@@ -15,14 +15,6 @@ Player::Player(int maxBullet) : bArray(maxBullet, image_LUT_player_bullet_light)
 	img[LIGHT + SWITCHING1] = image_entries[image_LUT_player_ship_polarityswitch_1_light];
 	img[SHADOW + SWITCHING1] = image_entries[image_LUT_player_ship_polarityswitch_1_shadow];
 	
-	/*
-	SDL_SetColorKey(img[LIGHT], SDL_SRCCOLORKEY, SDL_MapRGB(img[LIGHT]->format, 255, 0, 255));
-	SDL_SetColorKey(img[SHADOW], SDL_SRCCOLORKEY, SDL_MapRGB(img[SHADOW]->format, 255, 0, 255));
-	SDL_SetColorKey(img[LIGHT + SWITCHING0], SDL_SRCCOLORKEY, SDL_MapRGB(img[LIGHT + SWITCHING0]->format, 255, 0, 255));
-	SDL_SetColorKey(img[SHADOW + SWITCHING0], SDL_SRCCOLORKEY, SDL_MapRGB(img[SHADOW + SWITCHING0]->format, 255, 0, 255));
-	SDL_SetColorKey(img[LIGHT + SWITCHING1], SDL_SRCCOLORKEY, SDL_MapRGB(img[LIGHT + SWITCHING1]->format, 255, 0, 255));
-	SDL_SetColorKey(img[SHADOW + SWITCHING1], SDL_SRCCOLORKEY, SDL_MapRGB(img[SHADOW + SWITCHING1]->format, 255, 0, 255));
-	*/
 	x = 0;
 	y = 0;
 }

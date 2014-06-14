@@ -92,7 +92,7 @@ void Pattern_1_4(Enemy *e, Player *p)
 
 void Pattern_1_5(Enemy *e, Player *p)
 {
-	e->x = itofix(160);
+	e->x = itofix(160) + (fixcos(e->getInternal(0)) << 5);
 	e->y = itofix(60);
 	if(!(e->getInternal(0) & 3))
 	{
@@ -103,7 +103,7 @@ void Pattern_1_5(Enemy *e, Player *p)
 			e->bArray.add(e->x - itofix(e->img[0]), e->y, fixcos((i << 6) + e->getInternal(0)) << 1, fixsin((i << 6) + e->getInternal(0)), e->getPolarity());
 			e->bArray.add(e->x + itofix(e->img[0]), e->y, fixcos((i << 6) + e->getInternal(0)) << 1, fixsin((i << 6) + e->getInternal(0)), e->getPolarity());
 			cura = angle + (rand() % 32) - 16;
-			e->bArray.add(e->x, e->y, fixcos(cura) << 1, fixsin(cura) << 1, !e->getPolarity());
+			e->bArray.add(e->x, e->y, fixcos(cura) << 1, fixsin(cura) << 1, e->getPolarity());
 		}
 	}
 	incrementInternal(0);

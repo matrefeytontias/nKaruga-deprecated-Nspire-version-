@@ -47,6 +47,8 @@ void Pattern_1_1(Enemy *e, Player *p)
 	e->setRotation(e->getInternal(0) >> 1);
 }
 
+// x = t^2 * 1.5
+// y = t
 void Pattern_1_2(Enemy *e, Player *p)
 {
 	if(!(e->getInternal(0) % 2))
@@ -60,6 +62,8 @@ void Pattern_1_2(Enemy *e, Player *p)
 	e->setRotation(e->getInternal(0) >> 1);
 }
 
+// x = ((t * 3 - 240)^2 - 240) / (waveIndex * .5 + 1) + 320
+// y = t
 void Pattern_1_3(Enemy *e, Player *p)
 {
 	if(!(e->getInternal(0) % 3))
@@ -72,6 +76,8 @@ void Pattern_1_3(Enemy *e, Player *p)
 	e->setRotation(e->getInternal(0) >> 1);
 }
 
+// x = -((t * 3 - 240)^2 - 240) / (waveIndex * .5 + 1)
+// y = t
 void Pattern_1_4(Enemy *e, Player *p)
 {
 	if(!(e->getInternal(0) % 3))
@@ -84,16 +90,21 @@ void Pattern_1_4(Enemy *e, Player *p)
 	e->setRotation(e->getInternal(0) >> 1);
 }
 
-/*
-void Enemy_pattern_2(Enemy *e, Player *p)
+void Pattern_1_5(Enemy *e, Player *p)
 {
-	if(!(e->getInternal(0) % 64))
+	e->x = itofix(160);
+	e->y = itofix(60);
+	if(!(e->getInternal(0) & 3))
 	{
 		Fixed angle = angleToPlayer(e, p);
-		e->bArray.add(e->x, e->y, fixcos(angle), fixsin(angle), e->getPolarity());
+		Fixed cura;
+		for(int i = 0; i < 4; i++)
+		{
+			e->bArray.add(e->x - itofix(e->img[0]), e->y, fixcos((i << 6) + e->getInternal(0)) << 1, fixsin((i << 6) + e->getInternal(0)), e->getPolarity());
+			e->bArray.add(e->x + itofix(e->img[0]), e->y, fixcos((i << 6) + e->getInternal(0)) << 1, fixsin((i << 6) + e->getInternal(0)), e->getPolarity());
+			cura = angle + (rand() % 32) - 16;
+			e->bArray.add(e->x, e->y, fixcos(cura) << 1, fixsin(cura) << 1, !e->getPolarity());
+		}
 	}
-	
 	incrementInternal(0);
-	e->setRotation(e->getInternal(0) >> 1);
 }
-*/

@@ -58,5 +58,9 @@ int levelStream[] = {
 	cmd_wait(96),
 	enemy(2, image_LUT_enemy_ship_0_shadow, image_LUT_enemy_bullet_1_shadow, callback_LUT_3, SHADOW, 1),
 	cmd_killed,
+	
+	// Test boss
+	enemy(50, image_LUT_enemy_ship_0_light, image_LUT_enemy_bullet_0_light, callback_LUT_4, LIGHT, 0),
+	cmd_killed,
 	LVLSTR_END
 	};

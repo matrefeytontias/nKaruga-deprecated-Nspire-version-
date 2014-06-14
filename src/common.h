@@ -210,6 +210,7 @@ enum callback_LUT
 	callback_LUT_1,
 	callback_LUT_2,
 	callback_LUT_3,
+	callback_LUT_4,
 	NB_CALLBACKS
 };
 

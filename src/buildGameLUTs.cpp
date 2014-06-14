@@ -1,8 +1,8 @@
 #include "common.h"
 // Use 3:4 sprite set
-#include "../gfx/gfx.h"
+//#include "../gfx/gfx.h"
 // Use 1:2 sprite set
-//#include "../gfx/testMidSize/gfx.h"
+#include "../gfx/testMidSize/gfx.h"
 #include "patterns.h"
 
 unsigned short *image_entries[NB_IMAGES];
@@ -29,4 +29,5 @@ void buildGameLUTs()
 	callback_entries[1] = Pattern_1_2;
 	callback_entries[2] = Pattern_1_3;
 	callback_entries[3] = Pattern_1_4;
+	callback_entries[4] = Pattern_1_5;
 }

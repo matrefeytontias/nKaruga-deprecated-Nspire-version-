@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
 	enemiesArray = (Enemy**)malloc(sizeof(Enemy*) * MAX_ENEMY);
 	if(!enemiesArray)
 	{
-		printf("Couldn't allocate %d bytes for enemiesArray.\n", sizeof(Enemy) * 32);
+		printf("Couldn't allocate %d bytes for enemiesArray.\n", sizeof(Enemy) * MAX_ENEMY);
 		exit(0);
 	}
 	

@@ -1,18 +1,33 @@
 #include "n2DLib.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
 // Buffering
 
-ScreenBuffer* BUFF_BASE_ADDRESS;
+unsigned short *BUFF_BASE_ADDRESS;
+void *SCREEN_BACKUP;
 
-int initBuffering()
+void initBuffering()
 {
-	if(is_classic)
-		*(int32_t*)0xC000001C = (*((int32_t*)0xC000001C) & ~0b1110) | 0b1000;
-	BUFF_BASE_ADDRESS = (ScreenBuffer*)malloc(BUFF_BYTES_SIZE);
+	BUFF_BASE_ADDRESS = (unsigned short*)malloc(BUFF_BYTES_SIZE);
+	if(!BUFF_BASE_ADDRESS) exit(0);
 	
-	return !BUFF_BASE_ADDRESS;
+	// Handle monochrome screens-specific shit
+	if(is_classic)
+	{
+		SCREEN_BACKUP = SCREEN_BASE_ADDRESS;
+		*(int32_t*)(0xC000001C) = (*((int32_t*)0xC000001C) & ~0b1110) | 0b1000;
+		*(void**)(0xC0000010) = malloc(BUFF_BYTES_SIZE);
+		if(!SCREEN_BASE_ADDRESS)
+		{
+			free(BUFF_BASE_ADDRESS);
+			*((int32_t*)0xC000001C) = (*((int32_t*)0xC000001C) & ~0b1110) | 0b0100;
+			*(void**)(0xC0000010) = SCREEN_BACKUP;
+			exit(0);
+		}
+	}
 }
 
 void updateScreen()
@@ -22,9 +37,13 @@ void updateScreen()
 
 void deinitBuffering()
 {
-	// Sets the monochrome screen back to 4-bits
+	// Handle monochrome screens-specific shit again
 	if(is_classic)
+	{
+		free(SCREEN_BASE_ADDRESS);
 		*((int32_t*)0xC000001C) = (*((int32_t*)0xC000001C) & ~0b1110) | 0b0100;
+		*(void**)(0xC0000010) = SCREEN_BACKUP;
+	}
 	free(BUFF_BASE_ADDRESS);
 }
 
@@ -48,19 +67,19 @@ void clearBuffer(unsigned short c)
 	int i;
 	if(has_colors)
 		for(i = 0; i < BUFF_BYTES_SIZE >> 1; i++)
-			*((ScreenBuffer*)BUFF_BASE_ADDRESS + i) = c;
+			*((unsigned short*)BUFF_BASE_ADDRESS + i) = c;
 	else
 	{
 		c = ~c;
 		c = ((c >> 11) + ((c & 0x07c0) >> 6) + (c & 0x1f)) & 0xffff;
 		for(i = 0; i < BUFF_BYTES_SIZE >> 1; i++)
-			*((ScreenBuffer*)BUFF_BASE_ADDRESS + i) = c;
+			*((unsigned short*)BUFF_BASE_ADDRESS + i) = c;
 	}
 }
 
-inline unsigned short getPixel(unsigned short *src, int x, int y)
+inline unsigned short getPixel(unsigned short *src, unsigned int x, unsigned int y)
 {
-	if(x >= 0 && x < src[0] && y >= 0 && y < src[1])
+	if(x < src[0] && y < src[1])
 		return src[x + y * src[0] + 3];
 	else
 		return src[2];
@@ -102,30 +121,32 @@ inline void setPixelRGB(unsigned int x, unsigned int y, unsigned char r, unsigne
 	}
 }
 
-void drawSprite(unsigned short *src, int _x, int _y)
+void drawSprite(unsigned short *src, unsigned int _x, unsigned int _y)
 {
-	int x, y, w = src[0] + _x, h = src[1] + _y, c = 3;
+	unsigned int x, y, w = src[0] + _x, h = src[1] + _y, c = 3;
 	for(y = _y; y < h; y++)
 	{
 		for(x = _x; x < w; x++, c++)
 		{
 			if(src[c] != src[2])
-				setPixel(x, y, src[c]);
+				if(x < 320 && y < 240)
+					setPixel(x, y, src[c]);
 		}
 	}
 }
 
-void drawSpritePart(unsigned short *src, int _x, int _y, Rect part)
+void drawSpritePart(unsigned short *src, unsigned int _x, unsigned int _y, Rect part)
 {
 	unsigned short c;
-	int x, y = _y, w = part.w + _x, h = part.h + _y, z = part.x, t = part.y;
+	unsigned int x, y, w = part.w + _x, h = part.h + _y, z = part.x, t = part.y;
 	for(y = _y; y < h; y++, t++)
 	{
 		for(x = _x, z = part.x; x < w; x++, z++)
 		{
 			c = getPixel(src, z, t);
 			if(c != src[2])
-				setPixel(x, y, c);
+				if(x < 320 && y < 240)
+					setPixel(x, y, c);
 		}
 	}
 }
@@ -256,4 +277,6 @@ void fillEllipse(int x, int y, int w, int h, uint8_t r, uint8_t g, uint8_t b)
 				setPixelRGB(x + i, y + j, r, g, b);
 }
 
+#ifdef __cplusplus
 }
+#endif

@@ -6,11 +6,9 @@ int main(int argc, char **argv) {
 	int levelCounter, levelTimer, enemyCounter, waveIndex;
 	bool levelEnded = false;
 	
-	// Engine
-	enable_relative_paths(argv);
+	initBuffering();
 	
-	if(initBuffering())
-		exit(0);
+	enable_relative_paths(argv);
 	
 	buildGameLUTs();
 	
@@ -96,7 +94,7 @@ int main(int argc, char **argv) {
 			levelEnded = 1;
 	
 		updateScreen();
-		memset(BUFF_BASE_ADDRESS, 0xff, BUFF_BYTES_SIZE);
+		clearBufferW();
 		
 		if(is_cx) sleep(4);
 	}

@@ -95,8 +95,6 @@ int main(int argc, char **argv) {
 	
 		updateScreen();
 		clearBufferW();
-		
-		if(is_cx) sleep(4);
 	}
 	
 	for(int i = 0; i < MAX_ENEMY; i++)

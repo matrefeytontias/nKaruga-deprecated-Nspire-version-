@@ -65,6 +65,7 @@ void Pattern_1_4(Enemy *e, Player *p)
 	e->setRotation(e->getInternal(0) >> 1);
 }
 
+// no parametric equation for you
 void Pattern_1_5(Enemy *e, Player *p)
 {
 	e->setInternal(1, e->getInternal(0) >> 2);
@@ -76,7 +77,7 @@ void Pattern_1_5(Enemy *e, Player *p)
 			e->y = itofix(e->getInternal(1));
 		}
 		else
-			e->x = e->getWaveIndex() & 7 < 4 ? e->x - itofix(1) : e->x + itofix(1);
+			e->x = (e->getWaveIndex() & 7) < 4 ? e->x - itofix(1) : e->x + itofix(1);
 	}
 	incrementInternal(0);
 }

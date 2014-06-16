@@ -2,31 +2,6 @@
 
 #define incrementInternal(x) e->setInternal(x, e->getInternal(x) + 1);
 
-inline int sq(int x)
-{
-	return x * x;
-}
-
-inline Fixed fixsq(Fixed x)
-{
-	return fixmul(x, x);
-}
-
-inline int cube(int x)
-{
-	return x * x * x;
-}
-
-inline Fixed fixcube(Fixed x)
-{
-	return fixmul(fixmul(x, x), x);
-}
-
-inline Fixed angleToPlayer(Enemy *e, Player *p)
-{
-	return (int)(atan2((double)(p->y - e->y), (double)(p->x - e->x)) * 128. / M_PI);
-}
-
 // Patterns are of the form Pattern_chapter_wave
 // Trajectories are parametric equations
 
@@ -91,6 +66,23 @@ void Pattern_1_4(Enemy *e, Player *p)
 }
 
 void Pattern_1_5(Enemy *e, Player *p)
+{
+	e->setInternal(1, e->getInternal(0) >> 2);
+	if(e->getInternal(0) & 1)
+	{
+		if(e->getInternal(1) < 140 - (int)(e->getWaveIndex() / 8) * 20)
+		{
+			e->x = itofix((e->getWaveIndex() & 7) * 30 + 40);
+			e->y = itofix(e->getInternal(1));
+		}
+		else
+			e->x = e->getWaveIndex() & 7 < 4 ? e->x - itofix(1) : e->x + itofix(1);
+	}
+	incrementInternal(0);
+}
+
+// Test boss
+void Pattern_test_boss(Enemy *e, Player *p)
 {
 	e->x = itofix(160) + (fixcos(e->getInternal(0)) << 5);
 	e->y = itofix(60);

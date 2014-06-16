@@ -65,14 +65,14 @@ public:
 	void handle(Player*, bool, Enemy**);
 	void setImage(int);
 	void add(Fixed, Fixed, Fixed, Fixed, bool);
-private:
+	int maxBullet;
 	Bullet* data;
+private:
 	// Bullet images, light and shadow
 	// Both images have same dimensions
 	unsigned short *img[2];
 	// keep track of current bullet
 	int bulletCount;
-	int maxBullet;
 };
 
 // Player
@@ -134,7 +134,7 @@ public:
 	bool isActive();
 	void activate(int, int, int, int, int, bool, bool);
 	void deactivate();
-	void damage(bool);
+	void damage(Player*);
 	Fixed getRotation();
 	void setRotation(Fixed);
 	bool getPolarity();
@@ -148,6 +148,7 @@ public:
 	BulletArray bArray;
 private:
 	bool active;
+	bool firingBack;
 	int HP;
 	// Does the enemy use rotation (achieved in the pattern)
 	bool hasRotation;
@@ -204,15 +205,41 @@ enum image_LUT
 	NB_IMAGES
 };
 
-enum callback_LUT
+enum
 {
 	callback_LUT_0,
 	callback_LUT_1,
 	callback_LUT_2,
 	callback_LUT_3,
 	callback_LUT_4,
+	callback_LUT_5,
 	NB_CALLBACKS
 };
+
+inline int sq(int x)
+{
+	return x * x;
+}
+
+inline Fixed fixsq(Fixed x)
+{
+	return fixmul(x, x);
+}
+
+inline int cube(int x)
+{
+	return x * x * x;
+}
+
+inline Fixed fixcube(Fixed x)
+{
+	return fixmul(fixmul(x, x), x);
+}
+
+inline Fixed angleToPlayer(Enemy *e, Player *p)
+{
+	return (int)(atan2((double)(p->y - e->y), (double)(p->x - e->x)) * 128. / M_PI);
+}
 
 extern unsigned short *image_entries[NB_IMAGES];
 extern void (*callback_entries[NB_CALLBACKS])(Enemy*, Player*);

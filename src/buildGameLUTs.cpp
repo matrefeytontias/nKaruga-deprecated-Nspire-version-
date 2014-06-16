@@ -30,4 +30,5 @@ void buildGameLUTs()
 	callback_entries[2] = Pattern_1_3;
 	callback_entries[3] = Pattern_1_4;
 	callback_entries[4] = Pattern_1_5;
+	callback_entries[5] = Pattern_test_boss;
 }

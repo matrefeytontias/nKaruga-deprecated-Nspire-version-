@@ -36,10 +36,10 @@ void BulletArray::handle(Player *p, bool hurtPlayer, Enemy **enemiesArray)
 	{
 		if(data[i].isActive())
 		{
-			// Check collisions with player
-			// the player has a 1px hitbox (for now) (but that actually seems to be enough)
 			if(hurtPlayer)
 			{
+				// Check collisions with player
+				// the player has a 1px hitbox (for now) (but that actually seems to be enough)
 				if(p->x >= data[i].x - itofix(img[0][0]) / 2 && p->x < data[i].x + itofix(img[0][0]) / 2
 				&& p->y >= data[i].y - itofix(img[0][1]) / 2 && p->y < data[i].y + itofix(img[0][1]) / 2)
 				{
@@ -51,6 +51,7 @@ void BulletArray::handle(Player *p, bool hurtPlayer, Enemy **enemiesArray)
 			}
 			else
 			{
+				// Check collisions with enemies (there are much more enemies than players)
 				for(int j = 0; j < MAX_ENEMY; j++)
 				{
 					if(enemiesArray[j]->isActive())
@@ -60,7 +61,7 @@ void BulletArray::handle(Player *p, bool hurtPlayer, Enemy **enemiesArray)
 						data[i].y - itofix(img[0][1]) / 2 <= enemiesArray[j]->y + itofix(enemiesArray[j]->img[1]) / 2 &&
 						data[i].y + itofix(img[0][1]) / 2 >= enemiesArray[j]->y - itofix(enemiesArray[j]->img[1]) / 2)
 						{
-							enemiesArray[j]->damage(p->getPolarity());
+							enemiesArray[j]->damage(p);
 							data[i].deactivate();
 							carryOn = false;
 							break;

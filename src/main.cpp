@@ -90,12 +90,7 @@ int main(int argc, char **argv) {
 		ship.handle(kEv, enemiesArray);
 		
 		for(int i = 0; i < MAX_ENEMY; i++)
-		{
-			if(enemiesArray[i]->isActive())
-			{
-				enemiesArray[i]->handle(&ship);
-			}
-		}
+			enemiesArray[i]->handle(&ship);
 	
 		if(!ship.getLives())
 			levelEnded = 1;

@@ -118,7 +118,7 @@ public:
 	~Enemy();
 	void handle(Player*);
 	bool isActive();
-	void activate(int, int, int, int, int, bool, bool);
+	void activate(int, int, int, int, int, int, int, bool, bool);
 	void deactivate();
 	void damage(Player*);
 	Fixed getRotation();
@@ -148,7 +148,7 @@ private:
 };
 
 // Level streams
-#define enemy(HP, iID, biID, cbID, p, hR) HP, iID, biID, cbID, p, hR
+#define enemy(x, y, HP, iID, biID, cbID, p, hR) x, y, HP, iID, biID, cbID, p, hR
 
 // Special values
 #define LVLSTR_END -2
@@ -188,6 +188,8 @@ enum image_LUT
 	image_LUT_enemy_bullet_1_shadow,
 	image_LUT_enemy_ship_0_light,
 	image_LUT_enemy_ship_0_shadow,
+	image_LUT_enemy_ship_1_light,
+	image_LUT_enemy_ship_1_shadow,
 	NB_IMAGES
 };
 
@@ -199,6 +201,7 @@ enum
 	Pattern_1_4,
 	Pattern_1_5,
 	Pattern_1_6,
+	Pattern_1_7,
 	NB_CALLBACKS
 };
 

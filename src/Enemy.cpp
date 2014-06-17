@@ -13,10 +13,12 @@ Enemy::~Enemy()
 void Enemy::handle(Player *p)
 {
 	Rect er;
+	Fixed angle;
 	
 	if(active)
 	{
 		// handle bullets and pattern first
+		angle = angleToPlayer(this, p);
 		switch(callback)
 		{
 			// Chapter 1
@@ -69,23 +71,27 @@ void Enemy::handle(Player *p)
 				internal[1] = internal[0] >> 2;
 				if(internal[0] & 1)
 				{
-					if(internal[1] < 140 - (int)(waveIndex / 8) * 20)
-					{
-						x = itofix((waveIndex & 7) * 30 + 40);
+					if(internal[1] < 140 - (int)(waveIndex >> 3) * 20)
 						y = itofix(internal[1]);
-					}
 					else
 						x = (waveIndex & 7) < 4 ? x - itofix(1) : x + itofix(1);
 				}
 				internal[0]++;
 				break;
-			// Test boss
+			// Wave 6
 			case Pattern_1_6:
+				if(!(internal[0] & 15))
+				{
+					bArray.add(x, y, fixcos(angle), fixsin(angle), polarity);
+				}
+				internal[0]++;
+				rotationAngle = ~angle + 64;
+				break;
+			// Test boss
+			case Pattern_1_7:
 				x = itofix(160) + (fixcos(internal[0]) << 5);
-				y = itofix(60);
 				if(!(internal[0] & 3))
 				{
-					Fixed angle = angleToPlayer(this, p);
 					Fixed cura;
 					for(int i = 0; i < 4; i++)
 					{
@@ -139,12 +145,12 @@ bool Enemy::isActive()
 	return active;
 }
 
-void Enemy::activate(int _HP, int shipImgID, int bulletImgID, int callbackID, int _waveIndex, bool _polarity, bool _hasRotation)
+void Enemy::activate(int _x, int _y, int _HP, int shipImgID, int bulletImgID, int callbackID, int _waveIndex, bool _polarity, bool _hasRotation)
 {
 	bArray.setImage(bulletImgID);
 	HP = _HP;
-	x = 0;
-	y = 0;
+	x = _x;
+	y = _y;
 	
 	img = image_entries[shipImgID];
 	

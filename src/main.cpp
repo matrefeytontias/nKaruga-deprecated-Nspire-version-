@@ -74,9 +74,9 @@ int main(int argc, char **argv) {
 			}
 			else
 			{
-				enemiesArray[enemyCounter]->activate(levelStream[levelCounter], levelStream[levelCounter + 1], levelStream[levelCounter + 2], levelStream[levelCounter + 3],
-													waveIndex, levelStream[levelCounter + 4], levelStream[levelCounter + 5]);
-				levelCounter += 6;
+				enemiesArray[enemyCounter]->activate(itofix(levelStream[levelCounter]), itofix(levelStream[levelCounter + 1]), levelStream[levelCounter + 2], levelStream[levelCounter + 3],
+													levelStream[levelCounter + 4], levelStream[levelCounter + 5], waveIndex, levelStream[levelCounter + 6], levelStream[levelCounter + 7]);
+				levelCounter += 8;
 				enemyCounter = (enemyCounter + 1) & MAX_ENEMY - 1;
 				waveIndex++;
 			}
@@ -95,6 +95,7 @@ int main(int argc, char **argv) {
 	
 		updateScreen();
 		clearBufferW();
+		sleep(4);
 	}
 	
 	for(int i = 0; i < MAX_ENEMY; i++)

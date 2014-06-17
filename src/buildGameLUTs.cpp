@@ -5,7 +5,6 @@
 #include "../gfx/testMidSize/gfx.h"
 
 unsigned short *image_entries[NB_IMAGES];
-//void (*callback_entries[NB_CALLBACKS])(Enemy*, Player*);
 
 void buildGameLUTs()
 {

@@ -17,8 +17,6 @@ void Enemy::handle(Player *p)
 	if(active)
 	{
 		// handle bullets and pattern first
-		//callback.execute(this, p);
-		
 		switch(callback)
 		{
 			// Chapter 1

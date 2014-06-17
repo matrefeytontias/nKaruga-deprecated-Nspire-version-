@@ -228,7 +228,6 @@ inline Fixed angleToPlayer(Enemy *e, Player *p)
 }
 
 extern unsigned short *image_entries[NB_IMAGES];
-//extern void (*callback_entries[NB_CALLBACKS])(Enemy*, Player*);
 
 extern void buildGameLUTs();
 extern void freeGameLUTs();

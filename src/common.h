@@ -107,20 +107,6 @@ private:
 	int lives;
 } ;
 
-// You know what's even funnier ? Enemy is also needed in EnemyPattern
-
-// EnemyPattern
-class EnemyPattern
-{
-public:
-	EnemyPattern();
-	~EnemyPattern();
-	void set(void (*func)(Enemy*, Player*));
-	void execute(Enemy*, Player*);
-private:
-	void (*callback)(Enemy*, Player*);
-};
-
 // Enemy
 // For real this time
 #define MAX_ENEMY 32
@@ -155,7 +141,7 @@ private:
 	Fixed rotationAngle;
 	// What bullets does the enemy fire
 	bool polarity;
-	EnemyPattern callback;
+	int callback;
 	// The position of the enemy in the wave
 	int waveIndex;
 	int internal[3];
@@ -207,12 +193,12 @@ enum image_LUT
 
 enum
 {
-	callback_LUT_0,
-	callback_LUT_1,
-	callback_LUT_2,
-	callback_LUT_3,
-	callback_LUT_4,
-	callback_LUT_5,
+	Pattern_1_1,
+	Pattern_1_2,
+	Pattern_1_3,
+	Pattern_1_4,
+	Pattern_1_5,
+	Pattern_1_6,
 	NB_CALLBACKS
 };
 
@@ -242,7 +228,7 @@ inline Fixed angleToPlayer(Enemy *e, Player *p)
 }
 
 extern unsigned short *image_entries[NB_IMAGES];
-extern void (*callback_entries[NB_CALLBACKS])(Enemy*, Player*);
+//extern void (*callback_entries[NB_CALLBACKS])(Enemy*, Player*);
 
 extern void buildGameLUTs();
 extern void freeGameLUTs();

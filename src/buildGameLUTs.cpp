@@ -3,10 +3,9 @@
 //#include "../gfx/gfx.h"
 // Use 1:2 sprite set
 #include "../gfx/testMidSize/gfx.h"
-#include "patterns.h"
 
 unsigned short *image_entries[NB_IMAGES];
-void (*callback_entries[NB_CALLBACKS])(Enemy*, Player*);
+//void (*callback_entries[NB_CALLBACKS])(Enemy*, Player*);
 
 void buildGameLUTs()
 {
@@ -24,11 +23,4 @@ void buildGameLUTs()
 	image_entries[image_LUT_enemy_bullet_1_shadow] = image_enemy_bullet_1_shadow;
 	image_entries[image_LUT_enemy_ship_0_light] = image_enemy_ship_0_light;
 	image_entries[image_LUT_enemy_ship_0_shadow] = image_enemy_ship_0_shadow;
-	
-	callback_entries[0] = Pattern_1_1;
-	callback_entries[1] = Pattern_1_2;
-	callback_entries[2] = Pattern_1_3;
-	callback_entries[3] = Pattern_1_4;
-	callback_entries[4] = Pattern_1_5;
-	callback_entries[5] = Pattern_test_boss;
 }

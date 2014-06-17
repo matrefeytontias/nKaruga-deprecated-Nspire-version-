@@ -17,7 +17,92 @@ void Enemy::handle(Player *p)
 	if(active)
 	{
 		// handle bullets and pattern first
-		callback.execute(this, p);
+		//callback.execute(this, p);
+		
+		switch(callback)
+		{
+			// Chapter 1
+			// Wave 1
+			case Pattern_1_1:
+				if(!(internal[0] % 2))
+				{
+					internal[1] = internal[0] >> 1;
+					x = itofix(320) - fixmul(sq(internal[1]), 768);
+					y = itofix(internal[1]);
+				}
+				internal[0]++;
+				rotationAngle = internal[0] >> 1;
+				break;
+			// Wave 2
+			case Pattern_1_2:
+				if(!(internal[0] % 2))
+				{
+					internal[1] = internal[0] >> 1;
+					x = fixmul(sq(internal[1]), 768);
+					y = itofix(internal[1]);
+				}
+				internal[0]++;
+				rotationAngle = internal[0] >> 1;
+				break;
+			// Wave 3
+			case Pattern_1_3:
+				if(!(internal[0] % 3))
+				{
+					internal[1] = internal[0] / 3;
+					x = fixdiv(sq(internal[0] - 240) - itofix(240), waveIndex * 128 + 256) + itofix(320);
+					y = itofix(internal[1]);
+				}
+				internal[0]++;
+				rotationAngle = internal[0] >> 1;
+				break;
+			// Wave 4
+			case Pattern_1_4:
+				if(!(internal[0] % 3))
+				{
+					internal[1] = internal[0] / 3;
+					x = -fixdiv(sq(internal[0] - 240) - itofix(240), waveIndex * 128 + 256);
+					y = itofix(internal[1]);
+				}
+				internal[0]++;
+				rotationAngle = internal[0] >> 1;
+				break;
+			// Wave 5
+			case Pattern_1_5:
+				internal[1] = internal[0] >> 2;
+				if(internal[0] & 1)
+				{
+					if(internal[1] < 140 - (int)(waveIndex / 8) * 20)
+					{
+						x = itofix((waveIndex & 7) * 30 + 40);
+						y = itofix(internal[1]);
+					}
+					else
+						x = (waveIndex & 7) < 4 ? x - itofix(1) : x + itofix(1);
+				}
+				internal[0]++;
+				break;
+			// Test boss
+			case Pattern_1_6:
+				x = itofix(160) + (fixcos(internal[0]) << 5);
+				y = itofix(60);
+				if(!(internal[0] & 3))
+				{
+					Fixed angle = angleToPlayer(this, p);
+					Fixed cura;
+					for(int i = 0; i < 4; i++)
+					{
+						cura = ~((i << 6) + internal[0]);
+						bArray.add(x - itofix(img[0]), y, fixcos(cura) << 1, fixsin(cura), polarity);
+						cura = ~cura;
+						bArray.add(x + itofix(img[0]), y, fixcos(cura) << 1, fixsin(cura), polarity);
+						cura = angle + (rand() % 32) - 16;
+						bArray.add(x, y, fixcos(cura) << 1, fixsin(cura) << 1, polarity);
+					}
+				}
+				internal[0]++;
+				break;
+		}
+		
 		bArray.handle(p, true, NULL);
 		
 		er.x = fixtoi(x);
@@ -68,7 +153,7 @@ void Enemy::activate(int _HP, int shipImgID, int bulletImgID, int callbackID, in
 	polarity = _polarity;
 	hasRotation = _hasRotation;
 	rotationAngle = 0;
-	callback.set(callback_entries[callbackID]);
+	callback = callbackID;
 	waveIndex = _waveIndex;
 	for(int i = 0; i < 3; i++)
 		internal[i] = 0;

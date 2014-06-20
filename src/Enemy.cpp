@@ -96,9 +96,9 @@ void Enemy::handle(Player *p)
 					for(int i = 0; i < 4; i++)
 					{
 						cura = ~((i << 6) + internal[0]);
-						bArray.add(x - itofix(img[0]), y, fixcos(cura) << 1, fixsin(cura), polarity);
+						bArray.add(x - itofix(img[0] >> 1), y, fixcos(cura) << 1, fixsin(cura), polarity);
 						cura = ~cura;
-						bArray.add(x + itofix(img[0]), y, fixcos(cura) << 1, fixsin(cura), polarity);
+						bArray.add(x + itofix(img[0] >> 1), y, fixcos(cura) << 1, fixsin(cura), polarity);
 						cura = angle + (rand() % 32) - 16;
 						bArray.add(x, y, fixcos(cura) << 1, fixsin(cura) << 1, polarity);
 					}

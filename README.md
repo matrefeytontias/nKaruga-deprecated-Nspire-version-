@@ -8,9 +8,17 @@ Building
 
 To build the executable, you'll need everything that is in the nKaruga/src and nKaruga/gfx folder. Just build in nKaruga/src using your favorite tool (CLI or Ndless SDK). nKaruga.tns will be generated in the main folder, ready to be sent to your TI-Nspire (any TI-Nspire).
 
+<<<<<<< HEAD
 Two spritesets are (or will be) available for nKaruga. You (will) can switch between in the game, but you need both of them to build it.
 * gfx/c_gfx.h holds the cel-shaded spriteset
 * gfx/d_gfx.h holds the pseudo-3D spriteset
+=======
+If you use the CLI for building Ndless programs, running make in the root directory will be enough.
+
+Define DEBUG_NKARUGA in main.cpp to enable the necessary delay for the game to be played in an Nspire emulator (else it's waaaaaay too fast). Undefine it before sending to an actual TI-Nspire.
+
+**Building using alternative graphics**
+>>>>>>> b28af30aaa7d92854db32cc594197300e0b7868d
 
 At the moment, you don't need gfx/d_gfx.h as all 3D sprites aren't done yet, so the game will always run with the cel-shaded spriteset.
 
@@ -34,3 +42,10 @@ Commands for this beta :
 * CLEAR  : quit
 
 The beta ends when all enemies are defeated or quitted the screen.
+
+Credits
+=======
+
+Code : matrefeytontias
+
+GFX : Metaru, Hayleia, pierrotdu18

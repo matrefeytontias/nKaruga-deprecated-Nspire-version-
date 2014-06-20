@@ -38,3 +38,9 @@ Commands for this beta :
 * CLEAR  : quit
 
 The beta ends when all enemies are defeated or quitted the screen.
+
+Credits
+=======
+
+Code : matrefeytontias
+GFX : Metaru, Hayleia, pierrotdu18

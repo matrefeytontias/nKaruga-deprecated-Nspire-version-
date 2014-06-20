@@ -104,6 +104,7 @@ void Enemy::handle(Player *p)
 					}
 				}
 				internal[0]++;
+				rotationAngle = ~angle + 64;
 				break;
 		}
 		
@@ -169,9 +170,9 @@ void Enemy::deactivate()
 	active = false;
 }
 
-void Enemy::damage(Player *_p)
+void Enemy::damage(Player *_p, bool _pol)
 {
-	if(_p->getPolarity() == polarity)
+	if(_pol == polarity)
 		HP -= 1;
 	else
 		HP -= 2;
@@ -182,7 +183,7 @@ void Enemy::damage(Player *_p)
 			bArray.data[i].deactivate();
 		deactivate();
 		
-		if(_p->getPolarity() == polarity)
+		if(_pol == polarity)
 		{
 			Fixed angle = angleToPlayer(this, _p);
 			for(int i = 0; i < 16; i++)

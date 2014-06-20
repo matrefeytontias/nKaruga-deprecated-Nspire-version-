@@ -25,14 +25,14 @@ Player::~Player()
 
 void Player::handle(KeyEvent kEv, Enemy **enemiesArray)
 {
-	static Rect r;
+	static Rect r, temp;
 	
 	// Handle bullets first
 	bArray.handle(this, false, enemiesArray);
 	
 	// Then display the player
-	r.x = fixtoi(x) - img[(isSwitchingPolarity >> 3) << 1][0] / 2;
-	r.y = fixtoi(y) - img[(isSwitchingPolarity >> 3) << 1][1] / 2;
+	r.x = fixtoi(x) - (img[(isSwitchingPolarity >> 3) << 1][0] >> 1);
+	r.y = fixtoi(y) - (img[(isSwitchingPolarity >> 3) << 1][1] >> 1);
 	
 	drawSprite(img[((isSwitchingPolarity >> 3) << 1) + (polarity ? SHADOW : LIGHT)], r.x, r.y);
 	
@@ -54,8 +54,14 @@ void Player::handle(KeyEvent kEv, Enemy **enemiesArray)
 	if(KRIGHT(kEv)) x += itofix(1);
 	if(KUP(kEv)) y -= itofix(1);
 	
-	x = x < 0 ? 0 : (x > itofix(319) ? itofix(319) : x);
-	y = y < 0 ? 0 : (y > itofix(239) ? itofix(239) : y);
+	r.x = fixtoi(x) - (img[(isSwitchingPolarity >> 3) << 1][0] >> 1);
+	r.y = fixtoi(y) - (img[(isSwitchingPolarity >> 3) << 1][1] >> 1);
+	
+	temp.x = img[(isSwitchingPolarity >> 3) << 1][0] >> 1;
+	temp.y = img[(isSwitchingPolarity >> 3) << 1][1] >> 1;
+	
+	x = r.x < 0 ? itofix(temp.x) : (r.x > 320 - (temp.x << 1) ? itofix(320 - temp.x) : x);
+	y = r.y < 0 ? itofix(temp.y) : (r.y > 240 - (temp.y << 1) ? itofix(240 - temp.y) : y);
 	
 	if(KTAB(kEv))
 	{

@@ -61,7 +61,7 @@ void BulletArray::handle(Player *p, bool hurtPlayer, Enemy **enemiesArray)
 						data[i].y - itofix(img[0][1]) / 2 <= enemiesArray[j]->y + itofix(enemiesArray[j]->img[1]) / 2 &&
 						data[i].y + itofix(img[0][1]) / 2 >= enemiesArray[j]->y - itofix(enemiesArray[j]->img[1]) / 2)
 						{
-							enemiesArray[j]->damage(p);
+							enemiesArray[j]->damage(p, data[i].getPolarity());
 							data[i].deactivate();
 							carryOn = false;
 							break;

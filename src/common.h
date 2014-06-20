@@ -120,7 +120,7 @@ public:
 	bool isActive();
 	void activate(int, int, int, int, int, int, int, bool, bool);
 	void deactivate();
-	void damage(Player*);
+	void damage(Player*, bool);
 	Fixed getRotation();
 	void setRotation(Fixed);
 	bool getPolarity();
@@ -190,6 +190,7 @@ enum image_LUT
 	image_LUT_enemy_ship_0_shadow,
 	image_LUT_enemy_ship_1_light,
 	image_LUT_enemy_ship_1_shadow,
+	image_LUT_enemy_ship_2_light,
 	NB_IMAGES
 };
 

@@ -104,7 +104,7 @@ int levelStream[] = {
 	cmd_killed,
 	cmd_newWave,
 	// Test boss
-	enemy(160, 60, 50, image_LUT_enemy_ship_1_light, image_LUT_enemy_bullet_0_light, Pattern_1_7, LIGHT, 0),
+	enemy(160, 60, 50, image_LUT_enemy_ship_2_light, image_LUT_enemy_bullet_0_light, Pattern_1_7, LIGHT, 1),
 	cmd_killed,
 	LVLSTR_END
 	};

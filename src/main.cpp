@@ -1,6 +1,8 @@
 #include "common.h"
 #include "levels.h"
 
+#define DEBUG_NKARUGA
+
 int main(int argc, char **argv) {
 	KeyEvent kEv = 0;
 	int levelCounter, levelTimer, enemyCounter, waveIndex;
@@ -95,7 +97,9 @@ int main(int argc, char **argv) {
 	
 		updateScreen();
 		clearBufferW();
+		#ifdef DEBUG_NKARUGA
 		sleep(4);
+		#endif
 	}
 	
 	for(int i = 0; i < MAX_ENEMY; i++)

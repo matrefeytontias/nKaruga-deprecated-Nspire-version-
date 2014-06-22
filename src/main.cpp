@@ -1,7 +1,7 @@
 #include "common.h"
 #include "levels.h"
 
-#define DEBUG_NKARUGA
+//~ #define DEBUG_NKARUGA
 
 int main(int argc, char **argv) {
 	KeyEvent kEv = 0;
@@ -51,20 +51,22 @@ int main(int argc, char **argv) {
 		if(!levelTimer)
 		{
 			// Load the current enemy from the level stream
-			if(levelStream[levelCounter] == LVLSTR_CMD)
+			int currentLevelByte = levelStream[levelCounter];
+			if(currentLevelByte == LVLSTR_CMD)
 			{
 				levelCounter++;
-				if(levelStream[levelCounter] == LVLSTR_NEWWAVE)
+				currentLevelByte = levelStream[levelCounter];
+				if(currentLevelByte == LVLSTR_NEWWAVE)
 				{
 					waveIndex = 0;
 					levelCounter++;
 				}
-				else if(levelStream[levelCounter] == LVLSTR_WAIT)
+				else if(currentLevelByte == LVLSTR_WAIT)
 				{
 					levelTimer = levelStream[levelCounter + 1];
 					levelCounter += 2;
 				}
-				else if(levelStream[levelCounter] == LVLSTR_KILLED)
+				else if(currentLevelByte == LVLSTR_KILLED)
 				{
 					int levelCanProgress = 1;
 					for(int i = 0; i < MAX_ENEMY; i++)
@@ -72,13 +74,14 @@ int main(int argc, char **argv) {
 						if(enemiesArray[i]->isActive())
 						{
 							levelCanProgress = 0;
+							break;
 						}
 					}
 					if(levelCanProgress) levelCounter++;
 					else levelCounter--;
 				}
 			}
-			else if(levelStream[levelCounter] == LVLSTR_END)
+			else if(currentLevelByte == LVLSTR_END)
 			{
 				levelEnded = true;
 			}

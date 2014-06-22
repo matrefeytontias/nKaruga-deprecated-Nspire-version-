@@ -18,13 +18,12 @@ void Enemy::handle(Player *p)
 	if(active)
 	{
 		// handle bullets and pattern first
-		angle = angleToPlayer(this, p);
 		switch(callback)
 		{
 			// Chapter 1
 			// Wave 1
 			case Pattern_1_1:
-				if(!(internal[0] % 2))
+				if(!(internal[0] & 1))
 				{
 					internal[1] = internal[0] >> 1;
 					x = itofix(320) - fixmul(sq(internal[1]), 768);
@@ -35,7 +34,7 @@ void Enemy::handle(Player *p)
 				break;
 			// Wave 2
 			case Pattern_1_2:
-				if(!(internal[0] % 2))
+				if(!(internal[0] & 1))
 				{
 					internal[1] = internal[0] >> 1;
 					x = fixmul(sq(internal[1]), 768);
@@ -80,6 +79,7 @@ void Enemy::handle(Player *p)
 				break;
 			// Wave 6
 			case Pattern_1_6:
+				angle = angleToPlayer(this, p);
 				if(!(internal[0] & 15))
 				{
 					bArray.add(x, y, fixcos(angle), fixsin(angle), polarity);
@@ -89,6 +89,7 @@ void Enemy::handle(Player *p)
 				break;
 			// Test boss
 			case Pattern_1_7:
+				angle = angleToPlayer(this, p);
 				x = itofix(160) + (fixcos(internal[0]) << 5);
 				if(!(internal[0] & 3))
 				{
@@ -99,7 +100,7 @@ void Enemy::handle(Player *p)
 						bArray.add(x - itofix(img[0] >> 1), y, fixcos(cura) << 1, fixsin(cura), polarity);
 						cura = ~cura;
 						bArray.add(x + itofix(img[0] >> 1), y, fixcos(cura) << 1, fixsin(cura), polarity);
-						cura = angle + (rand() % 32) - 16;
+						cura = angle + (rand() & 31) - 16;
 						bArray.add(x, y, fixcos(cura) << 1, fixsin(cura) << 1, polarity);
 					}
 				}
@@ -113,8 +114,8 @@ void Enemy::handle(Player *p)
 		er.x = fixtoi(x);
 		er.y = fixtoi(y);
 		
-		if(er.x + img[0] / 2 < 0 || er.x - img[0] / 2 > 319 ||
-			er.y + img[1] / 2 < 0 || er.y - img[1] / 2 > 239)
+		if(er.x + (img[0] >> 1) < 0 || er.x - (img[0] >> 1) > 319 ||
+			er.y + (img[1] >> 1) < 0 || er.y - (img[1] >> 1) > 239)
 			deactivate();
 		else
 		{
@@ -125,8 +126,8 @@ void Enemy::handle(Player *p)
 			}
 			else
 			{
-				er.x -= img[0] / 2;
-				er.y -= img[1] / 2;
+				er.x -= img[0] >> 1;
+				er.y -= img[1] >> 1;
 				drawSprite(img, er.x, er.y);
 			}
 		}
@@ -137,7 +138,10 @@ void Enemy::handle(Player *p)
 		firingBack = false;
 		for(int i = 0; i < bArray.maxBullet; i++)
 			if(bArray.data[i].isActive())
+			{
 				firingBack = true;
+				break;
+			}
 	}
 }
 
@@ -172,22 +176,20 @@ void Enemy::deactivate()
 
 void Enemy::damage(Player *_p, bool _pol)
 {
-	if(_pol == polarity)
-		HP -= 1;
-	else
-		HP -= 2;
+	HP--;
+	if(_pol != polarity)
+		HP--;
 	
 	if(HP <= 0)
 	{
-		for(int i = 0; i < bArray.maxBullet; i++)
-			bArray.data[i].deactivate();
+		bArray.reset();
 		deactivate();
 		
 		if(_pol == polarity)
 		{
 			Fixed angle = angleToPlayer(this, _p);
 			for(int i = 0; i < 16; i++)
-				bArray.add(x, y, fixcos(angle + (rand() % 32) - 16) << 1, fixsin(angle + (rand() % 32) - 16) + (rand() % 256), polarity);
+				bArray.add(x, y, fixcos(angle + (rand() & 31) - 16) << 1, fixsin(angle + (rand() & 31) - 16) + (rand() & 255), polarity);
 			firingBack = true;
 		}
 	}

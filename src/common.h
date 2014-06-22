@@ -65,6 +65,8 @@ public:
 	void handle(Player*, bool, Enemy**);
 	void setImage(int);
 	void add(Fixed, Fixed, Fixed, Fixed, bool);
+	void deactivate(int);
+	void reset();
 	int maxBullet;
 	Bullet* data;
 private:

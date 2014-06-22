@@ -40,12 +40,13 @@ void BulletArray::handle(Player *p, bool hurtPlayer, Enemy **enemiesArray)
 			{
 				// Check collisions with player
 				// the player has a 1px hitbox (for now) (but that actually seems to be enough)
-				if(p->x >= data[i].x - itofix(img[0][0]) / 2 && p->x < data[i].x + itofix(img[0][0]) / 2
-				&& p->y >= data[i].y - itofix(img[0][1]) / 2 && p->y < data[i].y + itofix(img[0][1]) / 2)
+				if(p->x >= data[i].x - itofix(img[0][0] >> 1) && p->x < data[i].x + itofix(img[0][0] >> 1)
+				&& p->y >= data[i].y - itofix(img[0][1] >> 1) && p->y < data[i].y + itofix(img[0][1] >> 1))
 				{
 					if(data[i].getPolarity() != p->getPolarity())
 						p->hurt();
-					data[i].deactivate();
+					deactivate(i);
+					
 					carryOn = false;
 				}
 			}
@@ -56,13 +57,13 @@ void BulletArray::handle(Player *p, bool hurtPlayer, Enemy **enemiesArray)
 				{
 					if(enemiesArray[j]->isActive())
 					{
-						if(data[i].x - itofix(img[0][0]) / 2 <= enemiesArray[j]->x + itofix(enemiesArray[j]->img[0]) / 2 &&
-						data[i].x + itofix(img[0][0]) / 2 >= enemiesArray[j]->x - itofix(enemiesArray[j]->img[0]) / 2 &&
-						data[i].y - itofix(img[0][1]) / 2 <= enemiesArray[j]->y + itofix(enemiesArray[j]->img[1]) / 2 &&
-						data[i].y + itofix(img[0][1]) / 2 >= enemiesArray[j]->y - itofix(enemiesArray[j]->img[1]) / 2)
+						if(data[i].x - itofix(img[0][0] >> 1) <= enemiesArray[j]->x + itofix(enemiesArray[j]->img[0] >> 1) &&
+						data[i].x + itofix(img[0][0] >> 1) >= enemiesArray[j]->x - itofix(enemiesArray[j]->img[0] >> 1) &&
+						data[i].y - itofix(img[0][1] >> 1) <= enemiesArray[j]->y + itofix(enemiesArray[j]->img[1] >> 1) &&
+						data[i].y + itofix(img[0][1] >> 1) >= enemiesArray[j]->y - itofix(enemiesArray[j]->img[1] >> 1))
 						{
 							enemiesArray[j]->damage(p, data[i].getPolarity());
-							data[i].deactivate();
+							deactivate(i);
 							carryOn = false;
 							break;
 						}
@@ -75,15 +76,16 @@ void BulletArray::handle(Player *p, bool hurtPlayer, Enemy **enemiesArray)
 				data[i].y += data[i].dy;
 				
 				if(data[i].x + itofix(img[0][0]) < 0 || data[i].x > itofix(319) || data[i].y + itofix(img[0][1]) < 0 || data[i].y > itofix(239))
-					data[i].deactivate();
+					deactivate(i);
 				else
 				{
-					br.x = fixtoi(data[i].x) - img[0][0] / 2;
-					br.y = fixtoi(data[i].y) - img[0][1] / 2;
+					br.x = fixtoi(data[i].x) - (img[0][0] >> 1);
+					br.y = fixtoi(data[i].y) - (img[0][1] >> 1);
 					drawSprite(img[data[i].getPolarity() ? SHADOW : LIGHT], br.x, br.y);
 				}
 			}
 		}
+		else break;
 	}
 }
 
@@ -95,6 +97,26 @@ void BulletArray::setImage(int ID)
 
 void BulletArray::add(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, bool _p)
 {
-	data[bulletCount].activate(_x - itofix(img[_p][0]) / 2, _y - itofix(img[_p][1]), _dx, _dy, _p);
-	bulletCount = (bulletCount + 1) % maxBullet;
+	if(bulletCount < maxBullet)
+	{
+		data[bulletCount].activate(_x - itofix(img[_p][0] >> 1), _y - itofix(img[_p][1]), _dx, _dy, _p);
+		bulletCount++;
+	}
+}
+
+void BulletArray::deactivate(int n)
+{
+	data[n].deactivate();
+	
+	for(int i = n; i < bulletCount - 1; i++)
+		data[i] = data[i + 1];
+	bulletCount--;
+	data[bulletCount].deactivate();
+}
+
+void BulletArray::reset()
+{
+	for(int i = 0; i < maxBullet; i++)
+		data[i].deactivate();
+	bulletCount = 0;
 }

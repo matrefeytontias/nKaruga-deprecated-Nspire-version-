@@ -11,7 +11,7 @@
 // y = t
 void Pattern_1_1(Enemy *e, Player *p)
 {
-	if(!(e->getInternal(0) % 2))
+	if(!(e->getInternal(0) & 1))
 	{
 		e->setInternal(1, e->getInternal(0) >> 1);
 		e->x = itofix(320) - fixmul(sq(e->getInternal(1)), 768);
@@ -26,7 +26,7 @@ void Pattern_1_1(Enemy *e, Player *p)
 // y = t
 void Pattern_1_2(Enemy *e, Player *p)
 {
-	if(!(e->getInternal(0) % 2))
+	if(!(e->getInternal(0) & 1))
 	{
 		e->setInternal(1, e->getInternal(0) >> 1);
 		e->x = fixmul(sq(e->getInternal(1)), 768);
@@ -71,7 +71,7 @@ void Pattern_1_5(Enemy *e, Player *p)
 	e->setInternal(1, e->getInternal(0) >> 2);
 	if(e->getInternal(0) & 1)
 	{
-		if(e->getInternal(1) < 140 - (int)(e->getWaveIndex() / 8) * 20)
+		if(e->getInternal(1) < 140 - (int)(e->getWaveIndex() >> 3) * 20)
 		{
 			e->x = itofix((e->getWaveIndex() & 7) * 30 + 40);
 			e->y = itofix(e->getInternal(1));
@@ -97,7 +97,7 @@ void Pattern_test_boss(Enemy *e, Player *p)
 			e->bArray.add(e->x - itofix(e->img[0]), e->y, fixcos(cura) << 1, fixsin(cura), e->getPolarity());
 			cura = ~cura;
 			e->bArray.add(e->x + itofix(e->img[0]), e->y, fixcos(cura) << 1, fixsin(cura), e->getPolarity());
-			cura = angle + (rand() % 32) - 16;
+			cura = angle + (rand() & 31) - 16;
 			e->bArray.add(e->x, e->y, fixcos(cura) << 1, fixsin(cura) << 1, e->getPolarity());
 		}
 	}

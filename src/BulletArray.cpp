@@ -107,11 +107,10 @@ void BulletArray::add(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, bool _p)
 void BulletArray::deactivate(int n)
 {
 	data[n].deactivate();
-	
-	for(int i = n; i < bulletCount - 1; i++)
-		data[i] = data[i + 1];
 	bulletCount--;
-	data[bulletCount].deactivate();
+	data[bulletCount] = data[n];
+	for(int i = n; i < bulletCount; i++)
+		data[i] = data[i + 1];
 }
 
 void BulletArray::reset()

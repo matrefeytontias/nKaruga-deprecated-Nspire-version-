@@ -194,6 +194,7 @@ enum image_LUT
 	image_LUT_enemy_ship_2_shadow,
 	image_LUT_enemy_ship_3_light,
 	image_LUT_enemy_ship_3_shadow,
+	image_LUT_background,
 	NB_IMAGES
 };
 

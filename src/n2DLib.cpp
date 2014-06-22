@@ -32,7 +32,8 @@ void initBuffering()
 
 void updateScreen()
 {
-	memcpy(SCREEN_BASE_ADDRESS, BUFF_BASE_ADDRESS, BUFF_BYTES_SIZE);
+	// Screen-access delays make this the fastest method
+	memcpy(SCREEN_BASE_ADDRESS, BUFF_BASE_ADDRESS, BUFF_BYTE_SIZE);
 }
 
 void deinitBuffering()
@@ -61,6 +62,20 @@ void rotate(int x, int y, Fixed ca, Fixed sa, Rect* out)
 }
 
 // Graphics
+
+void clearBufferB()
+{
+	int i;
+	for(i = 0; i < 320 * 120; i++)
+		((unsigned int*)BUFF_BASE_ADDRESS)[i] = is_cx ? 0 : 255;
+}
+
+void clearBufferW()
+{
+	int i;
+	for(i = 0; i < 320 * 120; i++)
+		((unsigned int*)BUFF_BASE_ADDRESS)[i] = is_cx ? 255 : 0;
+}
 
 void clearBuffer(unsigned short c)
 {

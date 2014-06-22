@@ -99,12 +99,12 @@ int levelStream[] = {
 	cmd_killed,
 	cmd_newWave,
 	// Wave 6
-	enemy(107, 20, 16, image_LUT_enemy_ship_1_light, image_LUT_enemy_bullet_1_light, Pattern_1_6, LIGHT, 1),
-	enemy(214, 20, 16, image_LUT_enemy_ship_1_shadow, image_LUT_enemy_bullet_1_light, Pattern_1_6, SHADOW, 1),
+	enemy(107, 20, 16, image_LUT_enemy_ship_2_light, image_LUT_enemy_bullet_1_light, Pattern_1_6, LIGHT, 1),
+	enemy(214, 20, 16, image_LUT_enemy_ship_2_shadow, image_LUT_enemy_bullet_1_light, Pattern_1_6, SHADOW, 1),
 	cmd_killed,
 	cmd_newWave,
 	// Test boss
-	enemy(160, 60, 50, image_LUT_enemy_ship_2_light, image_LUT_enemy_bullet_0_light, Pattern_1_7, LIGHT, 1),
+	enemy(160, 60, 50, image_LUT_enemy_ship_3_light, image_LUT_enemy_bullet_0_light, Pattern_1_7, LIGHT, 1),
 	cmd_killed,
 	LVLSTR_END
 	};

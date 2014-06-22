@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
 		printf("Couldn't allocate %d bytes for enemiesArray.\n", sizeof(Enemy) * MAX_ENEMY);
 		exit(0);
 	}
-	
+
 	for(int i = 0; i < MAX_ENEMY; i++)
 	{
 		enemiesArray[i] = new Enemy;

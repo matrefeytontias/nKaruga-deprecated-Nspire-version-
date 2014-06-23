@@ -189,7 +189,7 @@ void Enemy::damage(Player *_p, bool _pol)
 		{
 			Fixed angle = angleToPlayer(this, _p);
 			for(int i = 0; i < 16; i++)
-				bArray.add(x, y, fixcos(angle + (rand() & 31) - 16) << 1, fixsin(angle + (rand() & 31) - 16) + (rand() & 255), polarity);
+				bArray.add(x, y, fixcos(angle + (rand() & 15) - 8) << 1, fixsin(angle + (rand() & 15) - 8) + (rand() & 255), polarity);
 			firingBack = true;
 		}
 	}

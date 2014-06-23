@@ -13,15 +13,8 @@ int main(int argc, char **argv) {
 	buildGameLUTs();
 	
 	Player ship = Player();
-	Enemy **enemiesArray;
+	Enemy *enemiesArray[MAX_ENEMY];
 	
-	enemiesArray = (Enemy**)malloc(sizeof(Enemy*) * MAX_ENEMY);
-	if(!enemiesArray)
-	{
-		printf("Couldn't allocate %d bytes for enemiesArray.\n", sizeof(Enemy) * MAX_ENEMY);
-		exit(0);
-	}
-
 	for(int i = 0; i < MAX_ENEMY; i++)
 	{
 		enemiesArray[i] = new Enemy;
@@ -127,7 +120,6 @@ int main(int argc, char **argv) {
 	
 	for(int i = 0; i < MAX_ENEMY; i++)
 		delete enemiesArray[i];
-	free(enemiesArray);
 	
 	deinitBuffering();
 	return 0;

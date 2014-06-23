@@ -11,7 +11,7 @@ To build the executable, you'll need everything that is in the nKaruga/src and n
 Two spritesets are (or will be) available for nKaruga. You (will) can switch between in the game, but you need both of them to build it.
 * gfx/c_gfx.h holds the cel-shaded spriteset
 * gfx/d_gfx.h holds the pseudo-3D spriteset
-=======
+
 If you use the CLI for building Ndless programs, running make in the root directory will be enough.
 
 Define DEBUG_NKARUGA in main.cpp to enable the necessary delay for the game to be played in an Nspire emulator (else it's waaaaaay too fast). Undefine it before sending to an actual TI-Nspire.

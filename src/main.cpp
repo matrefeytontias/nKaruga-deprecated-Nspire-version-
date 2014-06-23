@@ -1,7 +1,7 @@
 #include "common.h"
 #include "levels.h"
 
-//~ #define DEBUG_NKARUGA
+#define DEBUG_NKARUGA
 
 int main(int argc, char **argv) {
 	KeyEvent kEv = 0;
@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
 	
 	buildGameLUTs();
 	
-	Player ship(32);
+	Player ship = Player();
 	Enemy **enemiesArray;
 	
 	enemiesArray = (Enemy**)malloc(sizeof(Enemy*) * MAX_ENEMY);

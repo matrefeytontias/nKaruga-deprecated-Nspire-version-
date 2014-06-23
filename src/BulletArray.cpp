@@ -1,30 +1,21 @@
 #include "common.h"
 
-BulletArray::BulletArray(int _maxBullet, int bulletImgID)
+BulletArray::BulletArray(int bulletImgID)
 {
-	maxBullet = _maxBullet;
-	data = (Bullet*)malloc(sizeof(Bullet) * maxBullet);
-	if(!data)
-	{
-		printf("Couldn't allocate %d bytes for BulletArray::BulletArray.\n", sizeof(Bullet) * maxBullet);
-		exit(0);
-	}
-	for(int i = 0; i < maxBullet; i++)
-	{
-		data[i] = Bullet();
-		data[i].deactivate();
-	}
+	maxBullet = 400;
 	
 	// first comes light bullet, then shadow bullet - ALWAYS !!!
 	img[LIGHT] = image_entries[bulletImgID];
 	img[SHADOW] = image_entries[bulletImgID + 1];
+	
+	for(int i = 0; i < maxBullet; i++)
+		data[i].deactivate();
 	
 	bulletCount = 0;
 }
 
 BulletArray::~BulletArray()
 {
-	free(data);
 }
 
 void BulletArray::handle(Player *p, bool hurtPlayer, Enemy **enemiesArray)
@@ -108,14 +99,18 @@ void BulletArray::deactivate(int n)
 {
 	data[n].deactivate();
 	bulletCount--;
-	data[bulletCount] = data[n];
 	for(int i = n; i < bulletCount; i++)
 		data[i] = data[i + 1];
+	data[bulletCount].deactivate();
 }
 
 void BulletArray::reset()
 {
 	for(int i = 0; i < maxBullet; i++)
-		data[i].deactivate();
+	{
+		if(data[i].isActive())
+			data[i].deactivate();
+		else break;
+	}
 	bulletCount = 0;
 }

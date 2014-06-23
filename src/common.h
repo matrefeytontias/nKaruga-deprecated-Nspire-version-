@@ -28,7 +28,6 @@ extern KeyEvent getk(void);
 #define SHADOW 1
 #define SWITCHING0 2
 #define SWITCHING1 4
-#define MAX_BULLETS 64
 
 class Bullet
 {
@@ -60,7 +59,7 @@ class Enemy;
 class BulletArray
 {
 public:
-	BulletArray(int, int);
+	BulletArray(int);
 	~BulletArray();
 	void handle(Player*, bool, Enemy**);
 	void setImage(int);
@@ -68,7 +67,7 @@ public:
 	void deactivate(int);
 	void reset();
 	int maxBullet;
-	Bullet* data;
+	Bullet data[400];
 private:
 	// Bullet images, light and shadow
 	// Both images have same dimensions
@@ -81,7 +80,7 @@ private:
 class Player
 {
 public:
-	Player(int);
+	Player();
 	~Player();
 	void handle(KeyEvent, Enemy**);
 	bool getPolarity();

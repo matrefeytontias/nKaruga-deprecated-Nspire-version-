@@ -1,6 +1,6 @@
 #include "common.h"
 
-Enemy::Enemy() : bArray(800, 0)
+Enemy::Enemy() : bArray(0)
 {
 	active = false;
 	firingBack = false;

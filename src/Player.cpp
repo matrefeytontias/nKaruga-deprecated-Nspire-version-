@@ -1,6 +1,6 @@
 #include "common.h"
 
-Player::Player(int maxBullet) : bArray(maxBullet, image_LUT_player_bullet_light)
+Player::Player() : bArray(image_LUT_player_bullet_light)
 {
 	polarity = true;
 	fireRepeat = false;

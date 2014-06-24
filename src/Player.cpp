@@ -31,17 +31,17 @@ void Player::handle(KeyEvent kEv, Enemy **enemiesArray)
 	bArray.handle(this, false, enemiesArray);
 	
 	// Then display the player
-	r.x = fixtoi(x) - (img[(isSwitchingPolarity >> 3) << 1][0] >> 1);
-	r.y = fixtoi(y) - (img[(isSwitchingPolarity >> 3) << 1][1] >> 1);
+	r.x = fixtoi(x) - (img[(isSwitchingPolarity / 8) * 2][0] / 2);
+	r.y = fixtoi(y) - (img[(isSwitchingPolarity / 8) * 2][1] / 2);
 	
-	drawSprite(img[((isSwitchingPolarity >> 3) << 1) + (polarity ? SHADOW : LIGHT)], r.x, r.y);
+	drawSprite(img[((isSwitchingPolarity / 8) * 2) + (polarity ? SHADOW : LIGHT)], r.x, r.y);
 	
 	if(isSwitchingPolarity)
 	{
 		isSwitchingPolarity++;
 	}
 	
-	if((isSwitchingPolarity >> 3) == 3)
+	if((isSwitchingPolarity / 8) == 3)
 	{
 		polarity = !polarity;
 		isSwitchingPolarity = 0;
@@ -54,14 +54,14 @@ void Player::handle(KeyEvent kEv, Enemy **enemiesArray)
 	if(KRIGHT(kEv)) x += itofix(1);
 	if(KUP(kEv)) y -= itofix(1);
 	
-	r.x = fixtoi(x) - (img[(isSwitchingPolarity >> 3) << 1][0] >> 1);
-	r.y = fixtoi(y) - (img[(isSwitchingPolarity >> 3) << 1][1] >> 1);
+	r.x = fixtoi(x) - (img[(isSwitchingPolarity / 8) * 2][0] / 2);
+	r.y = fixtoi(y) - (img[(isSwitchingPolarity / 8) * 2][1] / 2);
 	
-	temp.x = img[(isSwitchingPolarity >> 3) << 1][0] >> 1;
-	temp.y = img[(isSwitchingPolarity >> 3) << 1][1] >> 1;
+	temp.x = img[(isSwitchingPolarity / 8) * 2][0] / 2;
+	temp.y = img[(isSwitchingPolarity / 8) * 2][1] / 2;
 	
-	x = r.x < 0 ? itofix(temp.x) : (r.x > 320 - (temp.x << 1) ? itofix(320 - temp.x) : x);
-	y = r.y < 0 ? itofix(temp.y) : (r.y > 240 - (temp.y << 1) ? itofix(240 - temp.y) : y);
+	x = r.x < 0 ? itofix(temp.x) : (r.x > 320 - (temp.x * 2) ? itofix(320 - temp.x) : x);
+	y = r.y < 0 ? itofix(temp.y) : (r.y > 240 - (temp.y * 2) ? itofix(240 - temp.y) : y);
 	
 	if(KTAB(kEv))
 	{

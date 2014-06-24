@@ -23,25 +23,25 @@ void Enemy::handle(Player *p)
 			// Chapter 1
 			// Wave 1
 			case Pattern_1_1:
-				if(!(internal[0] & 1))
+				if(!(internal[0] % 2))
 				{
-					internal[1] = internal[0] >> 1;
+					internal[1] = internal[0] / 2;
 					x = itofix(320) - fixmul(sq(internal[1]), 768);
 					y = itofix(internal[1]);
 				}
 				internal[0]++;
-				rotationAngle = internal[0] >> 1;
+				rotationAngle = internal[0] / 2;
 				break;
 			// Wave 2
 			case Pattern_1_2:
-				if(!(internal[0] & 1))
+				if(!(internal[0] % 2))
 				{
-					internal[1] = internal[0] >> 1;
+					internal[1] = internal[0] / 2;
 					x = fixmul(sq(internal[1]), 768);
 					y = itofix(internal[1]);
 				}
 				internal[0]++;
-				rotationAngle = internal[0] >> 1;
+				rotationAngle = internal[0] / 2;
 				break;
 			// Wave 3
 			case Pattern_1_3:
@@ -52,7 +52,7 @@ void Enemy::handle(Player *p)
 					y = itofix(internal[1]);
 				}
 				internal[0]++;
-				rotationAngle = internal[0] >> 1;
+				rotationAngle = internal[0] / 2;
 				break;
 			// Wave 4
 			case Pattern_1_4:
@@ -63,24 +63,24 @@ void Enemy::handle(Player *p)
 					y = itofix(internal[1]);
 				}
 				internal[0]++;
-				rotationAngle = internal[0] >> 1;
+				rotationAngle = internal[0] / 2;
 				break;
 			// Wave 5
 			case Pattern_1_5:
 				internal[1] = internal[0] >> 2;
-				if(internal[0] & 1)
+				if(internal[0] % 2)
 				{
 					if(internal[1] < 140 - (int)(waveIndex >> 3) * 20)
 						y = itofix(internal[1]);
 					else
-						x = (waveIndex & 7) < 4 ? x - itofix(1) : x + itofix(1);
+						x = (waveIndex % 8) < 4 ? x - itofix(1) : x + itofix(1);
 				}
 				internal[0]++;
 				break;
 			// Wave 6
 			case Pattern_1_6:
 				angle = angleToPlayer(this, p);
-				if(!(internal[0] & 15))
+				if(!(internal[0] % 25))
 				{
 					bArray.add(x, y, fixcos(angle), fixsin(angle), polarity);
 				}
@@ -91,16 +91,16 @@ void Enemy::handle(Player *p)
 			case Pattern_1_7:
 				angle = angleToPlayer(this, p);
 				x = itofix(160) + (fixcos(internal[0]) << 5);
-				if(!(internal[0] & 3))
+				if(!(internal[0] % 4))
 				{
 					Fixed cura;
 					for(int i = 0; i < 4; i++)
 					{
 						cura = ~((i << 6) + internal[0]);
-						bArray.add(x - itofix(img[0] >> 1), y, fixcos(cura) << 1, fixsin(cura), polarity);
+						bArray.add(x - itofix(img[0] / 2), y, fixcos(cura) << 1, fixsin(cura), polarity);
 						cura = ~cura;
-						bArray.add(x + itofix(img[0] >> 1), y, fixcos(cura) << 1, fixsin(cura), polarity);
-						cura = angle + (rand() & 31) - 16;
+						bArray.add(x + itofix(img[0] / 2), y, fixcos(cura) << 1, fixsin(cura), polarity);
+						cura = angle + (rand() % 32) - 16;
 						bArray.add(x, y, fixcos(cura) << 1, fixsin(cura) << 1, polarity);
 					}
 				}
@@ -114,8 +114,8 @@ void Enemy::handle(Player *p)
 		er.x = fixtoi(x);
 		er.y = fixtoi(y);
 		
-		if(er.x + (img[0] >> 1) < 0 || er.x - (img[0] >> 1) > 319 ||
-			er.y + (img[1] >> 1) < 0 || er.y - (img[1] >> 1) > 239)
+		if(er.x + (img[0] / 2) < 0 || er.x - (img[0] / 2) > 319 ||
+			er.y + (img[1] / 2) < 0 || er.y - (img[1] / 2) > 239)
 			deactivate();
 		else
 		{
@@ -126,8 +126,8 @@ void Enemy::handle(Player *p)
 			}
 			else
 			{
-				er.x -= img[0] >> 1;
-				er.y -= img[1] >> 1;
+				er.x -= img[0] / 2;
+				er.y -= img[1] / 2;
 				drawSprite(img, er.x, er.y);
 			}
 		}
@@ -189,7 +189,7 @@ void Enemy::damage(Player *_p, bool _pol)
 		{
 			Fixed angle = angleToPlayer(this, _p);
 			for(int i = 0; i < 16; i++)
-				bArray.add(x, y, fixcos(angle + (rand() & 15) - 8) << 1, fixsin(angle + (rand() & 15) - 8) + (rand() & 255), polarity);
+				bArray.add(x, y, fixcos(angle + (rand() % 16) - 8) << 1, fixsin(angle + (rand() % 16) - 8) + (rand() % 256), polarity);
 			firingBack = true;
 		}
 	}

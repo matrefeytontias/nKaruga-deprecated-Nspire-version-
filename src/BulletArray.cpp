@@ -31,8 +31,8 @@ void BulletArray::handle(Player *p, bool hurtPlayer, Enemy **enemiesArray)
 			{
 				// Check collisions with player
 				// the player has a 1px hitbox (for now) (but that actually seems to be enough)
-				if(p->x >= data[i].x - itofix(img[0][0] >> 1) && p->x < data[i].x + itofix(img[0][0] >> 1)
-				&& p->y >= data[i].y - itofix(img[0][1] >> 1) && p->y < data[i].y + itofix(img[0][1] >> 1))
+				if(p->x >= data[i].x - itofix(img[0][0] / 2) && p->x < data[i].x + itofix(img[0][0] / 2)
+				&& p->y >= data[i].y - itofix(img[0][1] / 2) && p->y < data[i].y + itofix(img[0][1] / 2))
 				{
 					if(data[i].getPolarity() != p->getPolarity())
 						p->hurt();
@@ -48,10 +48,10 @@ void BulletArray::handle(Player *p, bool hurtPlayer, Enemy **enemiesArray)
 				{
 					if(enemiesArray[j]->isActive())
 					{
-						if(data[i].x - itofix(img[0][0] >> 1) <= enemiesArray[j]->x + itofix(enemiesArray[j]->img[0] >> 1) &&
-						data[i].x + itofix(img[0][0] >> 1) >= enemiesArray[j]->x - itofix(enemiesArray[j]->img[0] >> 1) &&
-						data[i].y - itofix(img[0][1] >> 1) <= enemiesArray[j]->y + itofix(enemiesArray[j]->img[1] >> 1) &&
-						data[i].y + itofix(img[0][1] >> 1) >= enemiesArray[j]->y - itofix(enemiesArray[j]->img[1] >> 1))
+						if(data[i].x - itofix(img[0][0] / 2) <= enemiesArray[j]->x + itofix(enemiesArray[j]->img[0] / 2) &&
+						data[i].x + itofix(img[0][0] / 2) >= enemiesArray[j]->x - itofix(enemiesArray[j]->img[0] / 2) &&
+						data[i].y - itofix(img[0][1] / 2) <= enemiesArray[j]->y + itofix(enemiesArray[j]->img[1] / 2) &&
+						data[i].y + itofix(img[0][1] / 2) >= enemiesArray[j]->y - itofix(enemiesArray[j]->img[1] / 2))
 						{
 							enemiesArray[j]->damage(p, data[i].getPolarity());
 							deactivate(i);
@@ -70,8 +70,8 @@ void BulletArray::handle(Player *p, bool hurtPlayer, Enemy **enemiesArray)
 					deactivate(i);
 				else
 				{
-					br.x = fixtoi(data[i].x) - (img[0][0] >> 1);
-					br.y = fixtoi(data[i].y) - (img[0][1] >> 1);
+					br.x = fixtoi(data[i].x) - (img[0][0] / 2);
+					br.y = fixtoi(data[i].y) - (img[0][1] / 2);
 					drawSprite(img[data[i].getPolarity() ? SHADOW : LIGHT], br.x, br.y);
 				}
 			}
@@ -90,7 +90,7 @@ void BulletArray::add(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, bool _p)
 {
 	if(bulletCount < maxBullet)
 	{
-		data[bulletCount].activate(_x - itofix(img[_p][0] >> 1), _y - itofix(img[_p][1]), _dx, _dy, _p);
+		data[bulletCount].activate(_x - itofix(img[_p][0] / 2), _y - itofix(img[_p][1]), _dx, _dy, _p);
 		bulletCount++;
 	}
 }

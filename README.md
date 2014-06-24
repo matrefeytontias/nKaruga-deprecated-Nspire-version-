@@ -16,10 +16,6 @@ If you use the CLI for building Ndless programs, running make in the root direct
 
 Define DEBUG_NKARUGA in main.cpp to enable the necessary delay for the game to be played in an Nspire emulator (else it's waaaaaay too fast). Undefine it before sending to an actual TI-Nspire.
 
-**Building using alternative graphics**
-
-At the moment, you don't need gfx/d_gfx.h as all 3D sprites aren't done yet, so the game will always run with the cel-shaded spriteset.
-
 Running on a TI-Nspire
 ======================
 
@@ -38,6 +34,16 @@ Commands for this beta :
 * HOME   : release power _(this feature is not implemented yet)_
 * arrows : move
 * CLEAR  : quit
+
+Temporary commands:
+* 4 : switch to cel-shaded spriteset
+* 5 : switch to depth spriteset
+* 7 : enable background
+* 8 : disable background
+
+**About spritesets**
+
+In the final game, you won't be able to switch between them in-game. So the behaviour of the game when switching spritesets might seem a little odd, but that's normal.
 
 The beta ends when all enemies are defeated or quitted the screen.
 

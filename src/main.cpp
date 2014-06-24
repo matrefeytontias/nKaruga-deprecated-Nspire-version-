@@ -1,7 +1,7 @@
 #include "common.h"
 #include "levels.h"
 
-//~ #define DEBUG_NKARUGA
+#define DEBUG_NKARUGA
 
 int main(int argc, char **argv) {
 	KeyEvent kEv = 0;

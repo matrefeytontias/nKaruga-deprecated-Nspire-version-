@@ -6,7 +6,7 @@
 int main(int argc, char **argv) {
 	KeyEvent kEv = 0;
 	int levelCounter, levelTimer, enemyCounter, waveIndex, scrollOffset = 0, pxScrollStart, pxScrollEnd;
-	bool levelEnded = false;
+	bool levelEnded = false, displayBg = true;
 	
 	enable_relative_paths(argv);
 	
@@ -37,7 +37,9 @@ int main(int argc, char **argv) {
 	drawSprite(image_entries[image_LUT_background], 0, 0);
 	memcpy(image_entries[image_LUT_background] + 3, BUFF_BASE_ADDRESS, BUFF_BYTES_SIZE);
 	// Also, transpose it
-	image_entries[image_LUT_background] += 6;
+	c_image_entries[image_LUT_background] += 6;
+	// for both spritesets
+	d_image_entries[image_LUT_background] += 6;
 	
 	while(!KQUIT(kEv) && !levelEnded)
 	{
@@ -101,17 +103,27 @@ int main(int argc, char **argv) {
 	
 		updateScreen();
 		
-		// Display a scrolling background
-		pxScrollStart = scrollOffset * 160;
-		pxScrollEnd = 160*240 - pxScrollStart;
-		// cheat using cast to copy faster since the ARM9 registers are 32-bits
-		for(int i = pxScrollStart, j = 0; i < 160 * 240; i++, j++)
-			((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int *)image_entries[image_LUT_background])[j];
-		for(int i = 0, j = pxScrollEnd; j < 160 * 240; i++, j++)
-			((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int *)image_entries[image_LUT_background])[j];
+		if(displayBg)
+		{
+			// Display a scrolling background
+			pxScrollStart = scrollOffset * 160;
+			pxScrollEnd = 160*240 - pxScrollStart;
+			// cheat using cast to copy faster since the ARM9 registers are 32-bits
+			for(int i = pxScrollStart, j = 0; i < 160 * 240; i++, j++)
+				((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int *)image_entries[image_LUT_background])[j];
+			for(int i = 0, j = pxScrollEnd; j < 160 * 240; i++, j++)
+				((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int *)image_entries[image_LUT_background])[j];
+			
+			scrollOffset++;
+			if(scrollOffset > 239) scrollOffset = 0;
+		}
+		else
+			clearBufferW();
 		
-		scrollOffset++;
-		if(scrollOffset > 239) scrollOffset = 0;
+		if(isKeyPressed(KEY_NSPIRE_7)) displayBg = true;
+		if(isKeyPressed(KEY_NSPIRE_8)) displayBg = false;
+		if(isKeyPressed(KEY_NSPIRE_4)) image_entries = c_image_entries;
+		if(isKeyPressed(KEY_NSPIRE_5)) image_entries = d_image_entries;
 		
 		#ifdef DEBUG_NKARUGA
 		sleep(3);

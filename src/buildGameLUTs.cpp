@@ -30,8 +30,6 @@ void buildGameLUTs()
 	c_image_entries[image_LUT_background] = image_background;
 	
 	// Depth spriteset
-	
-	// Not ready yet !
 	d_image_entries[image_LUT_player_ship_light] = d_image_player_ship_light;
 	d_image_entries[image_LUT_player_ship_shadow] = d_image_player_ship_shadow;
 	d_image_entries[image_LUT_player_ship_polarityswitch_0_light] = d_image_player_ship_polarityswitch_0_light;
@@ -52,5 +50,5 @@ void buildGameLUTs()
 	d_image_entries[image_LUT_background] = image_background;
 	
 	// Default spriteset
-	image_entries = d_image_entries;
+	image_entries = c_image_entries;
 }

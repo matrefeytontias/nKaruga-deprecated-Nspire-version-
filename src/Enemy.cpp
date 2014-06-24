@@ -122,7 +122,7 @@ void Enemy::handle(Player *p)
 			// then the enemy image
 			if(hasRotation)
 			{
-				drawSpriteRotated(img, er, rotationAngle);
+				drawSpriteRotated(img, &er, rotationAngle);
 			}
 			else
 			{

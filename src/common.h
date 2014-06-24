@@ -236,6 +236,8 @@ inline Fixed angleToPlayer(Enemy *e, Player *p)
 	return (int)(atan2((double)(p->y - e->y), (double)(p->x - e->x)) * 128. / M_PI);
 }
 
+extern unsigned short *c_image_entries[NB_IMAGES];
+extern unsigned short *d_image_entries[NB_IMAGES];
 extern unsigned short **image_entries;
 
 extern void buildGameLUTs();

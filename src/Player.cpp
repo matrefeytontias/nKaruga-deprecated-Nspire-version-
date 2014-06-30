@@ -1,6 +1,6 @@
 #include "common.h"
 
-Player::Player() : bArray(image_LUT_player_bullet_light)
+Player::Player()
 {
 	polarity = true;
 	fireRepeat = false;
@@ -23,14 +23,11 @@ Player::~Player()
 {
 }
 
-void Player::handle(KeyEvent kEv, Enemy **enemiesArray)
+void Player::handle(KeyEvent kEv, BulletArray *bArray)
 {
 	static Rect r, temp;
 	
-	// Handle bullets first
-	bArray.handle(this, false, enemiesArray);
-	
-	// Then display the player
+	// Display the player
 	r.x = fixtoi(x) - (img[(isSwitchingPolarity / 8) * 2][0] / 2);
 	r.y = fixtoi(y) - (img[(isSwitchingPolarity / 8) * 2][1] / 2);
 	
@@ -79,14 +76,14 @@ void Player::handle(KeyEvent kEv, Enemy **enemiesArray)
 			if(fireRepeat)
 			{
 				// fire 2 bullets if the key is being held
-				bArray.add(x - itofix(img[0][0]) / 3, y, 0, itofix(-3), polarity);
-				bArray.add(x + itofix(img[0][0]) / 3, y, 0, itofix(-3), polarity);
+				bArray->add(x - itofix(img[0][0]) / 3, y, 0, itofix(-3), image_LUT_player_bullet_light, polarity, false);
+				bArray->add(x + itofix(img[0][0]) / 3, y, 0, itofix(-3), image_LUT_player_bullet_light, polarity, false);
 				fireDelay = 16;
 			}
 			else
 			{
 				// fire 1 bullet
-				bArray.add(x, y, 0, itofix(-3), polarity);
+				bArray->add(x, y, 0, itofix(-3), image_LUT_player_bullet_light, polarity, false);
 				fireDelay = 24;
 			}
 			fireRepeat = true;

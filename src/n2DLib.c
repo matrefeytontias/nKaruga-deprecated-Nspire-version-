@@ -14,19 +14,19 @@ void initBuffering()
 	BUFF_BASE_ADDRESS = (unsigned short*)malloc(BUFF_BYTES_SIZE);
 	if(!BUFF_BASE_ADDRESS) exit(0);
 	
+	SCREEN_BACKUP = *(void**)0xC0000010;
+	
 	// Handle monochrome screens-specific shit
 	if(is_classic)
-	{
-		SCREEN_BACKUP = *(void**)0xC0000010;
 		*(int32_t*)(0xC000001C) = (*((int32_t*)0xC000001C) & ~0x0e) | 0x08;
-		*(void**)(0xC0000010) = malloc(BUFF_BYTES_SIZE);
-		if(!*(void**)(0xC0000010))
-		{
-			free(BUFF_BASE_ADDRESS);
-			*((int32_t*)0xC000001C) = (*((int32_t*)0xC000001C) & ~0x0e) | 0x04;
-			*(void**)(0xC0000010) = SCREEN_BACKUP;
-			exit(0);
-		}
+	
+	*(void**)(0xC0000010) = malloc(BUFF_BYTES_SIZE);
+	if(!*(void**)(0xC0000010))
+	{
+		free(BUFF_BASE_ADDRESS);
+		*((int32_t*)0xC000001C) = (*((int32_t*)0xC000001C) & ~0x0e) | 0x04;
+		*(void**)(0xC0000010) = SCREEN_BACKUP;
+		exit(0);
 	}
 }
 
@@ -38,13 +38,11 @@ void updateScreen()
 
 void deinitBuffering()
 {
+	free(SCREEN_BASE_ADDRESS);
 	// Handle monochrome screens-specific shit again
 	if(is_classic)
-	{
-		free(SCREEN_BASE_ADDRESS);
 		*((int32_t*)0xC000001C) = (*((int32_t*)0xC000001C) & ~0x0e) | 0x04;
-		*(void**)(0xC0000010) = SCREEN_BACKUP;
-	}
+	*(void**)(0xC0000010) = SCREEN_BACKUP;
 	free(BUFF_BASE_ADDRESS);
 }
 

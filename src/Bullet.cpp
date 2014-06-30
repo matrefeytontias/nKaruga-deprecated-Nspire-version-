@@ -2,6 +2,7 @@
 
 Bullet::Bullet()
 {
+	active = false;
 }
 
 Bullet::~Bullet()
@@ -21,14 +22,16 @@ bool Bullet::isActive()
 	return active;
 }
 
-void Bullet::activate(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, bool _p)
+void Bullet::activate(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, int imgID, bool _p, bool _h)
 {
 	active = true;
 	polarity = _p;
+	hurtPlayer = _h;
 	x = _x;
 	y = _y;
 	dx = _dx;
 	dy = _dy;
+	img = image_entries[imgID + (_p ? 1 : 0)];
 }
 
 void Bullet::deactivate()
@@ -39,4 +42,9 @@ void Bullet::deactivate()
 bool Bullet::getPolarity()
 {
 	return polarity;
+}
+
+bool Bullet::hurtsPlayer()
+{
+	return hurtPlayer;
 }

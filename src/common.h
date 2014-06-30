@@ -6,6 +6,10 @@
 
 #include "n2DLib.h"
 
+extern "C" {
+void bufcpy(void*, void*);
+}
+
 typedef int KeyEvent;
 
 typedef int Fixed;
@@ -29,6 +33,8 @@ extern KeyEvent getk(void);
 #define SWITCHING0 2
 #define SWITCHING1 4
 
+#define MAX_BULLET 400
+
 class Bullet
 {
 public:
@@ -36,16 +42,19 @@ public:
 	~Bullet();
 	Rect* makeRect();
 	bool isActive();
-	void activate(Fixed, Fixed, Fixed, Fixed, bool);
+	void activate(Fixed, Fixed, Fixed, Fixed, int, bool, bool);
 	void deactivate();
 	bool getPolarity();
+	bool hurtsPlayer();
 	// x, y on-screen
 	Fixed x, y;
 	// speed
 	Fixed dx, dy;
+	unsigned short *img;
 private:
 	bool active;
 	bool polarity;
+	bool hurtPlayer;
 };
 
 // Player
@@ -59,19 +68,13 @@ class Enemy;
 class BulletArray
 {
 public:
-	BulletArray(int);
+	BulletArray();
 	~BulletArray();
-	void handle(Player*, bool, Enemy**);
-	void setImage(int);
-	void add(Fixed, Fixed, Fixed, Fixed, bool);
+	void handle(Player*, Enemy**);
+	void add(Fixed, Fixed, Fixed, Fixed, int, bool, bool);
 	void deactivate(int);
-	void reset();
-	int maxBullet;
-	Bullet data[400];
+	Bullet data[MAX_BULLET];
 private:
-	// Bullet images, light and shadow
-	// Both images have same dimensions
-	unsigned short *img[2];
 	// keep track of current bullet
 	int bulletCount;
 };
@@ -82,7 +85,7 @@ class Player
 public:
 	Player();
 	~Player();
-	void handle(KeyEvent, Enemy**);
+	void handle(KeyEvent, BulletArray*);
 	bool getPolarity();
 	void switchPolarity();
 	void hurt();
@@ -95,8 +98,6 @@ public:
 	// images have same dimensions
 	unsigned short *img[6];
 private:
-	// bullet array
-	BulletArray bArray;
 	int isSwitchingPolarity;
 	// keep firing at a reasonable rate
 	int fireDelay;
@@ -117,11 +118,11 @@ class Enemy
 public:
 	Enemy();
 	~Enemy();
-	void handle(Player*);
+	void handle(Player*, BulletArray*);
 	bool isActive();
-	void activate(int, int, int, int, int, int, int, bool, bool);
+	void activate(int, int, int, int, int, int, bool, bool);
 	void deactivate();
-	void damage(Player*, bool);
+	void damage(Player*, bool, BulletArray*);
 	Fixed getRotation();
 	void setRotation(Fixed);
 	bool getPolarity();
@@ -132,10 +133,8 @@ public:
 	Fixed x, y;
 	// Enemy image
 	unsigned short *img;
-	BulletArray bArray;
 private:
 	bool active;
-	bool firingBack;
 	int HP;
 	// Does the enemy use rotation (achieved in the pattern)
 	bool hasRotation;
@@ -149,7 +148,7 @@ private:
 };
 
 // Level streams
-#define enemy(x, y, HP, iID, biID, cbID, p, hR) x, y, HP, iID, biID, cbID, p, hR
+#define enemy(x, y, HP, iID, cbID, p, hR) x, y, HP, iID, cbID, p, hR
 
 // Special values
 #define LVLSTR_END -2

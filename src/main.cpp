@@ -1,7 +1,7 @@
 #include "common.h"
 #include "levels.h"
 
-#define DEBUG_NKARUGA
+//~ #define DEBUG_NKARUGA
 
 int main(int argc, char **argv) {
 	KeyEvent kEv = 0;
@@ -12,7 +12,8 @@ int main(int argc, char **argv) {
 	
 	buildGameLUTs();
 	
-	Player ship = Player();
+	BulletArray* bArray = new BulletArray;
+	Player ship;
 	Enemy *enemiesArray[MAX_ENEMY];
 	
 	for(int i = 0; i < MAX_ENEMY; i++)
@@ -83,8 +84,8 @@ int main(int argc, char **argv) {
 			else
 			{
 				enemiesArray[enemyCounter]->activate(itofix(levelStream[levelCounter]), itofix(levelStream[levelCounter + 1]), levelStream[levelCounter + 2], levelStream[levelCounter + 3],
-													levelStream[levelCounter + 4], levelStream[levelCounter + 5], waveIndex, levelStream[levelCounter + 6], levelStream[levelCounter + 7]);
-				levelCounter += 8;
+													levelStream[levelCounter + 4], waveIndex, levelStream[levelCounter + 5], levelStream[levelCounter + 6]);
+				levelCounter += 7;
 				enemyCounter = (enemyCounter + 1) % MAX_ENEMY;
 				waveIndex++;
 			}
@@ -93,11 +94,13 @@ int main(int argc, char **argv) {
 			levelTimer--;
 		
 		kEv = getk();
-		ship.handle(kEv, enemiesArray);
+		ship.handle(kEv, bArray);
 		
 		for(int i = 0; i < MAX_ENEMY; i++)
-			enemiesArray[i]->handle(&ship);
-	
+			enemiesArray[i]->handle(&ship, bArray);
+		
+		bArray->handle(&ship, enemiesArray);
+		
 		if(!ship.getLives())
 			levelEnded = 1;
 	
@@ -133,6 +136,7 @@ int main(int argc, char **argv) {
 	for(int i = 0; i < MAX_ENEMY; i++)
 		delete enemiesArray[i];
 	
+	delete bArray;
 	deinitBuffering();
 	return 0;
 }

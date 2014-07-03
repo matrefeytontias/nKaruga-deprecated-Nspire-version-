@@ -133,10 +133,10 @@ int main(int argc, char **argv) {
 		}
 		skipFrame = !skipFrame;
 		
-		if(isKeyPressed(KEY_NSPIRE_7)) displayBg = true;
-		if(isKeyPressed(KEY_NSPIRE_8)) displayBg = false;
-		if(isKeyPressed(KEY_NSPIRE_4)) image_entries = c_image_entries;
-		if(isKeyPressed(KEY_NSPIRE_5)) image_entries = d_image_entries;
+		if(K7(kEv)) displayBg = true;
+		if(K8(kEv)) displayBg = false;
+		if(K4(kEv)) image_entries = c_image_entries;
+		if(K5(kEv)) image_entries = d_image_entries;
 		
 		#ifdef DEBUG_NKARUGA
 		sleep(3);

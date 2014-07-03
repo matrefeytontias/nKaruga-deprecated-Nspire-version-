@@ -23,6 +23,10 @@ typedef int Fixed;
 #define KTAB(x) (x & 32)
 #define KHOME(x) (x & 64)
 #define KQUIT(x) (x & 128)
+#define K4(x) (x & 256)
+#define K5(x) (x & 512)
+#define K7(x) (x & 1024)
+#define K8(x) (x & 2048)
 
 extern KeyEvent getk(void);
 

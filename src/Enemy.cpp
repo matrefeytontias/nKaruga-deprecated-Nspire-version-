@@ -117,15 +117,18 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 		else
 		{
 			// then the enemy image
-			if(hasRotation)
+			if(!skipFrame)
 			{
-				drawSpriteRotated(img, &er, rotationAngle);
-			}
-			else
-			{
-				er.x -= img[0] / 2;
-				er.y -= img[1] / 2;
-				drawSprite(img, er.x, er.y);
+				if(hasRotation)
+				{
+					drawSpriteRotated(img, &er, rotationAngle);
+				}
+				else
+				{
+					er.x -= img[0] / 2;
+					er.y -= img[1] / 2;
+					drawSprite(img, er.x, er.y);
+				}
 			}
 		}
 	}

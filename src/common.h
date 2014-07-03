@@ -244,4 +244,6 @@ extern void freeGameLUTs();
 
 extern Enemy **enemiesArray;
 
+extern bool skipFrame;
+
 #endif

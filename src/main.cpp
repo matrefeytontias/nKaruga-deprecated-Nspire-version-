@@ -3,10 +3,13 @@
 
 //~ #define DEBUG_NKARUGA
 
+bool skipFrame = false;
+
 int main(int argc, char **argv) {
 	KeyEvent kEv = 0;
 	int levelCounter, levelTimer, enemyCounter, waveIndex, scrollOffset = 0, pxScrollStart, pxScrollEnd;
 	bool levelEnded = false, displayBg = true;
+	int readKeys = 0;
 	
 	enable_relative_paths(argv);
 	
@@ -93,7 +96,10 @@ int main(int argc, char **argv) {
 		else
 			levelTimer--;
 		
-		kEv = getk();
+		if(!(readKeys % 4))
+			kEv = getk();
+		readKeys++;
+		
 		ship.handle(kEv, bArray);
 		
 		for(int i = 0; i < MAX_ENEMY; i++)
@@ -103,25 +109,29 @@ int main(int argc, char **argv) {
 		
 		if(!ship.getLives())
 			levelEnded = 1;
-	
-		updateScreen();
 		
-		if(displayBg)
+		if(!skipFrame)
 		{
-			// Display a scrolling background
-			pxScrollStart = scrollOffset * 160;
-			pxScrollEnd = 160*240 - pxScrollStart;
-			// cheat using cast to copy faster since the ARM9 registers are 32-bits
-			for(int i = pxScrollStart, j = 0; i < 160 * 240; i++, j++)
-				((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int *)image_entries[image_LUT_background])[j];
-			for(int i = 0, j = pxScrollEnd; j < 160 * 240; i++, j++)
-				((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int *)image_entries[image_LUT_background])[j];
-			
-			scrollOffset++;
-			if(scrollOffset > 239) scrollOffset = 0;
+			updateScreen();
+		
+			if(displayBg)
+			{
+				// Display a scrolling background
+				pxScrollStart = scrollOffset * 160;
+				pxScrollEnd = 160*240 - pxScrollStart;
+				// cheat using cast to copy faster since the ARM9 registers are 32-bits
+				for(int i = pxScrollStart, j = 0; i < 160 * 240; i++, j++)
+					((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int *)image_entries[image_LUT_background])[j];
+				for(int i = 0, j = pxScrollEnd; j < 160 * 240; i++, j++)
+					((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int *)image_entries[image_LUT_background])[j];
+				
+				scrollOffset++;
+				if(scrollOffset > 239) scrollOffset = 0;
+			}
+			else
+				clearBufferW();
 		}
-		else
-			clearBufferW();
+		skipFrame = !skipFrame;
 		
 		if(isKeyPressed(KEY_NSPIRE_7)) displayBg = true;
 		if(isKeyPressed(KEY_NSPIRE_8)) displayBg = false;

@@ -31,7 +31,7 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 	r.x = fixtoi(x) - (img[(isSwitchingPolarity / 8) * 2][0] / 2);
 	r.y = fixtoi(y) - (img[(isSwitchingPolarity / 8) * 2][1] / 2);
 	
-	drawSprite(img[((isSwitchingPolarity / 8) * 2) + (polarity ? SHADOW : LIGHT)], r.x, r.y);
+	if(!skipFrame) drawSprite(img[((isSwitchingPolarity / 8) * 2) + (polarity ? SHADOW : LIGHT)], r.x, r.y);
 	
 	if(isSwitchingPolarity)
 	{

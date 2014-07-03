@@ -67,7 +67,7 @@ void BulletArray::handle(Player *p, Enemy **enemiesArray)
 				{
 					br.x = fixtoi(cb->x) - (cb->img[0] / 2);
 					br.y = fixtoi(cb->y) - (cb->img[1] / 2);
-					drawSprite(cb->img, br.x, br.y);
+					if(!skipFrame) drawSprite(cb->img, br.x, br.y);
 				}
 			}
 		}

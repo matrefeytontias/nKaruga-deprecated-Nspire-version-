@@ -1,7 +1,7 @@
 #include "common.h"
 #include "levels.h"
 
-#define DEBUG_NKARUGA
+//~ #define DEBUG_NKARUGA
 
 int skipFrame = 0, waveTimer = 0;
 
@@ -42,9 +42,12 @@ void playGame()
 {
 	KeyEvent kEv = 0;
 	int levelCounter, levelTimer, enemyCounter, waveIndex, scrollOffset = 0, pxScrollStart, pxScrollEnd;
-	bool levelEnded = false, displayBg = true;
-	int readKeys = 0;
+	bool levelEnded = false, displayBg = true, inTransitionFromIntro = false;
+	int readKeys = 0, gpTimer = 0;
 	unsigned short *bg;
+	// Variables for transition animation
+	int currentW = 0, chapterNum = 0, dX = 0, dY = 0;
+	const char *levelStrs[5] = { "Chapter 1\nIdeal", "Chapter 2\nTrial", "Chapter 3\nFaith", "Chapter 4\nReality", "Chapter 5\nMetempsychosis" };
 	
 	// Skip header
 	bg = image_entries[image_LUT_background] + 6;
@@ -69,62 +72,106 @@ void playGame()
 	
 	while(!KQUIT(kEv) && !levelEnded)
 	{
-		waveTimer++;
-		if(!levelTimer)
+		gpTimer++;
+		if(!inTransitionFromIntro)
 		{
-			// Load the current enemy from the level stream
-			int currentLevelByte = levelStream[levelCounter];
-			if(currentLevelByte == LVLSTR_CMD)
+			waveTimer++;
+			if(!levelTimer)
 			{
-				levelCounter++;
-				currentLevelByte = levelStream[levelCounter];
-				if(currentLevelByte == LVLSTR_NEWWAVE)
+				// Load the current enemy from the level stream
+				int currentLevelByte = levelStream[levelCounter];
+				if(currentLevelByte == LVLSTR_CMD)
 				{
-					waveTimer = 0;
-					waveIndex = 0;
 					levelCounter++;
-				}
-				else if(currentLevelByte == LVLSTR_WAIT)
-				{
-					levelTimer = levelStream[levelCounter + 1];
-					levelCounter += 2;
-				}
-				else if(currentLevelByte == LVLSTR_KILLED)
-				{
-					int levelCanProgress = 1;
-					for(int i = 0; i < MAX_ENEMY; i++)
+					currentLevelByte = levelStream[levelCounter];
+					if(currentLevelByte == LVLSTR_NEWWAVE)
 					{
-						if(enemiesArray[i]->isActive())
-						{
-							levelCanProgress = 0;
-							break;
-						}
+						waveTimer = 0;
+						waveIndex = 0;
+						levelCounter++;
 					}
-					if(levelCanProgress) levelCounter++;
-					else levelCounter--;
+					else if(currentLevelByte == LVLSTR_WAIT)
+					{
+						levelTimer = levelStream[levelCounter + 1];
+						levelCounter += 2;
+					}
+					else if(currentLevelByte == LVLSTR_KILLED)
+					{
+						int levelCanProgress = 1;
+						for(int i = 0; i < MAX_ENEMY; i++)
+						{
+							if(enemiesArray[i]->isActive())
+							{
+								levelCanProgress = 0;
+								break;
+							}
+						}
+						if(levelCanProgress) levelCounter++;
+						else levelCounter--;
+					}
+					else if(currentLevelByte == LVLSTR_CHAPTER)
+					{
+						inTransitionFromIntro = true;
+						currentW = 0;
+						gpTimer = 0;
+						levelCounter++;
+						chapterNum = levelStream[levelCounter];
+						levelCounter++;
+					}
 				}
-			}
-			else if(currentLevelByte == LVLSTR_END)
-			{
-				levelEnded = true;
+				else if(currentLevelByte == LVLSTR_END)
+				{
+					levelEnded = true;
+				}
+				else
+				{
+					enemiesArray[enemyCounter]->activate(itofix(levelStream[levelCounter]), itofix(levelStream[levelCounter + 1]), levelStream[levelCounter + 2], levelStream[levelCounter + 3],
+														levelStream[levelCounter + 4], waveIndex, levelStream[levelCounter + 5], levelStream[levelCounter + 6]);
+					levelCounter += 7;
+					enemyCounter = (enemyCounter + 1) % MAX_ENEMY;
+					waveIndex++;
+				}
 			}
 			else
-			{
-				enemiesArray[enemyCounter]->activate(itofix(levelStream[levelCounter]), itofix(levelStream[levelCounter + 1]), levelStream[levelCounter + 2], levelStream[levelCounter + 3],
-													levelStream[levelCounter + 4], waveIndex, levelStream[levelCounter + 5], levelStream[levelCounter + 6]);
-				levelCounter += 7;
-				enemyCounter = (enemyCounter + 1) % MAX_ENEMY;
-				waveIndex++;
-			}
+				levelTimer--;
 		}
 		else
-			levelTimer--;
+		{
+			if(!skipFrame) fillRect(0, 0, currentW, 240, 0);
+			if(currentW == 0)
+			{
+				#define TRANSLATE 256
+				dX = (itofix(220) - ship.x) / TRANSLATE;
+				dY = (itofix(180) - ship.y) / TRANSLATE;
+				currentW++;
+			}
+			else if(currentW < 120)
+			{
+				if(!(gpTimer % 4))
+					currentW++;
+			}
+			else
+				if(!skipFrame) drawString(10, 60, levelStrs[chapterNum], 0xffff);
+			if(gpTimer > 1024)
+				inTransitionFromIntro = false;
+		}
 		
 		if(!(readKeys % 4))
 			kEv = getk();
 		readKeys++;
 		
-		ship.handle(kEv, bArray);
+		if(inTransitionFromIntro)
+		{
+			kEv = 0;
+			if(gpTimer < TRANSLATE)
+			{
+				ship.x += dX;
+				ship.y += dY;
+			}
+			sleep(6);
+		}
+		
+		ship.handle(kEv, bArray);		
 		
 		for(int i = 0; i < MAX_ENEMY; i++)
 			enemiesArray[i]->handle(&ship, bArray);

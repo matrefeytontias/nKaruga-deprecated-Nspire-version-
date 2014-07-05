@@ -162,10 +162,12 @@ private:
 #define LVLSTR_NEWWAVE 0
 #define LVLSTR_WAIT 1
 #define LVLSTR_KILLED 2
+#define LVLSTR_CHAPTER 3
 
 #define cmd_newWave LVLSTR_CMD, LVLSTR_NEWWAVE
 #define cmd_wait(x) LVLSTR_CMD, LVLSTR_WAIT, x
 #define cmd_killed LVLSTR_CMD, LVLSTR_KILLED
+#define cmd_startChapter(n) LVLSTR_CMD, LVLSTR_CHAPTER, n
 
 /* 
  * Level streams structure
@@ -198,6 +200,8 @@ enum image_LUT
 	image_LUT_enemy_ship_2_shadow,
 	image_LUT_enemy_ship_3_light,
 	image_LUT_enemy_ship_3_shadow,
+	image_LUT_enemy_ship_4_light,
+	image_LUT_enemy_ship_4_shadow,
 	image_LUT_background,
 	image_LUT_titleScreen,
 	NB_IMAGES

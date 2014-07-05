@@ -1,6 +1,7 @@
 #include "common.h"
-#include "../gfx/c_gfx.h"
+#include "../gfx/titleScreen.h"
 #include "../gfx/bg.h"
+#include "../gfx/c_gfx.h"
 #include "../gfx/d_gfx.h"
 
 unsigned short *c_image_entries[NB_IMAGES];
@@ -28,6 +29,7 @@ void buildGameLUTs()
 	c_image_entries[image_LUT_enemy_ship_2_shadow] = c_image_enemy_ship_2_shadow;
 	c_image_entries[image_LUT_enemy_ship_3_light] = c_image_enemy_ship_3_light;
 	c_image_entries[image_LUT_background] = image_background;
+	c_image_entries[image_LUT_titleScreen] = image_titleScreen;
 	
 	// Depth spriteset
 	d_image_entries[image_LUT_player_ship_light] = d_image_player_ship_light;
@@ -48,6 +50,7 @@ void buildGameLUTs()
 	d_image_entries[image_LUT_enemy_ship_2_shadow] = d_image_enemy_ship_2_shadow;
 	d_image_entries[image_LUT_enemy_ship_3_light] = d_image_enemy_ship_3_light;
 	d_image_entries[image_LUT_background] = image_background;
+	d_image_entries[image_LUT_titleScreen] = image_titleScreen;
 	
 	// Default spriteset
 	image_entries = c_image_entries;

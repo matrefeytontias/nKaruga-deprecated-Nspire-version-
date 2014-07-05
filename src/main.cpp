@@ -1,19 +1,53 @@
 #include "common.h"
 #include "levels.h"
 
-//~ #define DEBUG_NKARUGA
+#define DEBUG_NKARUGA
 
-bool skipFrame = false;
+int skipFrame = 0, waveTimer = 0;
+
+void playGame();
 
 int main(int argc, char **argv) {
-	KeyEvent kEv = 0;
-	int levelCounter, levelTimer, enemyCounter, waveIndex, scrollOffset = 0, pxScrollStart, pxScrollEnd;
-	bool levelEnded = false, displayBg = true;
-	int readKeys = 0;
+	bool donePlaying = false;
 	
 	enable_relative_paths(argv);
 	
 	buildGameLUTs();
+	
+	// Init display
+	initBuffering();
+	clearBufferW();
+	
+	// Save background so it is converted to the right format depending on the screen
+	drawSprite(image_entries[image_LUT_background], 0, 0);
+	memcpy(image_entries[image_LUT_background] + 3, BUFF_BASE_ADDRESS, BUFF_BYTES_SIZE);
+	
+	
+	while(!donePlaying)
+	{
+		drawSprite(image_entries[image_LUT_titleScreen], 0, 0);
+		updateScreen();		
+		
+		if(isKeyPressed(KEY_NSPIRE_ENTER))
+			playGame();
+		else if(isKeyPressed(KEY_NSPIRE_DEL))
+			donePlaying = true;
+	}
+	
+	deinitBuffering();
+	return 0;
+}
+
+void playGame()
+{
+	KeyEvent kEv = 0;
+	int levelCounter, levelTimer, enemyCounter, waveIndex, scrollOffset = 0, pxScrollStart, pxScrollEnd;
+	bool levelEnded = false, displayBg = true;
+	int readKeys = 0;
+	unsigned short *bg;
+	
+	// Skip header
+	bg = image_entries[image_LUT_background] + 6;
 	
 	BulletArray* bArray = new BulletArray;
 	Player ship;
@@ -33,20 +67,9 @@ int main(int argc, char **argv) {
 	enemyCounter = 0;
 	waveIndex = 0;
 	
-	// Init display
-	initBuffering();
-	clearBufferW();
-	
-	// Save background so it is converted to the right format depending on the screen
-	drawSprite(image_entries[image_LUT_background], 0, 0);
-	memcpy(image_entries[image_LUT_background] + 3, BUFF_BASE_ADDRESS, BUFF_BYTES_SIZE);
-	// Also, transpose it
-	c_image_entries[image_LUT_background] += 6;
-	// for both spritesets
-	d_image_entries[image_LUT_background] += 6;
-	
 	while(!KQUIT(kEv) && !levelEnded)
 	{
+		waveTimer++;
 		if(!levelTimer)
 		{
 			// Load the current enemy from the level stream
@@ -57,6 +80,7 @@ int main(int argc, char **argv) {
 				currentLevelByte = levelStream[levelCounter];
 				if(currentLevelByte == LVLSTR_NEWWAVE)
 				{
+					waveTimer = 0;
 					waveIndex = 0;
 					levelCounter++;
 				}
@@ -121,17 +145,17 @@ int main(int argc, char **argv) {
 				pxScrollEnd = 160*240 - pxScrollStart;
 				// cheat using cast to copy faster since the ARM9 registers are 32-bits
 				for(int i = pxScrollStart, j = 0; i < 160 * 240; i++, j++)
-					((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int *)image_entries[image_LUT_background])[j];
+					((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int *)bg)[j];
 				for(int i = 0, j = pxScrollEnd; j < 160 * 240; i++, j++)
-					((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int *)image_entries[image_LUT_background])[j];
-				
-				scrollOffset++;
-				if(scrollOffset > 239) scrollOffset = 0;
+					((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int *)bg)[j];
 			}
 			else
 				clearBufferW();
 		}
-		skipFrame = !skipFrame;
+		if(!has_colors) sleep(6);
+		
+		scrollOffset = (scrollOffset + 1) % 240;
+		skipFrame = (skipFrame + 1) % 4;
 		
 		if(K7(kEv)) displayBg = true;
 		if(K8(kEv)) displayBg = false;
@@ -139,7 +163,7 @@ int main(int argc, char **argv) {
 		if(K5(kEv)) image_entries = d_image_entries;
 		
 		#ifdef DEBUG_NKARUGA
-		sleep(3);
+		sleep(6);
 		#endif
 	}
 	
@@ -147,6 +171,4 @@ int main(int argc, char **argv) {
 		delete enemiesArray[i];
 	
 	delete bArray;
-	deinitBuffering();
-	return 0;
 }

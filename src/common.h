@@ -199,6 +199,7 @@ enum image_LUT
 	image_LUT_enemy_ship_3_light,
 	image_LUT_enemy_ship_3_shadow,
 	image_LUT_background,
+	image_LUT_titleScreen,
 	NB_IMAGES
 };
 
@@ -248,6 +249,6 @@ extern void freeGameLUTs();
 
 extern Enemy **enemiesArray;
 
-extern bool skipFrame;
+extern int skipFrame, waveTimer;
 
 #endif

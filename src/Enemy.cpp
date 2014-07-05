@@ -66,15 +66,13 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 				break;
 			// Wave 5
 			case Pattern_1_5:
-				internal[1] = internal[0] >> 2;
-				if(internal[0] % 2)
+				if(waveTimer % 2)
 				{
-					if(internal[1] < 140 - (int)(waveIndex >> 3) * 20)
-						y = itofix(internal[1]);
+					if(waveTimer < 370)
+						y += itofix(1);
 					else
-						x = (waveIndex % 8) < 4 ? x - itofix(1) : x + itofix(1);
+						x += (waveIndex / 4) & 1 ? itofix(1) : itofix(-1);
 				}
-				internal[0]++;
 				break;
 			// Wave 6
 			case Pattern_1_6:

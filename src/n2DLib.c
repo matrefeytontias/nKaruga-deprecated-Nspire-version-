@@ -1,12 +1,15 @@
 #include "n2DLib.h"
+#include "n2DLib_font.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// Buffering
+/*             *
+ *  Buffering  *
+ *             */
 
-unsigned short *BUFF_BASE_ADDRESS;
+unsigned short *BUFF_BASE_ADDRESS, *ALT_SCREEN_BASE_ADDRESS;
 void *SCREEN_BACKUP;
 
 void initBuffering()
@@ -20,33 +23,37 @@ void initBuffering()
 	if(is_classic)
 		*(int32_t*)(0xC000001C) = (*((int32_t*)0xC000001C) & ~0x0e) | 0x08;
 	
-	*(void**)(0xC0000010) = malloc(BUFF_BYTES_SIZE);
-	if(!*(void**)(0xC0000010))
+	ALT_SCREEN_BASE_ADDRESS = (unsigned short*)malloc(BUFF_BYTES_SIZE);
+	if(!ALT_SCREEN_BASE_ADDRESS)
 	{
 		free(BUFF_BASE_ADDRESS);
 		*((int32_t*)0xC000001C) = (*((int32_t*)0xC000001C) & ~0x0e) | 0x04;
-		*(void**)(0xC0000010) = SCREEN_BACKUP;
+		*(void**)0xC0000010 = SCREEN_BACKUP;
 		exit(0);
 	}
+	*(void**)0xC0000010 = ALT_SCREEN_BASE_ADDRESS;
 }
 
 void updateScreen()
 {
 	// Screen-access delays make this the fastest method
-	memcpy(*(void**)0xC0000010, BUFF_BASE_ADDRESS, BUFF_BYTES_SIZE);
+	memcpy(ALT_SCREEN_BASE_ADDRESS, BUFF_BASE_ADDRESS, BUFF_BYTES_SIZE);
 }
 
 void deinitBuffering()
 {
-	free(SCREEN_BASE_ADDRESS);
 	// Handle monochrome screens-specific shit again
 	if(is_classic)
 		*((int32_t*)0xC000001C) = (*((int32_t*)0xC000001C) & ~0x0e) | 0x04;
 	*(void**)(0xC0000010) = SCREEN_BACKUP;
+	free(ALT_SCREEN_BASE_ADDRESS);
 	free(BUFF_BASE_ADDRESS);
 }
 
-// Maths
+/*         *
+ *  Maths  *
+ *         */
+
 Fixed fixcos(Fixed angle)
 {
 	static Fixed cosLUT[] = { 256, 255, 255, 255, 254, 254, 253, 252, 251, 249, 248, 246, 244, 243, 241, 238, 236, 234, 231, 228, 225, 222, 219, 216, 212, 209, 205, 201, 197, 193, 189, 185, 181, 176, 171, 167, 162, 157, 152, 147, 142, 136, 131, 126, 120, 115, 109, 103, 97, 92, 86, 80, 74, 68, 62, 56, 49, 43, 37, 31, 25, 18, 12, 6, 0, -6, -12, -18, -25, -31, -37, -43, -49, -56, -62, -68, -74, -80, -86, -92, -97, -103, -109, -115, -120, -126, -131, -136, -142, -147, -152, -157, -162, -167, -171, -176, -181, -185, -189, -193, -197, -201, -205, -209, -212, -216, -219, -222, -225, -228, -231, -234, -236, -238, -241, -243, -244, -246, -248, -249, -251, -252, -253, -254, -254, -255, -255, -255, -256, -255, -255, -255, -254, -254, -253, -252, -251, -249, -248, -246, -244, -243, -241, -238, -236, -234, -231, -228, -225, -222, -219, -216, -212, -209, -205, -201, -197, -193, -189, -185, -181, -176, -171, -167, -162, -157, -152, -147, -142, -136, -131, -126, -120, -115, -109, -103, -97, -92, -86, -80, -74, -68, -62, -56, -49, -43, -37, -31, -25, -18, -12, -6, 0, 6, 12, 18, 25, 31, 37, 43, 49, 56, 62, 68, 74, 80, 86, 92, 97, 103, 109, 115, 120, 126, 131, 136, 142, 147, 152, 157, 162, 167, 171, 176, 181, 185, 189, 193, 197, 201, 205, 209, 212, 216, 219, 222, 225, 228, 231, 234, 236, 238, 241, 243, 244, 246, 248, 249, 251, 252, 253, 254, 254, 255, 255, 255 };
@@ -59,7 +66,9 @@ void rotate(int x, int y, Fixed ca, Fixed sa, Rect* out)
 	out->y = fixtoi(fixmul(itofix(x), -sa) + fixmul(itofix(y), ca));
 }
 
-// Graphics
+/*            *
+ *  Graphics  *
+ *            */
 
 void clearBufferB()
 {
@@ -221,9 +230,9 @@ void drawSpriteRotated(unsigned short* source, Rect* sr, Fixed angle)
 	}
 }
 
-/*	     *
- *  Geometry *
- *           */
+/*            *
+ *  Geometry  *
+ *            */
  
 void drawLine(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b)
 {
@@ -298,6 +307,39 @@ void fillEllipse(int x, int y, int w, int h, uint8_t r, uint8_t g, uint8_t b)
 		for(i=-w; i<=w; i++)
 			if(i*i*h*h+j*j*w*w <= h*h*w*w)
 				setPixelRGB(x + i, y + j, r, g, b);
+}
+
+/*        *
+ *  Text  *
+ *        */
+
+void drawString(int x, int y, const char *str, unsigned short c)
+{
+	int i, j, k, _x = x, max = strlen(str) + 1;
+	unsigned char *curChar;
+	for(i = 0; i < max; i++)
+	{
+		curChar = n2DLib_font + str[i] * 8;
+		if(str[i] == '\n')
+		{
+			x = _x;
+			y += 8;
+		}
+		else
+		{
+			// Draw curChar as monochrome 8*8 image using given color
+			for(k = 0; k < 8; k++)
+			{
+				for(j = 7; j >= 0; j--)
+				{
+					if((curChar[k] >> j) & 1)
+						setPixel(x + (7 - j), y + k, c);
+				}
+			}
+			x += 8;
+		}
+		if(x > 319) break;
+	}
 }
 
 #ifdef __cplusplus

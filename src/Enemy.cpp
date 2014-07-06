@@ -66,9 +66,9 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 				break;
 			// Wave 5
 			case Pattern_1_5:
-				if(waveTimer % 2)
+				if(!(waveTimer % 3))
 				{
-					if(waveTimer < 370)
+					if(waveTimer < 500)
 						y += itofix(1);
 					else
 						x += (waveIndex / 4) & 1 ? itofix(1) : itofix(-1);

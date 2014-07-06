@@ -1,7 +1,8 @@
 #include "common.h"
 #include "levels.h"
+#include "../gfx/kanji.h"
 
-//~ #define DEBUG_NKARUGA
+#define DEBUG_NKARUGA
 
 int skipFrame = 0, waveTimer = 0;
 
@@ -47,7 +48,8 @@ void playGame()
 	unsigned short *bg;
 	// Variables for transition animation
 	int currentW = 0, chapterNum = 0, dX = 0, dY = 0;
-	const char *levelStrs[5] = { "Chapter 1\nIdeal", "Chapter 2\nTrial", "Chapter 3\nFaith", "Chapter 4\nReality", "Chapter 5\nMetempsychosis" };
+	static const char *levelStrs[5] = { "Chapter 1\nIdeal", "Chapter 2\nTrial", "Chapter 3\nFaith", "Chapter 4\nReality", "Chapter 5\nMetempsychosis" };
+	static unsigned short *levelKanjis[1] = { image_kanji_1 };
 	
 	// Skip header
 	bg = image_entries[image_LUT_background] + 6;
@@ -151,7 +153,11 @@ void playGame()
 					currentW++;
 			}
 			else
-				if(!skipFrame) drawString(10, 60, levelStrs[chapterNum], 0xffff);
+				if(!skipFrame)
+				{
+					drawString(10, 60, levelStrs[chapterNum], 0xffff);
+					drawSprite(levelKanjis[chapterNum], 10, 80);
+				}
 			if(gpTimer > 1024)
 				inTransitionFromIntro = false;
 		}
@@ -168,7 +174,7 @@ void playGame()
 				ship.x += dX;
 				ship.y += dY;
 			}
-			sleep(6);
+			sleep(5);
 		}
 		
 		ship.handle(kEv, bArray);		

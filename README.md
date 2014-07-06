@@ -14,12 +14,12 @@ Two spritesets are (or will be) available for nKaruga. You (will) can switch bet
 
 If you use the CLI for building Ndless programs, running make in the root directory will be enough.
 
-Define DEBUG_NKARUGA in main.cpp to enable the necessary delay for the game to be played in an Nspire emulator (else it's waaaaaay too fast). Undefine it before sending to an actual TI-Nspire.
-
 Running on a TI-Nspire
 ======================
 
 You need **at least** Ndless 3.1 installed to run nKaruga on your TI-Nspire. That means nKaruga will only run on your TI-Nspire if the installed OS is Ndless 3.1-compatible.
+
+Use nKaruga.tns on real hardware, and nKaruga_emu.tns on nspire_emu (else it's waaaaaay too fast).
 
 Playing the game
 ================

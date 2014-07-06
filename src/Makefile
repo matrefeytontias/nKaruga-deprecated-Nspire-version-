@@ -4,7 +4,7 @@ AS = nspire-as
 GXX=nspire-g++
 LD = nspire-ld-bflt
 GCCFLAGS = -Wall -W -marm -Ofast
-LDFLAGS = -lfdm
+LDFLAGS = 
 ifeq ($(DEBUG),FALSE)
 	GCCFLAGS += -Os
 else
@@ -17,10 +17,11 @@ ifneq ($(strip $(CPPOBJS)),)
 	LDFLAGS += --cpp
 endif
 EXE = nKaruga.tns
+EXE_EMU = nKaruga_emu.tns
 DISTDIR = ../
 vpath %.tns $(DISTDIR)
 
-all: $(EXE)
+all: $(EXE) $(EXE_EMU)
 
 %.o: %.c
 	$(GCC) $(GCCFLAGS) -c $<
@@ -31,7 +32,15 @@ all: $(EXE)
 %.o: %.S
 	$(AS) -c $<
 
+main_emu.o: GCCFLAGS+= -D DEBUG_NKARUGA
+main_emu.o: main.cpp
+	$(GXX) $(GCCFLAGS) -c $< -o $@
+
+
 $(EXE): $(OBJS)
+$(EXE_EMU): main_emu.o  $(filter-out main.o,$(OBJS))
+
+%.tns:
 	mkdir -p $(DISTDIR)
 	$(LD) $^ -o $(DISTDIR)/$@ $(LDFLAGS)
 ifeq ($(DEBUG),FALSE)
@@ -39,4 +48,4 @@ ifeq ($(DEBUG),FALSE)
 endif
 
 clean:
-	rm -f *.o *.elf $(DISTDIR)/*.gdb $(DISTDIR)/$(EXE)
+	rm -f *.o *.elf $(DISTDIR)/*.gdb $(DISTDIR)/$(EXE) $(DISTDIR)/$(EXE_EMU)

@@ -2,8 +2,6 @@
 #include "levels.h"
 #include "../gfx/kanji.h"
 
-#define DEBUG_NKARUGA
-
 int skipFrame = 0, waveTimer = 0;
 
 void playGame();

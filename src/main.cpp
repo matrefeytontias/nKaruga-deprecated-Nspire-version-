@@ -156,7 +156,7 @@ void playGame()
 					drawString(10, 60, levelStrs[chapterNum], 0xffff);
 					drawSprite(levelKanjis[chapterNum], 10, 80);
 				}
-			if(gpTimer > 1024)
+			if(gpTimer > 768)
 				inTransitionFromIntro = false;
 		}
 		

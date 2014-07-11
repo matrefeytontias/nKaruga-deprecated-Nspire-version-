@@ -140,14 +140,14 @@ void playGame()
 			if(!skipFrame) fillRect(0, 0, currentW, 240, 0);
 			if(currentW == 0)
 			{
-				#define TRANSLATE 256
+				#define TRANSLATE 240
 				dX = (itofix(220) - ship.x) / TRANSLATE;
 				dY = (itofix(180) - ship.y) / TRANSLATE;
 				currentW++;
 			}
 			else if(currentW < 120)
 			{
-				if(!(gpTimer % 4))
+				if(!(gpTimer % 2))
 					currentW++;
 			}
 			else

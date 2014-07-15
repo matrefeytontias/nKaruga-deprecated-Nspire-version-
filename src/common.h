@@ -115,7 +115,7 @@ private:
 
 // Enemy
 // For real this time
-#define MAX_ENEMY 32
+#define MAX_ENEMY 36
 
 class Enemy
 {
@@ -163,11 +163,13 @@ private:
 #define LVLSTR_WAIT 1
 #define LVLSTR_KILLED 2
 #define LVLSTR_CHAPTER 3
+#define LVLSTR_BKPT 4
 
 #define cmd_newWave LVLSTR_CMD, LVLSTR_NEWWAVE
 #define cmd_wait(x) LVLSTR_CMD, LVLSTR_WAIT, x
 #define cmd_killed LVLSTR_CMD, LVLSTR_KILLED
 #define cmd_startChapter(n) LVLSTR_CMD, LVLSTR_CHAPTER, n
+#define cmd_bkpt LVLSTR_CMD, LVLSTR_BKPT
 
 /* 
  * Level streams structure
@@ -219,31 +221,6 @@ enum
 	NB_CALLBACKS
 };
 
-inline int sq(int x)
-{
-	return x * x;
-}
-
-inline Fixed fixsq(Fixed x)
-{
-	return fixmul(x, x);
-}
-
-inline int cube(int x)
-{
-	return x * x * x;
-}
-
-inline Fixed fixcube(Fixed x)
-{
-	return fixmul(fixmul(x, x), x);
-}
-
-inline Fixed angleToPlayer(Enemy *e, Player *p)
-{
-	return (int)(atan2((double)(p->y - e->y), (double)(p->x - e->x)) * 128. / M_PI);
-}
-
 extern unsigned short *c_image_entries[NB_IMAGES];
 extern unsigned short *d_image_entries[NB_IMAGES];
 extern unsigned short **image_entries;
@@ -253,6 +230,7 @@ extern void freeGameLUTs();
 
 extern Enemy **enemiesArray;
 
-extern int skipFrame, waveTimer;
+// Global vars
+extern int G_skipFrame, G_waveTimer, G_score;
 
 #endif

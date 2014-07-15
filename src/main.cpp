@@ -2,7 +2,7 @@
 #include "levels.h"
 #include "../gfx/kanji.h"
 
-int skipFrame = 0, waveTimer = 0;
+int G_skipFrame = 0, G_waveTimer = 0, G_score;
 
 void playGame();
 
@@ -16,11 +16,6 @@ int main(int argc, char **argv) {
 	// Init display
 	initBuffering();
 	clearBufferW();
-	
-	// Save background so it is converted to the right format depending on the screen
-	drawSprite(image_entries[image_LUT_background], 0, 0);
-	memcpy(image_entries[image_LUT_background] + 3, BUFF_BASE_ADDRESS, BUFF_BYTES_SIZE);
-	
 	
 	while(!donePlaying)
 	{
@@ -43,6 +38,11 @@ void playGame()
 	int levelCounter, levelTimer, enemyCounter, waveIndex, scrollOffset = 0, pxScrollStart, pxScrollEnd;
 	bool levelEnded = false, displayBg = true, inTransitionFromIntro = false;
 	int readKeys = 0, gpTimer = 0;
+	
+	Rect scoreRect, levelRect;
+	//~ int chainColor[3] = { 0 }, chainBonus, chainStatus;
+	// later ;)
+	
 	unsigned short *bg;
 	// Variables for transition animation
 	int currentW = 0, chapterNum = 0, dX = 0, dY = 0;
@@ -69,13 +69,14 @@ void playGame()
 	levelTimer = 0;
 	enemyCounter = 0;
 	waveIndex = 0;
+	G_score = 0;
 	
 	while(!KQUIT(kEv) && !levelEnded)
 	{
 		gpTimer++;
 		if(!inTransitionFromIntro)
 		{
-			waveTimer++;
+			G_waveTimer++;
 			if(!levelTimer)
 			{
 				// Load the current enemy from the level stream
@@ -86,7 +87,7 @@ void playGame()
 					currentLevelByte = levelStream[levelCounter];
 					if(currentLevelByte == LVLSTR_NEWWAVE)
 					{
-						waveTimer = 0;
+						G_waveTimer = 0;
 						waveIndex = 0;
 						levelCounter++;
 					}
@@ -118,6 +119,21 @@ void playGame()
 						chapterNum = levelStream[levelCounter];
 						levelCounter++;
 					}
+					else if(currentLevelByte == LVLSTR_BKPT)
+					{
+						printf("Current enemy : %d\n \
+						Current wave timer : %d\n \
+						Global timer : %d\n \
+						Current wave index : %d\n",
+						enemyCounter, G_waveTimer, gpTimer, waveIndex);
+						bkpt();
+						levelCounter++;
+					}
+					else
+					{
+						printf("Error : %d : unknown command !\n", currentLevelByte);
+						bkpt();
+					}
 				}
 				else if(currentLevelByte == LVLSTR_END)
 				{
@@ -137,7 +153,7 @@ void playGame()
 		}
 		else
 		{
-			if(!skipFrame) fillRect(0, 0, currentW, 240, 0);
+			if(!G_skipFrame) fillRect(0, 0, currentW, 240, 0);
 			if(currentW == 0)
 			{
 				#define TRANSLATE 240
@@ -151,9 +167,11 @@ void playGame()
 					currentW++;
 			}
 			else
-				if(!skipFrame)
+				if(!G_skipFrame)
 				{
-					drawString(10, 60, levelStrs[chapterNum], 0xffff);
+					levelRect.x = 10;
+					levelRect.y = 60;
+					drawString(&levelRect.x, &levelRect.y, levelRect.x, levelStrs[chapterNum], 0xffff);
 					drawSprite(levelKanjis[chapterNum], 10, 80);
 				}
 			if(gpTimer > 768)
@@ -185,8 +203,10 @@ void playGame()
 		if(!ship.getLives())
 			levelEnded = 1;
 		
-		if(!skipFrame)
+		if(!G_skipFrame)
 		{
+			scoreRect.x = scoreRect.y = 0;
+			drawDecimal(&scoreRect.x, &scoreRect.y, G_score, 0xffff);
 			updateScreen();
 		
 			if(displayBg)
@@ -206,7 +226,7 @@ void playGame()
 		if(!has_colors) sleep(6);
 		
 		scrollOffset = (scrollOffset + 1) % 240;
-		skipFrame = (skipFrame + 1) % 4;
+		G_skipFrame = (G_skipFrame + 1) % 4;
 		
 		if(K7(kEv)) displayBg = true;
 		if(K8(kEv)) displayBg = false;

@@ -24,16 +24,27 @@ void BulletArray::handle(Player *p, Enemy **enemiesArray)
 		{
 			if(cb->hurtsPlayer())
 			{
+				
 				// Check collisions with player
-				// the player has a 1px hitbox (for now) (but that actually seems to be enough)
-				if(p->x >= cb->x - itofix(cb->img[0] / 2) && p->x < cb->x + itofix(cb->img[0] / 2)
-				&& p->y >= cb->y - itofix(cb->img[1] / 2) && p->y < cb->y + itofix(cb->img[1] / 2))
+				if(cb->getPolarity() != p->getPolarity())
 				{
-					if(cb->getPolarity() != p->getPolarity())
+					// the player has a 1px hitbox (for now) (but that actually seems to be enough)
+					if(p->x >= cb->x - itofix(cb->img[0] / 2) && p->x < cb->x + itofix(cb->img[0] / 2)
+					&& p->y >= cb->y - itofix(cb->img[1] / 2) && p->y < cb->y + itofix(cb->img[1] / 2))
+					{
 						p->hurt();
-					deactivate(i);
-					
-					carryOn = false;
+						deactivate(i);
+						carryOn = false;
+					}
+				}
+				else
+				{
+					if(fixsq(cb->x - p->x) + fixsq(cb->y - p->y) < itofix(sq(p->img[0][0] / 2)))
+					{
+						deactivate(i);
+						G_score += 10;
+						carryOn = false;
+					}
 				}
 			}
 			else
@@ -49,6 +60,7 @@ void BulletArray::handle(Player *p, Enemy **enemiesArray)
 						cb->y + itofix(cb->img[1] / 2) >= enemiesArray[j]->y - itofix(enemiesArray[j]->img[1] / 2))
 						{
 							enemiesArray[j]->damage(p, cb->getPolarity(), this);
+							G_score += 100;
 							deactivate(i);
 							carryOn = false;
 							break;
@@ -67,7 +79,7 @@ void BulletArray::handle(Player *p, Enemy **enemiesArray)
 				{
 					br.x = fixtoi(cb->x) - (cb->img[0] / 2);
 					br.y = fixtoi(cb->y) - (cb->img[1] / 2);
-					if(!skipFrame) drawSprite(cb->img, br.x, br.y);
+					if(!G_skipFrame) drawSprite(cb->img, br.x, br.y);
 				}
 			}
 		}

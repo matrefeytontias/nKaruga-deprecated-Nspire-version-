@@ -1,5 +1,10 @@
 #include "common.h"
 
+inline Fixed angleToPlayer(Enemy *e, Player *p)
+{
+	return (int)(atan2((double)(p->y - e->y), (double)(p->x - e->x)) * 128. / M_PI);
+}
+
 Enemy::Enemy()
 {
 	active = false;
@@ -19,8 +24,7 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 		// handle bullets and pattern first
 		switch(callback)
 		{
-			// Chapter 1
-			// Wave 1
+			// Intro 1
 			case Pattern_1_1:
 				if(!(internal[0] % 2))
 				{
@@ -30,8 +34,7 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 				}
 				internal[0]++;
 				rotationAngle = internal[0] / 2;
-				break;
-			// Wave 2
+				break;	
 			case Pattern_1_2:
 				if(!(internal[0] % 2))
 				{
@@ -42,7 +45,6 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 				internal[0]++;
 				rotationAngle = internal[0] / 2;
 				break;
-			// Wave 3
 			case Pattern_1_3:
 				if(!(internal[0] % 3))
 				{
@@ -53,28 +55,25 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 				internal[0]++;
 				rotationAngle = internal[0] / 2;
 				break;
-			// Wave 4
 			case Pattern_1_4:
 				if(!(internal[0] % 3))
 				{
 					internal[1] = internal[0] / 3;
 					x = -fixdiv(sq(internal[0] - 240) - itofix(240), waveIndex * 128 + 256);
-					y = itofix(internal[1]);
+					y += itofix(1);
 				}
 				internal[0]++;
 				rotationAngle = internal[0] / 2;
 				break;
-			// Wave 5
 			case Pattern_1_5:
-				if(!(waveTimer % 3))
+				if(!(G_waveTimer % 3))
 				{
-					if(waveTimer < 500)
+					if(G_waveTimer < 500)
 						y += itofix(1);
 					else
-						x += (waveIndex / 4) & 1 ? itofix(1) : itofix(-1);
+						x += (waveIndex % 6) > 2 ? 192 : -192;
 				}
 				break;
-			// Wave 6
 			case Pattern_1_6:
 				angle = angleToPlayer(this, p);
 				if(!(internal[0] % 25))
@@ -84,7 +83,20 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 				internal[0]++;
 				rotationAngle = ~angle + 64;
 				break;
+			// Chapter 1
+			case Pattern_1_7:
+				if(!(G_waveTimer % 4))
+				{
+					y += abs(fixcos(internal[0])) * 3;
+					internal[0]++;
+					if(y < itofix(128))
+						x += x > itofix(160) ? -128 : 128;
+					else
+						x += x > itofix(160) ? itofix(1) : itofix(-1);
+				}
+				break;
 			// Test boss
+				/*
 			case Pattern_1_7:
 				angle = angleToPlayer(this, p);
 				x = itofix(160) + (fixcos(internal[0]) << 5);
@@ -104,18 +116,19 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 				internal[0]++;
 				rotationAngle = ~angle + 64;
 				break;
+				*/
 		}
 		
 		er.x = fixtoi(x);
 		er.y = fixtoi(y);
 		
-		if(er.x + (img[0] / 2) < 0 || er.x - (img[0] / 2) > 319 ||
-			er.y + (img[1] / 2) < 0 || er.y - (img[1] / 2) > 239)
+		if(er.x + img[0] / 2 < 0 || er.x - img[0] / 2 > 319 ||
+			er.y + img[1] / 2 < 0 || er.y - img[1] / 2 > 239)
 			deactivate();
 		else
 		{
 			// then the enemy image
-			if(!skipFrame)
+			if(!G_skipFrame)
 			{
 				if(hasRotation)
 				{

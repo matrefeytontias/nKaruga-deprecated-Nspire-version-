@@ -137,6 +137,7 @@ public:
 	Fixed x, y;
 	// Enemy image
 	unsigned short *img;
+	bool diedThisFrame;
 private:
 	bool active;
 	int HP;
@@ -149,6 +150,37 @@ private:
 	// The position of the enemy in the wave
 	int waveIndex;
 	int internal[3];
+};
+
+// Used to hold information on killed enemies in order to get the position for ChainNotifs
+class DestroyedEnemies
+{
+public:
+	DestroyedEnemies();
+	~DestroyedEnemies();
+	void activate(Enemy*, int);
+	int x[MAX_ENEMY];
+	int y[MAX_ENEMY];
+	bool relevant[MAX_ENEMY];
+};
+
+// Text notifications of score-chaining
+class ChainNotif
+{
+public:
+	ChainNotif();
+	~ChainNotif();
+	void activate(int, int, int);
+	void handle();
+private:
+	int x, backupX;
+	int y;
+	// Number to display
+	int value;
+	bool maxChain;
+	// Stay visible for a certain amount of frames
+	int untilDeath;
+	int counter;
 };
 
 // Level streams
@@ -204,6 +236,8 @@ enum image_LUT
 	image_LUT_enemy_ship_3_shadow,
 	image_LUT_enemy_ship_4_light,
 	image_LUT_enemy_ship_4_shadow,
+	image_LUT_chain_hit_light,
+	image_LUT_chain_hit_shadow,
 	image_LUT_background,
 	image_LUT_titleScreen,
 	NB_IMAGES
@@ -221,9 +255,7 @@ enum
 	NB_CALLBACKS
 };
 
-extern unsigned short *c_image_entries[NB_IMAGES];
-extern unsigned short *d_image_entries[NB_IMAGES];
-extern unsigned short **image_entries;
+extern unsigned short *c_image_entries[NB_IMAGES], *d_image_entries[NB_IMAGES], **image_entries;
 
 extern void buildGameLUTs();
 extern void freeGameLUTs();
@@ -231,6 +263,6 @@ extern void freeGameLUTs();
 extern Enemy **enemiesArray;
 
 // Global vars
-extern int G_skipFrame, G_waveTimer, G_score;
+extern int G_skipFrame, G_waveTimer, G_score, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus;
 
 #endif

@@ -8,6 +8,7 @@ inline Fixed angleToPlayer(Enemy *e, Player *p)
 Enemy::Enemy()
 {
 	active = false;
+	diedThisFrame = false;
 }
 
 Enemy::~Enemy()
@@ -124,7 +125,7 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 		
 		if(er.x + img[0] / 2 < 0 || er.x - img[0] / 2 > 319 ||
 			er.y + img[1] / 2 < 0 || er.y - img[1] / 2 > 239)
-			deactivate();
+			deactivate();		
 		else
 		{
 			// then the enemy image
@@ -143,6 +144,8 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 			}
 		}
 	}
+	else
+		diedThisFrame = false;
 }
 
 bool Enemy::isActive()
@@ -182,6 +185,7 @@ void Enemy::damage(Player *_p, bool _pol, BulletArray *bArray)
 	if(HP <= 0)
 	{
 		deactivate();
+		diedThisFrame = true;
 		
 		if(_pol == polarity)
 		{

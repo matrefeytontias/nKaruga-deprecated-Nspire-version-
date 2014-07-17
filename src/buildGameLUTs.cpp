@@ -30,6 +30,8 @@ void buildGameLUTs()
 	c_image_entries[image_LUT_enemy_ship_2_light] = c_image_enemy_ship_2_light;
 	c_image_entries[image_LUT_enemy_ship_2_shadow] = c_image_enemy_ship_2_shadow;
 	c_image_entries[image_LUT_enemy_ship_3_light] = c_image_enemy_ship_3_light;
+	c_image_entries[image_LUT_chain_hit_light] = c_image_chain_hit_light;
+	c_image_entries[image_LUT_chain_hit_shadow] = c_image_chain_hit_shadow;
 	c_image_entries[image_LUT_background] = image_background;
 	c_image_entries[image_LUT_titleScreen] = image_titleScreen;
 	
@@ -51,6 +53,8 @@ void buildGameLUTs()
 	d_image_entries[image_LUT_enemy_ship_2_light] = d_image_enemy_ship_2_light;
 	d_image_entries[image_LUT_enemy_ship_2_shadow] = d_image_enemy_ship_2_shadow;
 	d_image_entries[image_LUT_enemy_ship_3_light] = d_image_enemy_ship_3_light;
+	d_image_entries[image_LUT_chain_hit_light] = d_image_chain_hit_light;
+	d_image_entries[image_LUT_chain_hit_shadow] = d_image_chain_hit_shadow;
 	d_image_entries[image_LUT_background] = image_background;
 	d_image_entries[image_LUT_titleScreen] = image_titleScreen;
 	

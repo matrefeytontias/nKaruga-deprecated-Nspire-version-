@@ -39,7 +39,7 @@ void BulletArray::handle(Player *p, Enemy **enemiesArray)
 				}
 				else
 				{
-					if(fixsq(cb->x - p->x) + fixsq(cb->y - p->y) < itofix(sq(p->img[0][0] / 2)))
+					if(sq(fixtoi(cb->x - p->x)) + sq(fixtoi(cb->y - p->y)) < sq(p->img[0][0] / 2))
 					{
 						deactivate(i);
 						G_score += 10;
@@ -73,7 +73,8 @@ void BulletArray::handle(Player *p, Enemy **enemiesArray)
 				cb->x += cb->dx;
 				cb->y += cb->dy;
 				
-				if(cb->x + itofix(cb->img[0]) < 0 || cb->x > itofix(319) || cb->y + itofix(cb->img[1]) < 0 || cb->y > itofix(239))
+				// Bullets have a threshold of 30
+				if(cb->x + itofix(cb->img[0]) < itofix(-30) || cb->x > itofix(349) || cb->y + itofix(cb->img[1]) < itofix(-30) || cb->y > itofix(279))
 					deactivate(i);
 				else
 				{

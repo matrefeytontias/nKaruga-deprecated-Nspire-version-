@@ -2,7 +2,7 @@
 #include "levels.h"
 #include "../gfx/kanji.h"
 
-int G_skipFrame = 0, G_waveTimer = 0, G_score;
+int G_skipFrame = 0, G_waveTimer = 0, G_score, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus;
 
 void playGame();
 
@@ -29,6 +29,7 @@ int main(int argc, char **argv) {
 	}
 	
 	deinitBuffering();
+	
 	return 0;
 }
 
@@ -39,9 +40,8 @@ void playGame()
 	bool levelEnded = false, displayBg = true, inTransitionFromIntro = false;
 	int readKeys = 0, gpTimer = 0;
 	
-	Rect scoreRect, levelRect;
-	//~ int chainColor[3] = { 0 }, chainBonus, chainStatus;
-	// later ;)
+	Rect statsRect, levelRect;
+	int chainColor[3] = { 0 }, inChainCount;
 	
 	unsigned short *bg;
 	// Variables for transition animation
@@ -55,6 +55,9 @@ void playGame()
 	BulletArray* bArray = new BulletArray;
 	Player ship;
 	Enemy *enemiesArray[MAX_ENEMY];
+	ChainNotif chainNotifsArray[MAX_ENEMY];
+	DestroyedEnemies deadEnemies;
+	int currentNotif;
 	
 	for(int i = 0; i < MAX_ENEMY; i++)
 	{
@@ -69,7 +72,15 @@ void playGame()
 	levelTimer = 0;
 	enemyCounter = 0;
 	waveIndex = 0;
+	
 	G_score = 0;
+	G_killedThisFrame[G_frameChainOffset] = -1;
+	for(int i = 0; i < 3; i++)
+		chainColor[i] = 0;
+	G_chainStatus = 0;
+	G_frameChainOffset = 0;
+	inChainCount = 0;
+	currentNotif = 0;
 	
 	while(!KQUIT(kEv) && !levelEnded)
 	{
@@ -196,7 +207,15 @@ void playGame()
 		ship.handle(kEv, bArray);		
 		
 		for(int i = 0; i < MAX_ENEMY; i++)
+		{
+			G_killedThisFrame[i] = -1;
+			if(enemiesArray[i]->diedThisFrame)
+			{
+				G_killedThisFrame[i] = enemiesArray[i]->getPolarity();
+				deadEnemies.activate(enemiesArray[i], i);
+			}
 			enemiesArray[i]->handle(&ship, bArray);
+		}
 		
 		bArray->handle(&ship, enemiesArray);
 		
@@ -205,8 +224,18 @@ void playGame()
 		
 		if(!G_skipFrame)
 		{
-			scoreRect.x = scoreRect.y = 0;
-			drawDecimal(&scoreRect.x, &scoreRect.y, G_score, 0xffff);
+			// Draw score and chains
+			statsRect.x = statsRect.y = 0;
+			drawStringF(&statsRect.x, &statsRect.y, 0, 0xffff, "Score : %d\n\n\n\nCH %d", G_score, G_chainStatus);
+			
+			// Draw chain count
+			for(int i = 0, j = 0; i < inChainCount; i++, j += 18)
+				drawSprite(image_entries[chainColor[i] == LIGHT ? image_LUT_chain_hit_light : image_LUT_chain_hit_shadow], j, 12);			
+			
+			// Draw score-chaining notifs
+			for(int i = 0; i < MAX_ENEMY; i++)
+				chainNotifsArray[i].handle();
+			
 			updateScreen();
 		
 			if(displayBg)
@@ -227,6 +256,49 @@ void playGame()
 		
 		scrollOffset = (scrollOffset + 1) % 240;
 		G_skipFrame = (G_skipFrame + 1) % 4;
+		
+		// handle chaining
+		for(int i = 0; i < MAX_ENEMY; i++)
+		{
+			if(G_killedThisFrame[i] != -1)
+			{
+				if(inChainCount == 3) inChainCount = 0;
+				
+				if(inChainCount)
+				{
+					if(chainColor[inChainCount - 1] != G_killedThisFrame[i])
+					{
+						inChainCount = 0;
+						G_chainStatus = 0;
+					}
+				}
+				
+				chainColor[inChainCount] = G_killedThisFrame[i];
+				inChainCount++;
+				
+				if(inChainCount == 3)
+				{
+					G_score += 100 * (1 << min(G_chainStatus, 8));
+					for(int j = 0; j < MAX_ENEMY; j++)
+					{
+						if(deadEnemies.relevant[j])
+						{
+							if(j == i)
+							{
+								#ifdef DEBUG_NKARUGA
+								printf("Activating chain notif\n");
+								#endif
+								chainNotifsArray[currentNotif].activate(deadEnemies.x[j], deadEnemies.y[j], 100 * (1 << min(G_chainStatus, 8)));
+								currentNotif = (currentNotif + 1) % MAX_ENEMY;
+							}
+							deadEnemies.relevant[j] = false;
+						}
+					}
+					G_chainStatus++;
+				}
+			}
+		}
+		G_frameChainOffset = 0;
 		
 		if(K7(kEv)) displayBg = true;
 		if(K8(kEv)) displayBg = false;

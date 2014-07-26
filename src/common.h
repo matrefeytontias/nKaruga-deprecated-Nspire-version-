@@ -255,7 +255,7 @@ enum
 	NB_CALLBACKS
 };
 
-extern unsigned short *c_image_entries[NB_IMAGES], *d_image_entries[NB_IMAGES], **image_entries;
+extern unsigned short *image_entries[NB_IMAGES];
 
 extern void buildGameLUTs();
 extern void freeGameLUTs();

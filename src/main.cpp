@@ -285,9 +285,6 @@ void playGame()
 						{
 							if(j == i)
 							{
-								#ifdef DEBUG_NKARUGA
-								printf("Activating chain notif\n");
-								#endif
 								chainNotifsArray[currentNotif].activate(deadEnemies.x[j], deadEnemies.y[j], 100 * (1 << min(G_chainStatus, 8)));
 								currentNotif = (currentNotif + 1) % MAX_ENEMY;
 							}
@@ -302,8 +299,6 @@ void playGame()
 		
 		if(K7(kEv)) displayBg = true;
 		if(K8(kEv)) displayBg = false;
-		if(K4(kEv)) image_entries = c_image_entries;
-		if(K5(kEv)) image_entries = d_image_entries;
 		
 		#ifdef DEBUG_NKARUGA
 		sleep(6);

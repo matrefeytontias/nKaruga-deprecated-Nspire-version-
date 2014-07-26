@@ -164,6 +164,21 @@ public:
 	bool relevant[MAX_ENEMY];
 };
 
+// Explosion animations
+class ExplosionAnim
+{
+public:
+	ExplosionAnim();
+	~ExplosionAnim();
+	void activate(int, int, bool);
+	void handle();
+private:
+	int x;
+	int y;
+	int counter;
+	bool polarity;
+};
+
 // Text notifications of score-chaining
 class ChainNotif
 {
@@ -238,6 +253,18 @@ enum image_LUT
 	image_LUT_enemy_ship_4_shadow,
 	image_LUT_chain_hit_light,
 	image_LUT_chain_hit_shadow,
+	image_LUT_explosion_light_0,
+	image_LUT_explosion_light_1,
+	image_LUT_explosion_light_2,
+	image_LUT_explosion_light_3,
+	image_LUT_explosion_light_4,
+	image_LUT_explosion_light_5,
+	image_LUT_explosion_shadow_0,
+	image_LUT_explosion_shadow_1,
+	image_LUT_explosion_shadow_2,
+	image_LUT_explosion_shadow_3,
+	image_LUT_explosion_shadow_4,
+	image_LUT_explosion_shadow_5,
 	image_LUT_background,
 	image_LUT_titleScreen,
 	NB_IMAGES

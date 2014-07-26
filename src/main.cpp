@@ -2,6 +2,9 @@
 #include "levels.h"
 #include "../gfx/kanji.h"
 
+#define ENEMY_W(i) enemiesArray[i]->img[0]
+#define ENEMY_H(i) enemiesArray[i]->img[1]
+
 int G_skipFrame = 0, G_waveTimer = 0, G_score, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus;
 
 void playGame();
@@ -57,7 +60,8 @@ void playGame()
 	Enemy *enemiesArray[MAX_ENEMY];
 	ChainNotif chainNotifsArray[MAX_ENEMY];
 	DestroyedEnemies deadEnemies;
-	int currentNotif;
+	ExplosionAnim explosionsAnims[MAX_ENEMY];
+	int currentNotif, currentExplosion;
 	
 	for(int i = 0; i < MAX_ENEMY; i++)
 	{
@@ -81,6 +85,7 @@ void playGame()
 	G_frameChainOffset = 0;
 	inChainCount = 0;
 	currentNotif = 0;
+	currentExplosion = 0;
 	
 	while(!KQUIT(kEv) && !levelEnded)
 	{
@@ -213,6 +218,11 @@ void playGame()
 			{
 				G_killedThisFrame[i] = enemiesArray[i]->getPolarity();
 				deadEnemies.activate(enemiesArray[i], i);
+				explosionsAnims[currentExplosion].activate(fixtoi(enemiesArray[i]->x),
+														   fixtoi(enemiesArray[i]->y),
+														   enemiesArray[i]->getPolarity());
+				printf("Activated explosion anim %d\n", currentExplosion);
+				currentExplosion = (currentExplosion + 1) % MAX_ENEMY;
 			}
 			enemiesArray[i]->handle(&ship, bArray);
 		}
@@ -227,6 +237,10 @@ void playGame()
 			// Draw score and chains
 			statsRect.x = statsRect.y = 0;
 			drawStringF(&statsRect.x, &statsRect.y, 0, 0xffff, "Score : %d\n\n\n\nCH %d", G_score, G_chainStatus);
+			
+			// Draw explosions
+			for(int i = 0; i < MAX_ENEMY; i++)
+				explosionsAnims[i].handle();
 			
 			// Draw chain count
 			for(int i = 0, j = 0; i < inChainCount; i++, j += 18)

@@ -26,6 +26,7 @@ void buildGameLUTs()
 	image_entries[image_LUT_enemy_ship_2_light] = image_enemy_ship_2_light;
 	image_entries[image_LUT_enemy_ship_2_shadow] = image_enemy_ship_2_shadow;
 	image_entries[image_LUT_enemy_ship_3_light] = image_enemy_ship_3_light;
+	image_entries[image_LUT_enemy_ship_3_shadow] = image_enemy_ship_3_shadow;
 	image_entries[image_LUT_chain_hit_light] = image_chain_hit_light;
 	image_entries[image_LUT_chain_hit_shadow] = image_chain_hit_shadow;
 	image_entries[image_LUT_explosion_light_0] = image_explosion_light_0;

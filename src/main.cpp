@@ -15,7 +15,8 @@ void playGame();
 int main(int argc, char **argv) {
 	bool donePlaying = false;
 	G_usingTouchpad = false;
-	G_tpinfo = touchpad_getinfo();
+	if(is_touchpad)
+		G_tpinfo = touchpad_getinfo();
 	
 	enable_relative_paths(argv);
 	
@@ -58,7 +59,7 @@ void playGame()
 	static unsigned short *levelKanjis[1] = { image_kanji_1 };
 	
 	// Skip header
-	bg = image_entries[image_LUT_background] + 6;
+	bg = image_entries[image_LUT_background] + 3;
 	
 	BulletArray* bArray = new BulletArray;
 	Player ship;
@@ -218,7 +219,7 @@ void playGame()
 			sleep(5);
 		}
 		
-		ship.handle(kEv, bArray);		
+		ship.handle(kEv, bArray);
 		
 		for(int i = 0; i < MAX_ENEMY; i++)
 		{
@@ -267,9 +268,9 @@ void playGame()
 				pxScrollEnd = 160*240 - pxScrollStart;
 				// cheat using cast to copy faster since the ARM9 registers are 32-bits
 				for(int i = pxScrollStart, j = 0; i < 160 * 240; i++, j++)
-					((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int *)bg)[j];
+					((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int*)bg)[j];
 				for(int i = 0, j = pxScrollEnd; j < 160 * 240; i++, j++)
-					((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int *)bg)[j];
+					((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int*)bg)[j];
 			}
 			else
 				clearBufferW();

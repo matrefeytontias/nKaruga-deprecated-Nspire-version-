@@ -192,7 +192,7 @@ void playGame()
 				{
 					levelRect.x = 10;
 					levelRect.y = 60;
-					drawString(&levelRect.x, &levelRect.y, levelRect.x, levelStrs[chapterNum], 0xffff);
+					drawString(&levelRect.x, &levelRect.y, levelRect.x, levelStrs[chapterNum], 0xffff, 0);
 					drawSprite(levelKanjis[chapterNum], 10, 80);
 				}
 			if(gpTimer > 768)
@@ -230,7 +230,6 @@ void playGame()
 				explosionsAnims[currentExplosion].activate(fixtoi(enemiesArray[i]->x),
 														   fixtoi(enemiesArray[i]->y),
 														   enemiesArray[i]->getPolarity());
-				printf("Activated explosion anim %d\n", currentExplosion);
 				currentExplosion = (currentExplosion + 1) % MAX_ENEMY;
 			}
 			enemiesArray[i]->handle(&ship, bArray);
@@ -245,7 +244,7 @@ void playGame()
 		{
 			// Draw score and chains
 			statsRect.x = statsRect.y = 0;
-			drawStringF(&statsRect.x, &statsRect.y, 0, 0xffff, "Score : %d\n\n\n\nCH %d", G_score, G_chainStatus);
+			drawStringF(&statsRect.x, &statsRect.y, 0, 0xffff, 0, "Score : %d\n\n\n\nCH %d", G_score, G_chainStatus);
 			
 			// Draw explosions
 			for(int i = 0; i < MAX_ENEMY; i++)

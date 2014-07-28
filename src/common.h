@@ -111,6 +111,8 @@ private:
 	bool fireRepeat;
 	bool polarityRepeat;
 	int lives;
+	touchpad_info_t *tpinfo;
+	touchpad_report_t tpstatus;
 } ;
 
 // Enemy
@@ -291,5 +293,8 @@ extern Enemy **enemiesArray;
 
 // Global vars
 extern int G_skipFrame, G_waveTimer, G_score, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus;
+extern bool G_usingTouchpad;
+extern touchpad_info_t *G_tpinfo;
+extern touchpad_report_t G_tpstatus;
 
 #endif

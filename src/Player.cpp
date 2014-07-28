@@ -2,6 +2,7 @@
 
 Player::Player()
 {
+	tpinfo = touchpad_getinfo();
 	polarity = true;
 	fireRepeat = false;
 	polarityRepeat = false;
@@ -45,18 +46,28 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 	}
 	
 	// And then only, player input
-	
-	if(KDOWN(kEv)) y += itofix(1);
-	if(KLEFT(kEv)) x -= itofix(1);
-	if(KRIGHT(kEv)) x += itofix(1);
-	if(KUP(kEv)) y -= itofix(1);
-	
+	if(G_usingTouchpad)
+	{
+		if(G_tpstatus.contact)
+		{
+			x += clamp((G_tpstatus.x - G_tpinfo->width / 2) * 768 / G_tpinfo->width, -512, 512);
+			y += clamp((G_tpinfo->height / 2 - G_tpstatus.y) * 768 / G_tpinfo->height, -512, 512);
+		}
+	}
+	else
+	{
+		if(KDOWN(kEv)) y += itofix(1);
+		if(KLEFT(kEv)) x -= itofix(1);
+		if(KRIGHT(kEv)) x += itofix(1);
+		if(KUP(kEv)) y -= itofix(1);
+	}
+		
 	r.x = fixtoi(x) - (img[(isSwitchingPolarity / 8) * 2][0] / 2);
 	r.y = fixtoi(y) - (img[(isSwitchingPolarity / 8) * 2][1] / 2);
-	
+		
 	temp.x = img[(isSwitchingPolarity / 8) * 2][0] / 2;
 	temp.y = img[(isSwitchingPolarity / 8) * 2][1] / 2;
-	
+		
 	x = r.x < 0 ? itofix(temp.x) : (r.x > 320 - (temp.x * 2) ? itofix(320 - temp.x) : x);
 	y = r.y < 0 ? itofix(temp.y) : (r.y > 240 - (temp.y * 2) ? itofix(240 - temp.y) : y);
 	

@@ -6,11 +6,16 @@
 #define ENEMY_H(i) enemiesArray[i]->img[1]
 
 int G_skipFrame = 0, G_waveTimer = 0, G_score, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus;
+bool G_usingTouchpad;
+touchpad_info_t *G_tpinfo;
+touchpad_report_t G_tpstatus;
 
 void playGame();
 
 int main(int argc, char **argv) {
 	bool donePlaying = false;
+	G_usingTouchpad = false;
+	G_tpinfo = touchpad_getinfo();
 	
 	enable_relative_paths(argv);
 	
@@ -195,7 +200,11 @@ void playGame()
 		}
 		
 		if(!(readKeys % 4))
+		{
+			if(G_usingTouchpad)
+				touchpad_scan(&G_tpstatus);
 			kEv = getk();
+		}
 		readKeys++;
 		
 		if(inTransitionFromIntro)
@@ -311,6 +320,8 @@ void playGame()
 		}
 		G_frameChainOffset = 0;
 		
+		if(K4(kEv)) G_usingTouchpad = is_touchpad ? true : false;
+		if(K5(kEv)) G_usingTouchpad = false;
 		if(K7(kEv)) displayBg = true;
 		if(K8(kEv)) displayBg = false;
 		

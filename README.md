@@ -32,6 +32,8 @@ Commands for this beta :
 * CLEAR  : quit
 
 Temporary debug commands:
+* 4 : enable touchpad (obviously, it only works with touchpad Nspires)
+* 5 : disable touchpad
 * 7 : enable background
 * 8 : disable background
 

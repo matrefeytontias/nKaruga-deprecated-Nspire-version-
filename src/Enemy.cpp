@@ -118,8 +118,8 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 				}
 				break;
 			case Pattern_1_9:
-				x += waveIndex % 2 ? itofix(1) : itofix(-1);
-				y += itofix(1);
+				x += waveIndex % 2 ? 192 : -192;
+				y += 128;
 				
 				if(!(G_waveTimer % 8))
 					bArray->add(x, y, 0, itofix(2), image_LUT_enemy_bullet_1_light, polarity, true);
@@ -140,6 +140,37 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 				break;
 			case Pattern_1_11:
 				y += itofix(1);
+				break;
+			case Pattern_1_12:
+				if(!(G_waveTimer % 4))
+				{
+					if(internal[0] < 45)
+						y += itofix(2);
+					else if(internal[0] == 45)
+					{
+						internal[1] = waveIndex % 2 ? 0 : 128;
+						internal[2] = x + (waveIndex % 2 ? itofix(-20) : itofix(20));
+						internal[3] = y;
+					}
+					else
+					{
+						x = fixcos(internal[1]) * 20 + internal[2];
+						y = fixsin(internal[1]) * 20 + internal[3];
+						internal[4] = (internal[0] - 45) % 64;
+						if(internal[4] >= 32)
+						{
+							if(!(internal[1] % 256))
+							{
+								angle = angleToPlayer(this, p);
+								bArray->add(x, y, fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_0_light, polarity, true);
+							}
+							internal[1] += 4;
+						}
+					}
+					
+					internal[0]++;
+					rotationAngle = internal[0];
+				}
 				break;
 		}
 		
@@ -190,7 +221,7 @@ void Enemy::activate(int _x, int _y, int _HP, int shipImgID, int callbackID, int
 	rotationAngle = 0;
 	callback = callbackID;
 	waveIndex = _waveIndex;
-	for(int i = 0; i < 3; i++)
+	for(int i = 0; i < 6; i++)
 		internal[i] = 0;
 	active = true;
 }

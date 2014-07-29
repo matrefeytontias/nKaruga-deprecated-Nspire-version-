@@ -151,7 +151,7 @@ private:
 	int callback;
 	// The position of the enemy in the wave
 	int waveIndex;
-	int internal[3];
+	int internal[6];
 };
 
 // Used to hold information on killed enemies in order to get the position for ChainNotifs
@@ -243,6 +243,8 @@ enum image_LUT
 	image_LUT_enemy_bullet_0_shadow,
 	image_LUT_enemy_bullet_1_light,
 	image_LUT_enemy_bullet_1_shadow,
+	image_LUT_enemy_bullet_2_light,
+	image_LUT_enemy_bullet_2_shadow,
 	image_LUT_enemy_ship_0_light,
 	image_LUT_enemy_ship_0_shadow,
 	image_LUT_enemy_ship_1_light,
@@ -253,6 +255,8 @@ enum image_LUT
 	image_LUT_enemy_ship_3_shadow,
 	image_LUT_enemy_ship_4_light,
 	image_LUT_enemy_ship_4_shadow,
+	image_LUT_enemy_ship_4_lightball,
+	image_LUT_enemy_ship_4_shadowball,
 	image_LUT_chain_hit_light,
 	image_LUT_chain_hit_shadow,
 	image_LUT_explosion_light_0,
@@ -285,6 +289,7 @@ enum
 	Pattern_1_9,
 	Pattern_1_10,
 	Pattern_1_11,
+	Pattern_1_12,
 	NB_CALLBACKS
 };
 

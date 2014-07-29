@@ -281,6 +281,10 @@ enum
 	Pattern_1_5,
 	Pattern_1_6,
 	Pattern_1_7,
+	Pattern_1_8,
+	Pattern_1_9,
+	Pattern_1_10,
+	Pattern_1_11,
 	NB_CALLBACKS
 };
 

@@ -90,41 +90,65 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 				{
 					y += abs(fixcos(internal[0])) * 3;
 					internal[0]++;
-					if(y < itofix(128))
+					if(internal[0] < 100)
 						x += x > itofix(160) ? -128 : 128;
 					else
 						x += x > itofix(160) ? itofix(1) : itofix(-1);
 				}
 				break;
-			// Test boss
-				/*
-			case Pattern_1_7:
-				angle = angleToPlayer(this, p);
-				x = itofix(160) + (fixcos(internal[0]) << 5);
-				if(!(internal[0] % 4))
+			case Pattern_1_8:
+				if(!(G_waveTimer % 4))
 				{
-					Fixed cura;
-					for(int i = 0; i < 4; i++)
+					angle = angleToPlayer(this, p);
+					if(internal[0] < 35)
+						y += itofix(2);
+					else
+						rotationAngle = ~angle + 64;
+					if(internal[0] > 65 && internal[0] < 100) 
 					{
-						cura = ~((i << 6) + internal[0]);
-						bArray->add(x - itofix(img[0] / 2), y, fixcos(cura) << 1, fixsin(cura), image_LUT_enemy_bullet_0_light, polarity, true);
-						cura = ~cura;
-						bArray->add(x + itofix(img[0] / 2), y, fixcos(cura) << 1, fixsin(cura), image_LUT_enemy_bullet_0_light, polarity, true);
-						cura = angle + (rand() % 32) - 16;
-						bArray->add(x, y, fixcos(cura) << 1, fixsin(cura) << 1, image_LUT_enemy_bullet_0_light, polarity, true);
+						if(!(G_waveTimer % 16))
+							bArray->add(x, y, fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_1_light, polarity, true);
 					}
+					else if(internal[0] > 164)
+					{
+						x += x < itofix(160) ? itofix(-1) : itofix(1);
+						y -= itofix(1);
+					}
+					internal[0]++;
 				}
-				internal[0]++;
-				rotationAngle = ~angle + 64;
 				break;
-				*/
+			case Pattern_1_9:
+				x += waveIndex % 2 ? itofix(1) : itofix(-1);
+				y += itofix(1);
+				
+				if(!(G_waveTimer % 8))
+					bArray->add(x, y, 0, itofix(2), image_LUT_enemy_bullet_1_light, polarity, true);
+				break;
+			case Pattern_1_10:
+				if(!(G_waveTimer % 4))
+				{
+					int temp = fixsin(internal[0]) * 80;
+					x = (waveIndex % 2 ? -temp : temp) + itofix(160);
+					if(abs(temp) > itofix(70))
+					{
+						if(!(G_waveTimer % 8))
+							bArray->add(x, y, 0, itofix(2), image_LUT_enemy_bullet_1_light, polarity, true);
+					}
+					y += 192;
+					internal[0]++;
+				}
+				break;
+			case Pattern_1_11:
+				y += itofix(1);
+				break;
 		}
 		
 		er.x = fixtoi(x);
 		er.y = fixtoi(y);
 		
-		if(er.x + img[0] / 2 < 0 || er.x - img[0] / 2 > 319 ||
-			er.y + img[1] / 2 < 0 || er.y - img[1] / 2 > 239)
+		// Have a relatively big threshold for off-screen animations
+		if(er.x + img[0] / 2 < -80 || er.x - img[0] / 2 > 399 ||
+			er.y + img[1] / 2 < -80 || er.y - img[1] / 2 > 319)
 			deactivate();		
 		else
 		{

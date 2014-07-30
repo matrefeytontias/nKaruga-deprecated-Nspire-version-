@@ -118,7 +118,7 @@ void Player::switchPolarity()
 
 void Player::hurt()
 {
-	lives--;
+	//~ lives--;
 }
 
 int Player::getLives()

@@ -152,7 +152,7 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 						internal[2] = x + (waveIndex % 2 ? itofix(-20) : itofix(20));
 						internal[3] = y;
 					}
-					else
+					else if(internal[0] - 45 < 416)
 					{
 						x = fixcos(internal[1]) * 20 + internal[2];
 						y = fixsin(internal[1]) * 20 + internal[3];
@@ -167,6 +167,8 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 							internal[1] += 4;
 						}
 					}
+					else
+						x += x < itofix(160) ? itofix(-2) : itofix(2);
 					
 					internal[0]++;
 					rotationAngle = internal[0];

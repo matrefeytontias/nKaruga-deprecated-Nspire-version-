@@ -42,7 +42,7 @@ void BulletArray::handle(Player *p, Enemy **enemiesArray)
 					if(sq(fixtoi(cb->x - p->x)) + sq(fixtoi(cb->y - p->y)) < sq(p->img[0][0] / 2))
 					{
 						deactivate(i);
-						G_score += 10;
+						G_score += 100;
 						carryOn = false;
 					}
 				}

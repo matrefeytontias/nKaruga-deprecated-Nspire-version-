@@ -2,13 +2,14 @@
 
 inline Fixed angleToPlayer(Enemy *e, Player *p)
 {
-	return (int)(atan2((double)(p->y - e->y), (double)(p->x - e->x)) * 128. / M_PI);
+	return (int)(atan2((double)(p->y - e->gety()), (double)(p->x - e->getx())) * 128. / M_PI);
 }
 
 Enemy::Enemy()
 {
 	active = false;
 	diedThisFrame = false;
+	isJointed = false;
 }
 
 Enemy::~Enemy()
@@ -174,10 +175,135 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 					rotationAngle = internal[0];
 				}
 				break;
+			case Pattern_1_13:
+				rotationAngle = 16 + fixcos(G_waveTimer) / 32;
+				if(!internal[1])
+				{
+					internal[1] = 1;
+					internal[0] = -1;
+				}
+				if(y < itofix(30))
+				{
+					y += 128;
+				}
+				else
+				{
+					if(internal[0] > 2 && internal[0] < 12)
+					{
+						if(!(G_waveTimer % 4))
+						{
+							for(int i = 0; i < 4; i++)
+							{
+								int k = i * 8 - 20 + 48;
+								bArray->add(fixcos(k + (internal[0] - 3) * 8) * img[0] / 2 + x, fixsin(k + (internal[0] - 3) * 8) * img[1] / 2 + y,
+											fixmul(fixcos(k), (internal[0] - 2) * 8 + 192),
+											fixmul(fixsin(k), (internal[0] - 2) * 8 + 192), image_LUT_enemy_bullet_0_light, polarity, true);
+							}
+							internal[0]++;
+						}
+					}
+					else if(internal[0] == 12)
+					{
+						internal[0] = 0;
+					}
+					else
+					{
+						if(!(G_waveTimer % 128))
+						{
+							if(internal[0] < 2)
+							{
+								for(int i = 0; i < 5; i++)
+								{
+									int k = (i - 2) * 16 + 48;
+									for(int j = 0; j < 3; j++)
+									{
+										
+										bArray->add(fixcos(k) * img[0] / 2 + x - fixsin(k) * (j - 1) * 6, fixsin(k) * img[1] / 2 + y + fixcos(k) * (j - 1) * 6,
+													fixcos(k), fixsin(k), image_LUT_enemy_bullet_2_light, polarity, true);
+									}
+								}
+								internal[0]++;
+							}
+							else if(internal[0] == 2)
+								internal[0]++;
+						}
+					}
+				}
+				break;
+			case Pattern_1_14:
+				rotationAngle = -16 + fixcos(G_waveTimer) / 32;
+				if(y < itofix(30))
+				{
+					y += 128;
+				}
+				else
+				{
+					if(internal[0] > 2 && internal[0] < 12)
+					{
+						if(!(G_waveTimer % 4))
+						{
+							for(int i = 0; i < 4; i++)
+							{
+								int k = i * 8 - 20 + 80;
+								bArray->add(fixcos(k - (internal[0] - 3) * 8) * img[0] / 2 + x, fixsin(k - (internal[0] - 3) * 8) * img[1] / 2 + y,
+											fixmul(fixcos(k), (internal[0] - 2) * 8 + 192),
+											fixmul(fixsin(k), (internal[0] - 2) * 8 + 192), image_LUT_enemy_bullet_0_light, polarity, true);
+							}
+							internal[0]++;
+						}
+					}
+					else if(internal[0] == 12)
+					{
+						internal[0] = 0;
+					}
+					else
+					{
+						if(!(G_waveTimer % 128))
+						{
+							if(internal[0] < 2)
+							{
+								for(int i = 0; i < 5; i++)
+								{
+									int k = (i - 2) * 16 + 80;
+									for(int j = 0; j < 3; j++)
+									{
+										
+										bArray->add(fixcos(k) * img[0] / 2 + x - fixsin(k) * (j - 1) * 6, fixsin(k) * img[1] / 2 + y + fixcos(k) * (j - 1) * 6,
+													fixcos(k), fixsin(k), image_LUT_enemy_bullet_2_light, polarity, true);
+									}
+								}
+								internal[0]++;
+							}
+							else if(internal[0] == 2)
+								internal[0]++;
+						}
+					}
+				}
+				break;
+			case Pattern_1_15:
+				x = fixcos(internal[0] + (waveIndex % 2 ? 128 : 0)) * 30;
+				y = fixsin(internal[0] + (waveIndex % 2 ? 128 : 0)) * 30;
+				if(!(G_waveTimer % 4))
+				{
+					if(!(internal[0] % 128))
+					{
+						angle = angleToPlayer(this, p);
+						bArray->add(getx(), gety(), fixcos(angle) / 2, fixsin(angle) / 2, image_LUT_enemy_bullet_0_light, polarity, true);
+					}
+					internal[0]++;
+					rotationAngle = internal[0];
+				}
+				break;
 		}
 		
 		er.x = fixtoi(x);
 		er.y = fixtoi(y);
+		
+		if(isJointed)
+		{
+			er.x += fixtoi(G_enemiesArray[jointedTo]->x + jointX);
+			er.y += fixtoi(G_enemiesArray[jointedTo]->y + jointY);
+		}
 		
 		// Have a relatively big threshold for off-screen animations
 		if(er.x + img[0] / 2 < -80 || er.x - img[0] / 2 > 399 ||
@@ -253,6 +379,14 @@ void Enemy::damage(Player *_p, bool _pol, BulletArray *bArray)
 	}
 }
 
+void Enemy::joint(int _n, Fixed _x, Fixed _y)
+{
+	isJointed = true;
+	jointedTo = _n;
+	jointX = _x;
+	jointY = _y;
+}
+
 Fixed Enemy::getRotation()
 {
 	return rotationAngle;
@@ -281,4 +415,14 @@ int Enemy::getInternal(int w)
 void Enemy::setInternal(int w, int v)
 {
 	internal[w] = v;
+}
+
+Fixed Enemy::getx()
+{
+	return isJointed ? x + G_enemiesArray[jointedTo]->getx() + jointX : x;
+}
+
+Fixed Enemy::gety()
+{
+	return isJointed ? y + G_enemiesArray[jointedTo]->gety() + jointY : y;
 }

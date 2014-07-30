@@ -74,7 +74,7 @@ class BulletArray
 public:
 	BulletArray();
 	~BulletArray();
-	void handle(Player*, Enemy**);
+	void handle(Player*);
 	void add(Fixed, Fixed, Fixed, Fixed, int, bool, bool);
 	void deactivate(int);
 	Bullet data[MAX_BULLET];
@@ -129,12 +129,15 @@ public:
 	void activate(int, int, int, int, int, int, bool, bool);
 	void deactivate();
 	void damage(Player*, bool, BulletArray*);
+	void joint(int, Fixed, Fixed);
 	Fixed getRotation();
 	void setRotation(Fixed);
 	bool getPolarity();
 	int getWaveIndex();
 	int getInternal(int);
 	void setInternal(int, int);
+	Fixed getx();
+	Fixed gety();
 	// x, y on-screen
 	Fixed x, y;
 	// Enemy image
@@ -152,6 +155,11 @@ private:
 	// The position of the enemy in the wave
 	int waveIndex;
 	int internal[6];
+	// Used to constraint an enemy to another
+	bool isJointed;
+	int jointedTo;
+	Fixed jointX;
+	Fixed jointY;
 };
 
 // Used to hold information on killed enemies in order to get the position for ChainNotifs
@@ -212,12 +220,14 @@ private:
 #define LVLSTR_WAIT 1
 #define LVLSTR_KILLED 2
 #define LVLSTR_CHAPTER 3
-#define LVLSTR_BKPT 4
+#define LVLSTR_JOINT 4
+#define LVLSTR_BKPT 5
 
 #define cmd_newWave LVLSTR_CMD, LVLSTR_NEWWAVE
 #define cmd_wait(x) LVLSTR_CMD, LVLSTR_WAIT, x
 #define cmd_killed LVLSTR_CMD, LVLSTR_KILLED
 #define cmd_startChapter(n) LVLSTR_CMD, LVLSTR_CHAPTER, n
+#define cmd_joint(which, to, x, y) LVLSTR_CMD, LVLSTR_JOINT, which, to, x, y
 #define cmd_bkpt LVLSTR_CMD, LVLSTR_BKPT
 
 /* 
@@ -290,6 +300,9 @@ enum
 	Pattern_1_10,
 	Pattern_1_11,
 	Pattern_1_12,
+	Pattern_1_13,
+	Pattern_1_14,
+	Pattern_1_15,
 	NB_CALLBACKS
 };
 
@@ -305,5 +318,6 @@ extern int G_skipFrame, G_waveTimer, G_score, G_killedThisFrame[MAX_ENEMY], G_fr
 extern bool G_usingTouchpad;
 extern touchpad_info_t *G_tpinfo;
 extern touchpad_report_t G_tpstatus;
+extern Enemy *G_enemiesArray[MAX_ENEMY];
 
 #endif

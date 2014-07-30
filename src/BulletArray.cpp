@@ -12,7 +12,7 @@ BulletArray::~BulletArray()
 {
 }
 
-void BulletArray::handle(Player *p, Enemy **enemiesArray)
+void BulletArray::handle(Player *p)
 {
 	static Rect br;
 	bool carryOn = true;
@@ -52,14 +52,14 @@ void BulletArray::handle(Player *p, Enemy **enemiesArray)
 				// Check collisions with enemies (there are much more enemies than players)
 				for(int j = 0; j < MAX_ENEMY; j++)
 				{
-					if(enemiesArray[j]->isActive())
+					if(G_enemiesArray[j]->isActive())
 					{
-						if(cb->x - itofix(cb->img[0] / 2) <= enemiesArray[j]->x + itofix(enemiesArray[j]->img[0] / 2) &&
-						cb->x + itofix(cb->img[0] / 2) >= enemiesArray[j]->x - itofix(enemiesArray[j]->img[0] / 2) &&
-						cb->y - itofix(cb->img[1] / 2) <= enemiesArray[j]->y + itofix(enemiesArray[j]->img[1] / 2) &&
-						cb->y + itofix(cb->img[1] / 2) >= enemiesArray[j]->y - itofix(enemiesArray[j]->img[1] / 2))
+						if(cb->x - itofix(cb->img[0] / 2) <= G_enemiesArray[j]->getx() + itofix(G_enemiesArray[j]->img[0] / 2) &&
+						cb->x + itofix(cb->img[0] / 2) >= G_enemiesArray[j]->getx() - itofix(G_enemiesArray[j]->img[0] / 2) &&
+						cb->y - itofix(cb->img[1] / 2) <= G_enemiesArray[j]->gety() + itofix(G_enemiesArray[j]->img[1] / 2) &&
+						cb->y + itofix(cb->img[1] / 2) >= G_enemiesArray[j]->gety() - itofix(G_enemiesArray[j]->img[1] / 2))
 						{
-							enemiesArray[j]->damage(p, cb->getPolarity(), this);
+							G_enemiesArray[j]->damage(p, cb->getPolarity(), this);
 							G_score += 100;
 							deactivate(i);
 							carryOn = false;
@@ -93,7 +93,7 @@ void BulletArray::add(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, int imgID, bool 
 	if(bulletCount < MAX_BULLET)
 	{
 		unsigned short *img = image_entries[imgID];
-		data[bulletCount].activate(_x - itofix(img[0] / 2), _y - itofix(img[1]), _dx, _dy, imgID, _p, _h);
+		data[bulletCount].activate(_x - itofix(img[0] / 2), _y - itofix(img[1] / 2), _dx, _dy, imgID, _p, _h);
 		bulletCount++;
 	}
 }

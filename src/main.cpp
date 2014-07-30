@@ -3,13 +3,15 @@
 #include "../gfx/kanji.h"
 #include "strings.h"
 
-#define ENEMY_W(i) enemiesArray[i]->img[0]
-#define ENEMY_H(i) enemiesArray[i]->img[1]
+#define ENEMY_W(i) G_enemiesArray[i]->img[0]
+#define ENEMY_H(i) G_enemiesArray[i]->img[1]
 
 int G_skipFrame = 0, G_waveTimer = 0, G_score, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus;
 bool G_usingTouchpad;
 touchpad_info_t *G_tpinfo;
 touchpad_report_t G_tpstatus;
+
+Enemy *G_enemiesArray[MAX_ENEMY];
 
 void playGame();
 
@@ -20,6 +22,12 @@ int main(int argc, char **argv)
 	G_usingTouchpad = false;
 	if(is_touchpad)
 		G_tpinfo = touchpad_getinfo();
+	
+	for(int i = 0; i < MAX_ENEMY; i++)
+	{
+		G_enemiesArray[i] = new Enemy;
+		G_enemiesArray[i]->deactivate();
+	}
 	
 	enable_relative_paths(argv);
 	
@@ -44,6 +52,9 @@ int main(int argc, char **argv)
 		else if(isKeyPressed(KEY_NSPIRE_DEL))
 			donePlaying = true;
 	}
+	
+	for(int i = 0; i < MAX_ENEMY; i++)
+		delete G_enemiesArray[i];
 	
 	deinitBuffering();
 	
@@ -71,17 +82,11 @@ void playGame()
 	
 	BulletArray* bArray = new BulletArray;
 	Player ship;
-	Enemy *enemiesArray[MAX_ENEMY];
+	
 	ChainNotif chainNotifsArray[MAX_ENEMY];
 	DestroyedEnemies deadEnemies;
 	ExplosionAnim explosionsAnims[MAX_ENEMY];
 	int currentNotif, currentExplosion;
-	
-	for(int i = 0; i < MAX_ENEMY; i++)
-	{
-		enemiesArray[i] = new Enemy;
-		enemiesArray[i]->deactivate();
-	}
 	
 	ship.x = itofix(160);
 	ship.y = itofix(220);
@@ -91,12 +96,16 @@ void playGame()
 	enemyCounter = 0;
 	waveIndex = 0;
 	
+	for(int i = 0; i < MAX_ENEMY; i++)
+		G_enemiesArray[i]->deactivate();
+	
 	G_score = 0;
 	G_killedThisFrame[G_frameChainOffset] = -1;
 	for(int i = 0; i < 3; i++)
 		chainColor[i] = 0;
 	G_chainStatus = 0;
 	G_frameChainOffset = 0;
+	G_waveTimer = 0;
 	inChainCount = 0;
 	currentNotif = 0;
 	currentExplosion = 0;
@@ -117,21 +126,25 @@ void playGame()
 					currentLevelByte = levelStream[levelCounter];
 					if(currentLevelByte == LVLSTR_NEWWAVE)
 					{
+						// Start a new wave
 						G_waveTimer = 0;
 						waveIndex = 0;
 						levelCounter++;
+						enemyCounter = 0;
 					}
 					else if(currentLevelByte == LVLSTR_WAIT)
 					{
+						// Wait some frames
 						levelTimer = levelStream[levelCounter + 1];
 						levelCounter += 2;
 					}
 					else if(currentLevelByte == LVLSTR_KILLED)
 					{
+						// Wait for every enemy to be killed before progressing
 						int levelCanProgress = 1;
 						for(int i = 0; i < MAX_ENEMY; i++)
 						{
-							if(enemiesArray[i]->isActive())
+							if(G_enemiesArray[i]->isActive())
 							{
 								levelCanProgress = 0;
 								break;
@@ -142,6 +155,8 @@ void playGame()
 					}
 					else if(currentLevelByte == LVLSTR_CHAPTER)
 					{
+						// Start a new chapter
+						// Set up transition
 						inTransitionFromIntro = true;
 						currentW = 0;
 						gpTimer = 0;
@@ -149,8 +164,17 @@ void playGame()
 						chapterNum = levelStream[levelCounter];
 						levelCounter++;
 					}
+					else if(currentLevelByte == LVLSTR_JOINT)
+					{
+						// Constraint an enemy to another
+						G_enemiesArray[levelStream[levelCounter + 1]]->joint(levelStream[levelCounter + 2],
+										levelStream[levelCounter + 3],
+										levelStream[levelCounter + 4]);
+						levelCounter += 5;
+					}
 					else if(currentLevelByte == LVLSTR_BKPT)
 					{
+						// Debug stuff
 						printf("Current enemy : %d\n \
 						Current wave timer : %d\n \
 						Global timer : %d\n \
@@ -161,17 +185,20 @@ void playGame()
 					}
 					else
 					{
+						// You messed up your level stream bro
 						printf("Error : %d : unknown command !\n", currentLevelByte);
 						bkpt();
 					}
 				}
 				else if(currentLevelByte == LVLSTR_END)
 				{
+					// End of the level
 					levelEnded = true;
 				}
 				else
 				{
-					enemiesArray[enemyCounter]->activate(itofix(levelStream[levelCounter]), itofix(levelStream[levelCounter + 1]), levelStream[levelCounter + 2], levelStream[levelCounter + 3],
+					// Dunno what it is ? Then it's an enemy by default
+					G_enemiesArray[enemyCounter]->activate(itofix(levelStream[levelCounter]), itofix(levelStream[levelCounter + 1]), levelStream[levelCounter + 2], levelStream[levelCounter + 3],
 														levelStream[levelCounter + 4], waveIndex, levelStream[levelCounter + 5], levelStream[levelCounter + 6]);
 					levelCounter += 7;
 					enemyCounter = (enemyCounter + 1) % MAX_ENEMY;
@@ -232,19 +259,19 @@ void playGame()
 		for(int i = 0; i < MAX_ENEMY; i++)
 		{
 			G_killedThisFrame[i] = -1;
-			if(enemiesArray[i]->diedThisFrame)
+			if(G_enemiesArray[i]->diedThisFrame)
 			{
-				G_killedThisFrame[i] = enemiesArray[i]->getPolarity();
-				deadEnemies.activate(enemiesArray[i], i);
-				explosionsAnims[currentExplosion].activate(fixtoi(enemiesArray[i]->x),
-														   fixtoi(enemiesArray[i]->y),
-														   enemiesArray[i]->getPolarity());
+				G_killedThisFrame[i] = G_enemiesArray[i]->getPolarity();
+				deadEnemies.activate(G_enemiesArray[i], i);
+				explosionsAnims[currentExplosion].activate(fixtoi(G_enemiesArray[i]->getx()),
+														   fixtoi(G_enemiesArray[i]->gety()),
+														   G_enemiesArray[i]->getPolarity());
 				currentExplosion = (currentExplosion + 1) % MAX_ENEMY;
 			}
-			enemiesArray[i]->handle(&ship, bArray);
+			G_enemiesArray[i]->handle(&ship, bArray);
 		}
 		
-		bArray->handle(&ship, enemiesArray);
+		bArray->handle(&ship);
 		
 		if(!ship.getLives())
 			levelEnded = 1;
@@ -337,9 +364,6 @@ void playGame()
 		sleep(6);
 		#endif
 	}
-	
-	for(int i = 0; i < MAX_ENEMY; i++)
-		delete enemiesArray[i];
 	
 	delete bArray;
 }

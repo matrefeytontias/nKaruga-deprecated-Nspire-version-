@@ -2,7 +2,7 @@
 
 //#define SKIP_INTRO
 
-static int levelStream[] = {
+const static int levelStream[] = {
 #ifndef SKIP_INTRO
 	cmd_wait(256),
 	//
@@ -224,7 +224,6 @@ static int levelStream[] = {
 	enemy(140, -80, 1, image_LUT_enemy_ship_0_light, Pattern_1_12, LIGHT, 1),
 	enemy(180, -80, 1, image_LUT_enemy_ship_0_shadow, Pattern_1_12, SHADOW, 1),
 	enemy(220, -80, 1, image_LUT_enemy_ship_0_light, Pattern_1_12, LIGHT, 1),
-	
 	enemy(20, -40, 1, image_LUT_enemy_ship_0_shadow, Pattern_1_12, SHADOW, 1),
 	enemy(60, -40, 1, image_LUT_enemy_ship_0_light, Pattern_1_12, LIGHT, 1),
 	enemy(100, -50, 1, image_LUT_enemy_ship_0_shadow, Pattern_1_12, SHADOW, 1),
@@ -233,7 +232,6 @@ static int levelStream[] = {
 	enemy(220, -50, 1, image_LUT_enemy_ship_0_light, Pattern_1_12, LIGHT, 1),
 	enemy(260, -40, 1, image_LUT_enemy_ship_0_shadow, Pattern_1_12, SHADOW, 1),
 	enemy(300, -40, 1, image_LUT_enemy_ship_0_light, Pattern_1_12, LIGHT, 1),
-	
 	enemy(20, -10, 0, image_LUT_enemy_ship_0_shadow, Pattern_1_12, SHADOW, 1),
 	enemy(60, -10, 0, image_LUT_enemy_ship_0_light, Pattern_1_12, LIGHT, 1),
 	enemy(100, -20, 1, image_LUT_enemy_ship_0_shadow, Pattern_1_12, SHADOW, 1),
@@ -242,13 +240,24 @@ static int levelStream[] = {
 	enemy(220, -20, 1, image_LUT_enemy_ship_0_light, Pattern_1_12, LIGHT, 1),
 	enemy(260, -10, 1, image_LUT_enemy_ship_0_shadow, Pattern_1_12, SHADOW, 1),
 	enemy(300, -10, 1, image_LUT_enemy_ship_0_light, Pattern_1_12, LIGHT, 1),
-	
 	enemy(100, 10, 1, image_LUT_enemy_ship_0_shadow, Pattern_1_12, SHADOW, 1),
 	enemy(140, 10, 1, image_LUT_enemy_ship_0_light, Pattern_1_12, LIGHT, 1),
 	enemy(180, 10, 1, image_LUT_enemy_ship_0_shadow, Pattern_1_12, SHADOW, 1),
 	enemy(220, 10, 1, image_LUT_enemy_ship_0_light, Pattern_1_12, LIGHT, 1),
-	
 	cmd_killed,
+	cmd_wait(128),
 	cmd_newWave,
+	// Wave 7
+	enemy(106, 0, 64, image_LUT_enemy_ship_3_shadow, Pattern_1_13, SHADOW, 1),
+	enemy(212, 0, 64, image_LUT_enemy_ship_3_light, Pattern_1_14, LIGHT, 1),
+	enemy(0, 0, 1, image_LUT_enemy_ship_0_shadow, Pattern_1_15, SHADOW, 1),
+	enemy(0, 0, 1, image_LUT_enemy_ship_0_shadow, Pattern_1_15, SHADOW, 1),
+	cmd_joint(2, 0, 0, 0),
+	cmd_joint(3, 0, 0, 0),
+	enemy(0, 0, 1, image_LUT_enemy_ship_0_light, Pattern_1_15, LIGHT, 1),
+	enemy(0, 0, 1, image_LUT_enemy_ship_0_light, Pattern_1_15, LIGHT, 1),
+	cmd_joint(4, 1, 0, 0),
+	cmd_joint(5, 1, 0, 0),
+	cmd_killed,
 	LVLSTR_END
 	};

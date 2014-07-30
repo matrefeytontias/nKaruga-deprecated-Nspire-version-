@@ -196,8 +196,8 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 							{
 								int k = i * 8 - 20 + 48;
 								bArray->add(fixcos(k + (internal[0] - 3) * 8) * img[0] / 2 + x, fixsin(k + (internal[0] - 3) * 8) * img[1] / 2 + y,
-											fixmul(fixcos(k), (internal[0] - 2) * 8 + 192),
-											fixmul(fixsin(k), (internal[0] - 2) * 8 + 192), image_LUT_enemy_bullet_0_light, polarity, true);
+											fixmul(fixcos(k), (internal[0] - 2) * 32 + 128),
+											fixmul(fixsin(k), (internal[0] - 2) * 32 + 128), image_LUT_enemy_bullet_0_light, polarity, true);
 							}
 							internal[0]++;
 						}
@@ -210,7 +210,7 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 					{
 						if(!(G_waveTimer % 128))
 						{
-							if(internal[0] < 2)
+							if(internal[0] < 2 && internal[0] >= 0)
 							{
 								for(int i = 0; i < 5; i++)
 								{
@@ -222,10 +222,8 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 													fixcos(k), fixsin(k), image_LUT_enemy_bullet_2_light, polarity, true);
 									}
 								}
-								internal[0]++;
 							}
-							else if(internal[0] == 2)
-								internal[0]++;
+							internal[0]++;
 						}
 					}
 				}
@@ -246,8 +244,8 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 							{
 								int k = i * 8 - 20 + 80;
 								bArray->add(fixcos(k - (internal[0] - 3) * 8) * img[0] / 2 + x, fixsin(k - (internal[0] - 3) * 8) * img[1] / 2 + y,
-											fixmul(fixcos(k), (internal[0] - 2) * 8 + 192),
-											fixmul(fixsin(k), (internal[0] - 2) * 8 + 192), image_LUT_enemy_bullet_0_light, polarity, true);
+											fixmul(fixcos(k), (internal[0] - 2) * 32 + 128),
+											fixmul(fixsin(k), (internal[0] - 2) * 32 + 128), image_LUT_enemy_bullet_0_light, polarity, true);
 							}
 							internal[0]++;
 						}
@@ -272,10 +270,8 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 													fixcos(k), fixsin(k), image_LUT_enemy_bullet_2_light, polarity, true);
 									}
 								}
-								internal[0]++;
 							}
-							else if(internal[0] == 2)
-								internal[0]++;
+							internal[0]++;
 						}
 					}
 				}

@@ -246,6 +246,8 @@ void playGame()
 		if(inTransitionFromIntro)
 		{
 			kEv = 0;
+			G_tpstatus.x = G_tpinfo->width / 2;
+			G_tpstatus.y = G_tpinfo->height / 2;
 			if(gpTimer < TRANSLATE)
 			{
 				ship.x += dX;

@@ -292,14 +292,8 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 				break;
 		}
 		
-		er.x = fixtoi(x);
-		er.y = fixtoi(y);
-		
-		if(isJointed)
-		{
-			er.x += fixtoi(G_enemiesArray[jointedTo]->x + jointX);
-			er.y += fixtoi(G_enemiesArray[jointedTo]->y + jointY);
-		}
+		er.x = fixtoi(getx());
+		er.y = fixtoi(gety());
 		
 		// Have a relatively big threshold for off-screen animations
 		if(er.x + img[0] / 2 < -80 || er.x - img[0] / 2 > 399 ||
@@ -370,7 +364,7 @@ void Enemy::damage(Player *_p, bool _pol, BulletArray *bArray)
 		{
 			Fixed angle = angleToPlayer(this, _p);
 			for(int i = 0; i < 16; i++)
-				bArray->add(x, y, fixcos(angle + (rand() % 16) - 8) << 1, fixsin(angle + (rand() % 16) - 8) + (rand() % 256), image_LUT_enemy_bullet_0_light, polarity, true);
+				bArray->add(getx(), gety(), fixcos(angle + (rand() % 16) - 8) << 1, fixsin(angle + (rand() % 16) - 8) + (rand() % 256), image_LUT_enemy_bullet_0_light, polarity, true);
 		}
 	}
 }

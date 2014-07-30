@@ -26,7 +26,7 @@ void ChainNotif::handle()
 	{
 		if(maxChain)
 		{
-			y -= 10;
+			y -= 8;
 			drawString(&x, &y, x, "max chain\n", 0xffff, 0);
 		}
 		drawDecimal(&x, &y, value, 0xfbe0, 0xf800);

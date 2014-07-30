@@ -1,6 +1,7 @@
 #include "common.h"
 #include "levels.h"
 #include "../gfx/kanji.h"
+#include "strings.h"
 
 #define ENEMY_W(i) enemiesArray[i]->img[0]
 #define ENEMY_H(i) enemiesArray[i]->img[1]
@@ -12,7 +13,9 @@ touchpad_report_t G_tpstatus;
 
 void playGame();
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
+	int x, y, blink = 0;
 	bool donePlaying = false;
 	G_usingTouchpad = false;
 	if(is_touchpad)
@@ -29,7 +32,12 @@ int main(int argc, char **argv) {
 	while(!donePlaying)
 	{
 		drawSprite(image_entries[image_LUT_titleScreen], 0, 0);
-		updateScreen();		
+		x = (320 - strlen(string_title) * 8) / 2;
+		y = 160;
+		if(blink % 96 < 48)
+			drawString(&x, &y, x, string_title, 0, 0xffff);
+		blink++;
+		updateScreen();
 		
 		if(isKeyPressed(KEY_NSPIRE_ENTER))
 			playGame();

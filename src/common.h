@@ -50,6 +50,8 @@ public:
 	void deactivate();
 	bool getPolarity();
 	bool hurtsPlayer();
+	bool handle();
+	void draw();
 	// x, y on-screen
 	Fixed x, y;
 	// speed

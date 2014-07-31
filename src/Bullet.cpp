@@ -48,3 +48,20 @@ bool Bullet::hurtsPlayer()
 {
 	return hurtPlayer;
 }
+
+bool Bullet::handle()
+{
+	x += dx;
+	y += dy;
+				
+	// Bullets have a threshold of 30
+	return x + itofix(img[0]) < itofix(-30) || x > itofix(349) || y + itofix(img[1]) < itofix(-30) || y > itofix(279);
+}
+
+void Bullet::draw()
+{
+	static Rect br;
+	br.x = fixtoi(x) - (img[0] / 2);
+	br.y = fixtoi(y) - (img[1] / 2);
+	drawSprite(img, br.x, br.y);
+}

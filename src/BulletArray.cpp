@@ -14,7 +14,6 @@ BulletArray::~BulletArray()
 
 void BulletArray::handle(Player *p)
 {
-	static Rect br;
 	bool carryOn = true;
 	
 	for(int i = 0; i < MAX_BULLET; i++)
@@ -70,18 +69,11 @@ void BulletArray::handle(Player *p)
 			}
 			if(carryOn)
 			{
-				cb->x += cb->dx;
-				cb->y += cb->dy;
-				
-				// Bullets have a threshold of 30
-				if(cb->x + itofix(cb->img[0]) < itofix(-30) || cb->x > itofix(349) || cb->y + itofix(cb->img[1]) < itofix(-30) || cb->y > itofix(279))
+				if(cb->handle())
 					deactivate(i);
-				else
-				{
-					br.x = fixtoi(cb->x) - (cb->img[0] / 2);
-					br.y = fixtoi(cb->y) - (cb->img[1] / 2);
-					if(!G_skipFrame) drawSprite(cb->img, br.x, br.y);
-				}
+				else if(!G_skipFrame)
+					cb->draw();
+				
 			}
 		}
 		else break;

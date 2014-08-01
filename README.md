@@ -20,16 +20,16 @@ Use nKaruga.tns on real hardware, and nKaruga_emu.tns on nspire_emu (else it's w
 Playing the game
 ================
 
-Ikaruga is a danmaku (*bullet hell*) SHMUP (SHoot-theM-UP) with a twist : enemy ships and your own ship can be of one of two polarities, light or shadow. Your own ship is different though : you are free to switch between both polarities, when enemy ships are stuck with the same polarity. When in light polarity mode, only shadow bullets hit you, and when in shadow polarity mode, only light bullets hit you. When you get hit by a bullet of the same polarity than you, the bullet is absorbed and fills your power gauge _(this feature is not implemented yet)_ instead of hurting you.
+Ikaruga is a danmaku (*bullet hell*) SHMUP (SHoot-theM-UP) with a twist : enemy ships and your own ship can be of one of two polarities, light or shadow. Your own ship is different though : you are free to switch between both polarities, when enemy ships are stuck with the same polarity. When in light polarity mode, only shadow bullets hit you, and when in shadow polarity mode, only light bullets hit you. When you get hit by a bullet of the same polarity than you, the bullet is absorbed and fills your power gauge instead of hurting you. When you have absorbed enough bullets, you can do a _power release_ and fire an amount of homing lasers given by the total number of bullets you absorbed divided per 10, rounded down. Your power gauge is then emptied.
 
-When you fire at an enemy, there are two situations : either the bullet hitting the enemy is of the opposite polarity, in this case the bullet inflicts 2 damages instead of 1 ; or the bullet is of the same polarity, in this case the bullet only inflicts 1 damage but the enemy will fireback a lot of bullets of its own polarity when dying.
+When you fire at an enemy, there are two situations : either the bullet hitting the enemy is of the opposite polarity, in this case the bullet inflicts double damages ; or the bullet is of the same polarity, in this case the bullet only inflicts normal damage but the enemy will fireback bullets of its own polarity when dying.
 
 Commands for this beta :
-* ESC    : fire
-* TAB    : switch polarity
-* HOME   : release power _(this feature is not implemented yet)_
+* CTRL   : fire
+* SHIFT  : switch polarity
+* DEL    : release power
 * arrows : move
-* CLEAR  : quit
+* ESC  : quit
 
 Temporary debug commands:
 * 4 : enable touchpad (obviously, it only works with touchpad Nspires)

@@ -248,8 +248,8 @@ const static int levelStream[] = {
 	cmd_wait(128),
 	cmd_newWave,
 	// Wave 7
-	enemy(106, 0, 64, image_LUT_enemy_ship_3_shadow, Pattern_1_13, SHADOW, 1, 20),
-	enemy(212, 0, 64, image_LUT_enemy_ship_3_light, Pattern_1_14, LIGHT, 1, 20),
+	enemy(106, 0, 64, image_LUT_enemy_ship_3_shadow, Pattern_1_13, SHADOW, 1, 30),
+	enemy(212, 0, 64, image_LUT_enemy_ship_3_light, Pattern_1_14, LIGHT, 1, 30),
 	enemy(0, 0, 1, image_LUT_enemy_ship_0_shadow, Pattern_1_15, SHADOW, 1, 5),
 	enemy(0, 0, 1, image_LUT_enemy_ship_0_shadow, Pattern_1_15, SHADOW, 1, 5),
 	cmd_joint(2, 0, 0, 0),

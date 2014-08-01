@@ -72,6 +72,7 @@ void playGame()
 	unsigned short *bg;
 	// Variables for transition animation
 	int currentW = 0, chapterNum = 0, dX = 0, dY = 0;
+	bool drawPowerSlot = true;
 	static const char *levelStrs[5] = { "Chapter 1\nIdeal", "Chapter 2\nTrial", "Chapter 3\nFaith", "Chapter 4\nReality", "Chapter 5\nMetempsychosis" };
 	static unsigned short *levelKanjis[1] = { image_kanji_1 };
 	
@@ -301,11 +302,13 @@ void playGame()
 				for(int j = 0; j < 10; j++)
 				{
 					if(G_power > (MAX_FRAGMENT - 1 - i) * 10 + j)
-						drawHLine(i * 14 + 40 + 11 - j, 5 + power_fill_offsets[j * 2], 5 + power_fill_offsets[j * 2 + 1], ship.getPolarity() ? 0xf800 : 0x3ff);
+						drawHLine(i * 14 + 40 + 10 - j, 5 + power_fill_offsets[j * 2], 5 + power_fill_offsets[j * 2 + 1],
+								drawPowerSlot || G_power < (MAX_FRAGMENT - i) * 10 ? (ship.getPolarity() ? 0xf800 : 0x3ff) : 0xffff );
 					else
 						break;
 				}
 			}
+			drawPowerSlot = !drawPowerSlot;
 			
 			// Draw score-chaining notifs
 			for(int i = 0; i < MAX_ENEMY; i++)

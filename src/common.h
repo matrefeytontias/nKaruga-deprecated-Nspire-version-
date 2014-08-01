@@ -19,9 +19,9 @@ typedef int Fixed;
 #define KLEFT(x) (x & 2)
 #define KRIGHT(x) (x & 4)
 #define KUP(x) (x & 8)
-#define KESC(x) (x & 16)
-#define KTAB(x) (x & 32)
-#define KHOME(x) (x & 64)
+#define KFIRE(x) (x & 16)
+#define KPOLARITY(x) (x & 32)
+#define KPOWER(x) (x & 64)
 #define KQUIT(x) (x & 128)
 #define K4(x) (x & 256)
 #define K5(x) (x & 512)
@@ -38,6 +38,10 @@ extern KeyEvent getk(void);
 #define SWITCHING1 4
 
 #define MAX_BULLET 400
+#define MAX_FRAGMENT 12
+#define FRAGMENT_TRAILING 7
+// 12*10
+#define MAX_POWER 120
 
 class Bullet
 {
@@ -70,6 +74,36 @@ class Player;
 // Funnily enough, we also need Enemy in BulletArray, and vice-versa
 class Enemy;
 
+class PowerFragment
+{
+public:
+	PowerFragment();
+	~PowerFragment();
+	bool isActive();
+	void activate(Fixed, Fixed, Fixed, Player*, bool, bool);
+	void deactivate();
+	bool getPolarity();
+	bool hurtsPlayer();
+	bool handle();
+	void draw();
+	Fixed x;
+	Fixed y;
+	// Polar coordinates of speed
+	Fixed speed;
+	Fixed angle;
+	Enemy *targetE;
+	Player *targetP;
+private:
+	Fixed previousX[FRAGMENT_TRAILING];
+	Fixed previousY[FRAGMENT_TRAILING];
+	bool polarity;
+	bool active;
+	bool hurtPlayer;
+	// Determine if the initial angle has been reached once already
+	bool hasReachedAngle;
+	int skipPositionRecord;
+};
+
 // BulletArray
 class BulletArray
 {
@@ -78,11 +112,15 @@ public:
 	~BulletArray();
 	void handle(Player*);
 	void add(Fixed, Fixed, Fixed, Fixed, int, bool, bool);
+	void add_homing(Fixed, Fixed, Fixed, Player*, bool, bool);
 	void deactivate(int);
+	void deactivate_homing(int);
 	Bullet data[MAX_BULLET];
+	PowerFragment data_homing[MAX_FRAGMENT];
 private:
 	// keep track of current bullet
 	int bulletCount;
+	int homingCount;
 };
 
 // Player
@@ -96,6 +134,7 @@ public:
 	void switchPolarity();
 	void hurt();
 	int getLives();
+	bool isDying();
 	// x, y on-screen
 	Fixed x, y;
 	// Ship images, light and shadow
@@ -112,9 +151,8 @@ private:
 	// Key repeat handlers
 	bool fireRepeat;
 	bool polarityRepeat;
+	bool dying;
 	int lives;
-	touchpad_info_t *tpinfo;
-	touchpad_report_t tpstatus;
 } ;
 
 // Enemy
@@ -128,9 +166,9 @@ public:
 	~Enemy();
 	void handle(Player*, BulletArray*);
 	bool isActive();
-	void activate(int, int, int, int, int, int, bool, bool);
+	void activate(int, int, int, int, int, int, bool, bool, int);
 	void deactivate();
-	void damage(Player*, bool, BulletArray*);
+	void damage(Player*, bool, int, BulletArray*);
 	void joint(int, Fixed, Fixed);
 	Fixed getRotation();
 	void setRotation(Fixed);
@@ -153,15 +191,19 @@ private:
 	Fixed rotationAngle;
 	// What bullets does the enemy fire
 	bool polarity;
+	// The enemy's behaviour
 	int callback;
 	// The position of the enemy in the wave
 	int waveIndex;
+	// Internal data for free use by the behaviour code
 	int internal[6];
 	// Used to constraint an enemy to another
 	bool isJointed;
 	int jointedTo;
 	Fixed jointX;
 	Fixed jointY;
+	// How many bullets does the enemy fireback when dying
+	int fireback;
 };
 
 // Used to hold information on killed enemies in order to get the position for ChainNotifs
@@ -211,7 +253,8 @@ private:
 };
 
 // Level streams
-#define enemy(x, y, HP, iID, cbID, p, hR) x, y, HP, iID, cbID, p, hR
+// x, y, HP, image ID, callback ID, polarity, has rotation ?, fireback
+#define enemy(x, y, HP, iID, cbID, p, hR, f) x, y, HP, iID, cbID, p, hR, f
 
 // Special values
 #define LVLSTR_END -2
@@ -251,6 +294,12 @@ enum image_LUT
 	image_LUT_player_ship_polarityswitch_1_shadow,
 	image_LUT_player_bullet_light,
 	image_LUT_player_bullet_shadow,
+	image_LUT_player_homing_bullet_light_0,
+	image_LUT_player_homing_bullet_light_1,
+	image_LUT_player_homing_bullet_light_2,
+	image_LUT_player_homing_bullet_shadow_0,
+	image_LUT_player_homing_bullet_shadow_1,
+	image_LUT_player_homing_bullet_shadow_2,
 	image_LUT_enemy_bullet_0_light,
 	image_LUT_enemy_bullet_0_shadow,
 	image_LUT_enemy_bullet_1_light,
@@ -283,6 +332,7 @@ enum image_LUT
 	image_LUT_explosion_shadow_3,
 	image_LUT_explosion_shadow_4,
 	image_LUT_explosion_shadow_5,
+	image_LUT_powerslot,
 	image_LUT_background,
 	image_LUT_titleScreen,
 	NB_IMAGES
@@ -316,10 +366,17 @@ extern void freeGameLUTs();
 extern Enemy **enemiesArray;
 
 // Global vars
-extern int G_skipFrame, G_waveTimer, G_score, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus;
+extern int G_skipFrame, G_waveTimer, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus;
+extern int G_score, G_power;
 extern bool G_usingTouchpad;
 extern touchpad_info_t *G_tpinfo;
 extern touchpad_report_t G_tpstatus;
 extern Enemy *G_enemiesArray[MAX_ENEMY];
+
+// Utils
+extern Fixed angleToPlayer(Enemy*, Player*);
+extern Fixed angleToEnemy(PowerFragment*, Enemy*);
+extern Fixed angleToPlayer(PowerFragment*, Player*);
+extern Enemy* findNearestEnemy(Fixed, Fixed);
 
 #endif

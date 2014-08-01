@@ -1,1 +1,0 @@
-char *string_title = "Press Enter to start or Clear to quit";

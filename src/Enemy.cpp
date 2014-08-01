@@ -326,14 +326,14 @@ bool Enemy::isActive()
 	return active;
 }
 
-void Enemy::activate(int _x, int _y, int _HP, int shipImgID, int callbackID, int _waveIndex, bool _polarity, bool _hasRotation)
+void Enemy::activate(int _x, int _y, int _HP, int shipImgID, int callbackID, int _waveIndex, bool _polarity, bool _hasRotation, int _f)
 {
 	HP = _HP;
 	x = _x;
 	y = _y;
 	
 	img = image_entries[shipImgID];
-	
+	fireback = _f;
 	polarity = _polarity;
 	hasRotation = _hasRotation;
 	rotationAngle = 0;
@@ -347,13 +347,15 @@ void Enemy::activate(int _x, int _y, int _HP, int shipImgID, int callbackID, int
 void Enemy::deactivate()
 {
 	active = false;
+	diedThisFrame = false;
+	isJointed = false;
 }
 
-void Enemy::damage(Player *_p, bool _pol, BulletArray *bArray)
+void Enemy::damage(Player *_p, bool _pol, int amount, BulletArray *bArray)
 {
-	HP--;
+	HP -= amount;
 	if(_pol != polarity)
-		HP--;
+		HP -= amount;
 	
 	if(HP <= 0)
 	{
@@ -363,7 +365,7 @@ void Enemy::damage(Player *_p, bool _pol, BulletArray *bArray)
 		if(_pol == polarity)
 		{
 			Fixed angle = angleToPlayer(this, _p);
-			for(int i = 0; i < 16; i++)
+			for(int i = 0; i < fireback; i++)
 				bArray->add(getx(), gety(), fixcos(angle + (rand() % 16) - 8) << 1, fixsin(angle + (rand() % 16) - 8) + (rand() % 256), image_LUT_enemy_bullet_0_light, polarity, true);
 		}
 	}

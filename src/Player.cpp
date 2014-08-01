@@ -2,10 +2,10 @@
 
 Player::Player()
 {
-	tpinfo = touchpad_getinfo();
 	polarity = true;
 	fireRepeat = false;
 	polarityRepeat = false;
+	dying = false;
 	isSwitchingPolarity = 0;
 	fireDelay = 32;
 	lives = 4;
@@ -71,7 +71,7 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 	x = r.x < 0 ? itofix(temp.x) : (r.x > 320 - (temp.x * 2) ? itofix(320 - temp.x) : x);
 	y = r.y < 0 ? itofix(temp.y) : (r.y > 240 - (temp.y * 2) ? itofix(240 - temp.y) : y);
 	
-	if(KTAB(kEv))
+	if(KPOLARITY(kEv))
 	{
 		if(!polarityRepeat)
 			switchPolarity();
@@ -80,9 +80,19 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 	else
 		polarityRepeat = false;
 	
+	if(KPOWER(kEv))
+	{
+		if(G_power > 9)
+		{
+			for(int i = 0; i < G_power / 10; i++)
+				bArray->add_homing(x, y, ((i % 6) - 3) * 8 + (i % 2 ? 128 : 0), this, polarity, false);
+			G_power = 0;
+		}
+	}
+	
 	if(fireDelay == 0)
 	{
-		if(KESC(kEv))
+		if(KFIRE(kEv))
 		{
 			if(fireRepeat)
 			{
@@ -124,4 +134,9 @@ void Player::hurt()
 int Player::getLives()
 {
 	return lives;
+}
+
+bool Player::isDying()
+{
+	return dying;
 }

@@ -1,12 +1,13 @@
 #include "common.h"
 #include "levels.h"
 #include "../gfx/kanji.h"
-#include "strings.h"
+#include "misc_data.h"
 
 #define ENEMY_W(i) G_enemiesArray[i]->img[0]
 #define ENEMY_H(i) G_enemiesArray[i]->img[1]
 
-int G_skipFrame = 0, G_waveTimer = 0, G_score, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus;
+int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus;
+int G_score, G_power;
 bool G_usingTouchpad;
 touchpad_info_t *G_tpinfo;
 touchpad_report_t G_tpstatus;
@@ -24,10 +25,7 @@ int main(int argc, char **argv)
 		G_tpinfo = touchpad_getinfo();
 	
 	for(int i = 0; i < MAX_ENEMY; i++)
-	{
 		G_enemiesArray[i] = new Enemy;
-		G_enemiesArray[i]->deactivate();
-	}
 	
 	enable_relative_paths(argv);
 	
@@ -77,8 +75,7 @@ void playGame()
 	static const char *levelStrs[5] = { "Chapter 1\nIdeal", "Chapter 2\nTrial", "Chapter 3\nFaith", "Chapter 4\nReality", "Chapter 5\nMetempsychosis" };
 	static unsigned short *levelKanjis[1] = { image_kanji_1 };
 	
-	// Skip header
-	bg = image_entries[image_LUT_background] + 3;
+	bg = image_entries[image_LUT_background];
 	
 	BulletArray* bArray = new BulletArray;
 	Player ship;
@@ -97,18 +94,23 @@ void playGame()
 	waveIndex = 0;
 	
 	for(int i = 0; i < MAX_ENEMY; i++)
+	{
 		G_enemiesArray[i]->deactivate();
+		G_killedThisFrame[i] = 0;
+	}
 	
 	G_score = 0;
-	G_killedThisFrame[G_frameChainOffset] = -1;
+	G_power = 0;
 	for(int i = 0; i < 3; i++)
 		chainColor[i] = 0;
 	G_chainStatus = 0;
 	G_frameChainOffset = 0;
 	G_waveTimer = 0;
+	
 	inChainCount = 0;
 	currentNotif = 0;
 	currentExplosion = 0;
+	gpTimer = 0;
 	
 	while(!KQUIT(kEv) && !levelEnded)
 	{
@@ -175,11 +177,10 @@ void playGame()
 					else if(currentLevelByte == LVLSTR_BKPT)
 					{
 						// Debug stuff
-						printf("Current enemy : %d\n \
-						Current wave timer : %d\n \
-						Global timer : %d\n \
-						Current wave index : %d\n",
+						printf("Current enemy : %d\nCurrent wave timer : %d\nGlobal timer : %d\nCurrent wave index : %d\n",
 						enemyCounter, G_waveTimer, gpTimer, waveIndex);
+						for(int i = 0; i < enemyCounter; i++)
+							printf("Enemy %d :\nX,Y : %d, %d\n", i, fixtoi(G_enemiesArray[i]->getx()), fixtoi(G_enemiesArray[i]->gety()));
 						bkpt();
 						levelCounter++;
 					}
@@ -198,9 +199,10 @@ void playGame()
 				else
 				{
 					// Dunno what it is ? Then it's an enemy by default
-					G_enemiesArray[enemyCounter]->activate(itofix(levelStream[levelCounter]), itofix(levelStream[levelCounter + 1]), levelStream[levelCounter + 2], levelStream[levelCounter + 3],
-														levelStream[levelCounter + 4], waveIndex, levelStream[levelCounter + 5], levelStream[levelCounter + 6]);
-					levelCounter += 7;
+					G_enemiesArray[enemyCounter]->activate(itofix(levelStream[levelCounter]), itofix(levelStream[levelCounter + 1]), levelStream[levelCounter + 2],
+														levelStream[levelCounter + 3], levelStream[levelCounter + 4], waveIndex, levelStream[levelCounter + 5],
+														levelStream[levelCounter + 6], levelStream[levelCounter + 7]);
+					levelCounter += 8;
 					enemyCounter = (enemyCounter + 1) % MAX_ENEMY;
 					waveIndex++;
 				}
@@ -233,7 +235,7 @@ void playGame()
 				}
 			if(gpTimer > 768)
 				inTransitionFromIntro = false;
-		}
+		}		
 		
 		if(!(readKeys % 4))
 		{
@@ -290,7 +292,20 @@ void playGame()
 			
 			// Draw chain count
 			for(int i = 0, j = 0; i < inChainCount; i++, j += 18)
-				drawSprite(image_entries[chainColor[i] == LIGHT ? image_LUT_chain_hit_light : image_LUT_chain_hit_shadow], j, 12);			
+				drawSprite(image_entries[chainColor[i] == LIGHT ? image_LUT_chain_hit_light : image_LUT_chain_hit_shadow], j, 12);
+			
+			// Draw power
+			for(int i = MAX_FRAGMENT - 1; i >= 0; i--)
+			{
+				drawSprite(image_entries[image_LUT_powerslot], 5, i * 14 + 40);
+				for(int j = 0; j < 10; j++)
+				{
+					if(G_power > (MAX_FRAGMENT - 1 - i) * 10 + j)
+						drawHLine(i * 14 + 40 + 11 - j, 5 + power_fill_offsets[j * 2], 5 + power_fill_offsets[j * 2 + 1], ship.getPolarity() ? 0xf800 : 0x3ff);
+					else
+						break;
+				}
+			}
 			
 			// Draw score-chaining notifs
 			for(int i = 0; i < MAX_ENEMY; i++)

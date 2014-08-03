@@ -267,8 +267,8 @@ const static int levelStream[] = {
 	enemy(120, 0, 6, image_LUT_enemy_ship_2_shadow, Pattern_1_16, SHADOW, 0, 8),
 	enemy(160, 0, 6, image_LUT_enemy_ship_2_shadow, Pattern_1_16, SHADOW, 0, 8),
 	enemy(200, 0, 6, image_LUT_enemy_ship_2_shadow, Pattern_1_16, SHADOW, 0, 8),
-	enemy(140, -30, 6, image_LUT_enemy_ship_2_light, Pattern_1_16, LIGHT, 0, 8),
-	enemy(180, -30, 6, image_LUT_enemy_ship_2_light, Pattern_1_16, LIGHT, 0, 8),
+	enemy(140, -50, 6, image_LUT_enemy_ship_2_light, Pattern_1_16, LIGHT, 0, 8),
+	enemy(180, -50, 6, image_LUT_enemy_ship_2_light, Pattern_1_16, LIGHT, 0, 8),
 	cmd_killed,
 	cmd_newWave,
 	// Wave 9

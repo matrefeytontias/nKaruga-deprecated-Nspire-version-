@@ -267,13 +267,13 @@ case Pattern_1_15:
 case Pattern_1_16:
 	if(y <= itofix(60))
 	{
-		if(!(G_waveTimer % 4))
+		if(!(G_waveTimer % 16))
 			bArray->add(x, y, 0, itofix(1), image_LUT_enemy_bullet_1_light, polarity, true);
-		y += 192;
+		y += 128;
 	}
 	else
 	{
-		y += 96;
+		y += 64;
 		x += itofix(polarity ? -1 : 1);
 	}
 	break;

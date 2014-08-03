@@ -264,8 +264,6 @@ void playGame()
 			sleep(5);
 		}
 		
-		G_particles->handle();
-		
 		ship.handle(kEv, bArray);
 		
 		for(int i = 0; i < MAX_ENEMY; i++)
@@ -284,6 +282,8 @@ void playGame()
 		}
 		
 		bArray->handle(&ship);
+		
+		G_particles->handle();
 		
 		if(!ship.getLives())
 			levelEnded = 1;

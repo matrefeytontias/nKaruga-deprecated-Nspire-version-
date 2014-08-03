@@ -13,6 +13,7 @@ touchpad_info_t *G_tpinfo;
 touchpad_report_t G_tpstatus;
 
 Enemy *G_enemiesArray[MAX_ENEMY];
+Particles *G_particles;
 
 void playGame();
 
@@ -27,6 +28,8 @@ int main(int argc, char **argv)
 	for(int i = 0; i < MAX_ENEMY; i++)
 		G_enemiesArray[i] = new Enemy;
 	
+	G_particles = new Particles;
+	
 	enable_relative_paths(argv);
 	
 	buildGameLUTs();
@@ -34,7 +37,7 @@ int main(int argc, char **argv)
 	// Init display
 	initBuffering();
 	clearBufferW();
-	
+
 	while(!donePlaying)
 	{
 		drawSprite(image_entries[image_LUT_titleScreen], 0, 0);
@@ -53,6 +56,8 @@ int main(int argc, char **argv)
 	
 	for(int i = 0; i < MAX_ENEMY; i++)
 		delete G_enemiesArray[i];
+	
+	delete G_particles;
 	
 	deinitBuffering();
 	
@@ -258,6 +263,8 @@ void playGame()
 			}
 			sleep(5);
 		}
+		
+		G_particles->handle();
 		
 		ship.handle(kEv, bArray);
 		

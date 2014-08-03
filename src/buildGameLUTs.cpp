@@ -28,6 +28,8 @@ void buildGameLUTs()
 	image_entries[image_LUT_enemy_bullet_1_shadow] = image_enemy_bullet_1_shadow;
 	image_entries[image_LUT_enemy_bullet_2_light] = image_enemy_bullet_2_light;
 	image_entries[image_LUT_enemy_bullet_2_shadow] = image_enemy_bullet_2_shadow;
+	image_entries[image_LUT_enemy_laser_light] = image_enemy_laser_light;
+	image_entries[image_LUT_enemy_laser_shadow] = image_enemy_laser_shadow;
 	image_entries[image_LUT_enemy_ship_0_light] = image_enemy_ship_0_light;
 	image_entries[image_LUT_enemy_ship_0_shadow] = image_enemy_ship_0_shadow;
 	image_entries[image_LUT_enemy_ship_1_light] = image_enemy_ship_1_light;
@@ -54,6 +56,8 @@ void buildGameLUTs()
 	image_entries[image_LUT_explosion_shadow_3] = image_explosion_shadow_3;
 	image_entries[image_LUT_explosion_shadow_4] = image_explosion_shadow_4;
 	image_entries[image_LUT_explosion_shadow_5] = image_explosion_shadow_5;
+	image_entries[image_LUT_particle_light] = image_particle_light;
+	image_entries[image_LUT_particle_shadow] = image_particle_shadow;
 	image_entries[image_LUT_powerslot] = image_powerslot;
 	image_entries[image_LUT_background] = image_background;
 	image_entries[image_LUT_titleScreen] = image_titleScreen;

@@ -39,10 +39,15 @@ extern KeyEvent getk(void);
 
 #define MAX_BULLET 400
 #define MAX_FRAGMENT 12
+#define MAX_LASER 4
 #define FRAGMENT_TRAILING 7
 // 12*10
 #define MAX_POWER 120
 
+#define LASER_SPEED 1
+#define LASER_THICKNESS 25
+
+// Both enemies and player can fire them
 class Bullet
 {
 public:
@@ -74,6 +79,7 @@ class Player;
 // Funnily enough, we also need Enemy in BulletArray, and vice-versa
 class Enemy;
 
+// Both enemies and player can fire them
 class PowerFragment
 {
 public:
@@ -104,6 +110,33 @@ private:
 	int skipPositionRecord;
 };
 
+// Only enemies can fire them
+class Laser
+{
+public:
+	Laser();
+	~Laser();
+	bool isActive();
+	void activate(Enemy*, bool);
+	void deactivate();
+	void handle();
+	void draw();
+	bool getPolarity();
+	Rect* getVector();
+	void getSides(Rect*, Rect*);
+	int getAmplitude();
+	void setAmplitude(int);
+	Fixed angle;
+	Enemy *origin;
+	int x;
+	int y;
+private:
+	bool active;
+	bool polarity;
+	// Lasers are not immediate, they grow
+	Fixed amplitude;
+};
+
 // BulletArray
 class BulletArray
 {
@@ -113,14 +146,20 @@ public:
 	void handle(Player*);
 	void add(Fixed, Fixed, Fixed, Fixed, int, bool, bool);
 	void add_homing(Fixed, Fixed, Fixed, Player*, bool, bool);
+	void fire_laser(Enemy*, bool);
 	void deactivate(int);
 	void deactivate_homing(int);
+	void stop_laser(Enemy*);
 	Bullet data[MAX_BULLET];
 	PowerFragment data_homing[MAX_FRAGMENT];
+	Laser data_laser[MAX_LASER];
 private:
-	// keep track of current bullet
+	// keep track of current bullet ...
 	int bulletCount;
+	// ... power fragment ...
 	int homingCount;
+	// ... and laser
+	int laserCount;
 };
 
 // Player
@@ -233,6 +272,26 @@ private:
 	bool polarity;
 };
 
+// Particles
+// Because they are pretty *_*
+#define MAX_PARTICLE 64
+class Particles
+{
+public:
+	Particles();
+	~Particles();
+	void add(Fixed, Fixed, Fixed, Fixed, bool);
+	void handle();
+private:
+	Fixed x[MAX_PARTICLE];
+	Fixed y[MAX_PARTICLE];
+	Fixed dx[MAX_PARTICLE];
+	Fixed dy[MAX_PARTICLE];
+	int time[MAX_PARTICLE];
+	bool polarity[MAX_PARTICLE];
+	int counter;
+};
+
 // Text notifications of score-chaining
 class ChainNotif
 {
@@ -306,6 +365,8 @@ enum image_LUT
 	image_LUT_enemy_bullet_1_shadow,
 	image_LUT_enemy_bullet_2_light,
 	image_LUT_enemy_bullet_2_shadow,
+	image_LUT_enemy_laser_light,
+	image_LUT_enemy_laser_shadow,
 	image_LUT_enemy_ship_0_light,
 	image_LUT_enemy_ship_0_shadow,
 	image_LUT_enemy_ship_1_light,
@@ -332,6 +393,8 @@ enum image_LUT
 	image_LUT_explosion_shadow_3,
 	image_LUT_explosion_shadow_4,
 	image_LUT_explosion_shadow_5,
+	image_LUT_particle_light,
+	image_LUT_particle_shadow,
 	image_LUT_powerslot,
 	image_LUT_background,
 	image_LUT_titleScreen,
@@ -355,6 +418,9 @@ enum
 	Pattern_1_13,
 	Pattern_1_14,
 	Pattern_1_15,
+	Pattern_1_16,
+	Pattern_1_17,
+	Pattern_1_18,
 	NB_CALLBACKS
 };
 
@@ -372,6 +438,7 @@ extern bool G_usingTouchpad;
 extern touchpad_info_t *G_tpinfo;
 extern touchpad_report_t G_tpstatus;
 extern Enemy *G_enemiesArray[MAX_ENEMY];
+extern Particles *G_particles;
 
 // Utils
 extern Fixed angleToPlayer(Enemy*, Player*);

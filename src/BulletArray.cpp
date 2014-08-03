@@ -4,9 +4,14 @@ BulletArray::BulletArray()
 {
 	for(int i = 0; i < MAX_BULLET; i++)
 		data[i].deactivate();
+	for(int i = 0; i < MAX_FRAGMENT; i++)
+		data_homing[i].deactivate();
+	for(int i = 0; i < MAX_LASER; i++)
+		data_laser[i].deactivate();
 	
 	bulletCount = 0;
 	homingCount = 0;
+	laserCount = 0;
 }
 
 BulletArray::~BulletArray()
@@ -99,6 +104,7 @@ void BulletArray::handle(Player *p)
 					{
 						p->hurt();
 						deactivate_homing(i);
+						G_power = min(G_power + 10, MAX_POWER);
 						carryOn = false;
 					}
 				}
@@ -144,6 +150,73 @@ void BulletArray::handle(Player *p)
 		}
 		else break;
 	}
+	
+	// Lasers
+	for(int i = 0; i < MAX_LASER; i++)
+	{
+		Rect *r, r1, r2;
+		Laser *cl = &data_laser[i];
+		if(cl->isActive())
+		{
+			if(cl->origin->isActive())
+			{
+				r = cl->getVector();
+				cl->getSides(&r1, &r2);
+				
+				// Uses cartesian hitbox for checking collision with player
+				// First, see if the player is not too far
+				if(sq(fixtoi(p->x) - r->x) + sq(fixtoi(p->y) - r->y) <= sq(cl->getAmplitude()))
+				{
+					// if we're not too far, carry on collision checking
+					// calculate the laser's cartesian equation and apply it to each of its sides
+					// ax + by + c = 0
+					int a, b, c1, c2;
+					a = r->h;
+					b = -r->w;
+					c1 = -(a * r1.x + b * r1.y);
+					c2 = -(a * r2.x + b * r2.y);
+					
+					if(p->getPolarity() != cl->getPolarity())
+					{
+						int temp = a * fixtoi(p->x) + b * fixtoi(p->y);
+						// Work the player's 1 px hitbox
+						if(sign(temp + c1) != sign(temp + c2))
+							// Hit !
+							p->hurt();
+					}
+					else
+					{
+						int temp1 = a * (fixtoi(p->x) - p->img[0][0] / 2) + b * fixtoi(p->y);
+						int temp2 = a * (fixtoi(p->x) + p->img[0][0] / 2) + b * fixtoi(p->y);
+						
+						if(sign(temp1 + c1) != sign(temp1 + c2) || sign(temp2 + c1) != sign(temp2 + c2))
+						{
+							// Hit, but doesn't hurt
+							cl->setAmplitude((int)sqrt(sq(fixtoi(p->x) - r->x) + sq(fixtoi(p->y) - r->y)));
+							// Using G_skipFrame as a delay
+							if(!G_skipFrame) G_power += G_power < MAX_POWER;
+							// Lasers are powerful, so they push the player
+							p->x += fixcos(cl->angle) / 2;
+							p->y += fixsin(cl->angle) / 2;
+							
+							// Add particles ! Yeeee !
+							int k = (rand() % 4) + 1;
+							for(int j = 0; j < k; j++)
+							{
+								Fixed a = cl->angle + 128 + (rand() % 64) - 32;
+								G_particles->add(p->x, p->y, fixcos(a) / 2, fixsin(a) / 2, cl->getPolarity());
+							}
+						}
+					}
+				}
+				
+				cl->handle();
+				if(!G_skipFrame) cl->draw();
+			}
+			else
+				cl->deactivate();
+		}
+	}
 }
 
 void BulletArray::add(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, int imgID, bool _p, bool _h)
@@ -165,6 +238,12 @@ void BulletArray::add_homing(Fixed _x, Fixed _y, Fixed angle, Player* targetP, b
 	}
 }
 
+void BulletArray::fire_laser(Enemy *e, bool _p)
+{
+	data_laser[laserCount].activate(e, _p);
+	laserCount = (laserCount + 1) % MAX_LASER;
+}
+
 void BulletArray::deactivate(int n)
 {
 	bulletCount--;
@@ -179,4 +258,16 @@ void BulletArray::deactivate_homing(int n)
 	for(int i = n; i < homingCount; i++)
 		data_homing[i] = data_homing[i + 1];
 	data_homing[homingCount].deactivate();
+}
+
+void BulletArray::stop_laser(Enemy *e)
+{
+	for(int i = 0; i < MAX_LASER; i++)
+	{
+		if(data_laser[i].origin == e)
+		{
+			data_laser[i].deactivate();
+			break;
+		}
+	}
 }

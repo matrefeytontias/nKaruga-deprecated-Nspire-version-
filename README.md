@@ -6,7 +6,7 @@ A clone of Treasure's *Ikaruga* for TI-Nspire calculators. Of course, this is st
 Building
 ========
 
-To build the executable, you'll need everything that is in the nKaruga/src and nKaruga/gfx folder. Just build in nKaruga/src using your favorite tool (CLI or Ndless SDK). nKaruga.tns will be generated in the main folder, ready to be sent to your TI-Nspire (any TI-Nspire).
+To build the executable, you'll need everything that is in the nKaruga/src and nKaruga/gfx folder. Just build in nKaruga/ using your favorite tool (CLI or Ndless SDK). nKaruga.tns and nKaruga_emu will be generated in the main folder, ready to be sent to your TI-Nspire (any TI-Nspire) for the former, and to a TI-Nspire emulator for the latter.
 
 If you use the CLI for building Ndless programs, running make in the root directory will be enough.
 
@@ -15,7 +15,7 @@ Running on a TI-Nspire
 
 You need **at least** Ndless 3.1 installed to run nKaruga on your TI-Nspire. That means nKaruga will only run on your TI-Nspire if the installed OS is Ndless 3.1 or higher-compatible.
 
-Use nKaruga.tns on real hardware, and nKaruga_emu.tns on nspire_emu (else it's waaaaaay too fast).
+Use nKaruga.tns on real hardware, and nKaruga_emu.tns on an Nspire emulator (else it's waaaaaay too fast).
 
 Playing the game
 ================

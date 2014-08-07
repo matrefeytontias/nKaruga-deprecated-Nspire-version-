@@ -265,16 +265,17 @@ case Pattern_1_15:
 	}
 	break;
 case Pattern_1_16:
-	if(y <= itofix(60))
+	if(y <= itofix(80))
 	{
-		if(!(G_waveTimer % 16))
-			bArray->add(x, y, 0, itofix(1), image_LUT_enemy_bullet_1_light, polarity, true);
-		y += 128;
+		if(!(G_waveTimer % 32) && y < itofix(60))
+			bArray->add(x, y, 0, 384, image_LUT_enemy_bullet_1_light, polarity, true);
+		y += 256 - fixtoi(y) * 3;
+		x += polarity ? -64 : 64;
 	}
 	else
 	{
 		y += 64;
-		x += itofix(polarity ? -1 : 1);
+		x += polarity ? -128 : 128;
 	}
 	break;
 case Pattern_1_17:
@@ -294,10 +295,12 @@ case Pattern_1_17:
 			bArray->fire_laser(this, polarity);
 			rotationAngle++;
 			internal[0] = 1;
+			internal[1] = rotationAngle * 2;
 		}
 		else if(rotationAngle < 32)
 		{
-			rotationAngle++;
+			internal[1]++;
+			rotationAngle = internal[1] / 2;
 		}
 		else if(rotationAngle == 32)
 		{
@@ -314,9 +317,9 @@ case Pattern_1_17:
 case Pattern_1_18:
 	if(!(G_waveTimer % 4))
 	{
-		x = fixcos(internal[0] + waveIndex * 21) * max(160 - internal[0], 80) + itofix(160);
-		y = fixsin(internal[0] + waveIndex * 21) * max(160 - internal[0], 80) + itofix(120);
-		internal[0]++;
-		rotationAngle++;
+		x = fixcos(internal[0] + waveIndex * 21) * max(200 - internal[0], 80) + itofix(160);
+		y = fixsin(internal[0] + waveIndex * 21) * max(200 - internal[0], 80) + itofix(120);
+		internal[0] += 2;
+		rotationAngle += 3;
 	}
 	break;

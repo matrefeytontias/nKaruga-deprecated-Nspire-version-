@@ -10,6 +10,14 @@ extern "C" {
 void bufcpy(void*, void*);
 }
 
+#define UNUSED(var) (void)var
+
+// Add those functions for C++ compiler under linux
+#if defined(__cplusplus) && !defined(min) && !defined(max)
+#define max(a, b) (a > b)
+#define min(a, b) (a < b)
+#endif
+
 typedef int KeyEvent;
 
 typedef int Fixed;

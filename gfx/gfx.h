@@ -618,7 +618,7 @@ static unsigned short image_enemy_bullet_2_shadow[] = {12,
 };
 
 static unsigned short image_enemy_laser_light[] = {1,
-24,
+25,
 0xf81f,
 0x843f, 
 0x8c7f, 
@@ -644,10 +644,11 @@ static unsigned short image_enemy_laser_light[] = {1,
 0xa51f, 
 0x9cdf, 
 0x8c7f, 
+0x843f
 };
 
 static unsigned short image_enemy_laser_shadow[] = {1,
-24,
+25,
 0xf81f,
 0xf000, 
 0xe000, 
@@ -673,6 +674,7 @@ static unsigned short image_enemy_laser_shadow[] = {1,
 0xb800, 
 0xc800, 
 0xe000, 
+0xf000
 };
 
 static unsigned short image_enemy_ship_0_light[] = {

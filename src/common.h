@@ -44,7 +44,7 @@ extern KeyEvent getk(void);
 // 12*10
 #define MAX_POWER 120
 
-#define LASER_SPEED 1
+#define LASER_SPEED 2
 #define LASER_THICKNESS 25
 
 // Both enemies and player can fire them

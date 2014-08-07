@@ -278,7 +278,7 @@ case Pattern_1_16:
 	}
 	break;
 case Pattern_1_17:
-	if(!(G_waveTimer % 8))
+	if(!(G_waveTimer % 4))
 	{
 		// Y position is timed to be starting position + 96 due to the enemy needing to rotate by 32 degrees in a single movement
 		// So it moves by 3 pixels and rotates by one degree at a time

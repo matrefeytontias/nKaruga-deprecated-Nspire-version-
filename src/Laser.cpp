@@ -41,7 +41,7 @@ inline unsigned short r5g6b5(uint8_t r, uint8_t g, uint8_t b)
 	return ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
 }
 
-void Laser::draw()
+void Laser::draw() 
 {
 	int j = (rand() % 4) + 1;
 	for(int i = 0; i < j; i++)
@@ -52,32 +52,46 @@ void Laser::draw()
 	
 	// n2DLib's drawLine algorithm, but drawing rotated laser sprites instead of pixels
 	// Algorithm by pierrotdu18
-	Rect r = (Rect){x, y, 0, 0};
-	int x2 = fixtoi(fixcos(angle) * amplitude) + x;
-	int y2 = fixtoi(fixsin(angle) * amplitude) + y;
-	int dx = abs(x2-r.x);
-	int dy = abs(y2-r.y);
-	int sx = (r.x < x2)?1:-1;
-	int sy = (r.y < y2)?1:-1;
+	int x1 = x;
+	int y1 = y;
+	int x2 = fixtoi(fixcos(angle) * amplitude) + x1;
+	int y2 = fixtoi(fixsin(angle) * amplitude) + y1;
+	int dx = abs(x2-x1);
+	int dy = abs(y2-y1);
+	int sx = (x1 < x2)?1:-1;
+	int sy = (y1 < y2)?1:-1;
 	int err = dx-dy;
-	int e2;	
+	int e2;
+	// Sprite drawing vars
+	Fixed sdx = fixsin(~angle);
+	Fixed sdy = fixcos(~angle);
+	unsigned short *laserSlice = image_entries[polarity ? image_LUT_enemy_laser_shadow : image_LUT_enemy_laser_light] + 3; // skip header
 	
-	while (!(r.x == x2 && r.y == y2))
+	while (!(x1 == x2 && y1 == y2))
 	{
-		drawSpriteRotated(image_entries[polarity ? image_LUT_enemy_laser_shadow : image_LUT_enemy_laser_light], &r, ~angle);
-		e2 = err*2;
+		// Draws a rotated laser "slice"
+		// Optimizes the sprite drawing since it's always the same 1*25 image
+		Fixed sxp = itofix(x1) - sdx * 12;
+		Fixed syp = itofix(y1) - sdy * 12;
+		for(int i = 0; i < 25; i++)
+		{
+			setPixel(fixtoi(sxp), fixtoi(syp), laserSlice[i]);
+			sxp += sdx;
+			syp += sdy;
+		}
+		
+		e2 = 2*err;
 		if (e2 > -dy)
 		{	
-			err -= dy;
-			r.x += sx;
+			err = err - dy;
+			x1 = x1 + sx;
 		}
 		if (e2 < dx)
 		{	
-			err += dx;
-			r.y += sy;
+			err = err + dx;
+			y1 = y1 + sy;
 		}
 	}
-	
 }
 
 bool Laser::getPolarity()

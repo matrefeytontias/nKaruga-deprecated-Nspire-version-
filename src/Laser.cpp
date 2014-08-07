@@ -63,8 +63,8 @@ void Laser::draw()
 	int err = dx-dy;
 	int e2;
 	// Sprite drawing vars
-	Fixed sdx = fixsin(~angle);
-	Fixed sdy = fixcos(~angle);
+	Fixed sdx = fixsin(-angle);
+	Fixed sdy = fixcos(-angle);
 	unsigned short *laserSlice = image_entries[polarity ? image_LUT_enemy_laser_shadow : image_LUT_enemy_laser_light] + 3; // skip header
 	
 	while (!(x1 == x2 && y1 == y2))

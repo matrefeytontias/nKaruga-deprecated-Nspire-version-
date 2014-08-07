@@ -274,7 +274,7 @@ private:
 
 // Particles
 // Because they are pretty *_*
-#define MAX_PARTICLE 64
+#define MAX_PARTICLE 128
 class Particles
 {
 public:

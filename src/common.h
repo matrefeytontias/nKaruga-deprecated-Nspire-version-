@@ -10,7 +10,7 @@ extern "C" {
 void bufcpy(void*, void*);
 }
 
-#define UNUSED(var) do { (void)(var); } while (0)
+#define UNUSED(var) (void)var
 
 // Add those functions for C++ compiler under linux
 #if defined(__cplusplus) && !defined(min) && !defined(max)

@@ -19,6 +19,7 @@ void playGame();
 
 int main(int argc, char **argv)
 {
+	(void) argc;	// Unused variable
 	int x, y, blink = 0;
 	bool donePlaying = false;
 	G_usingTouchpad = false;

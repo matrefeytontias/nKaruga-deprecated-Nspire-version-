@@ -8,21 +8,79 @@
 
 int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus;
 int G_score, G_power;
+bool G_displayBg = true, G_fireback = true, G_hardMode = false;
 bool G_usingTouchpad;
 touchpad_info_t *G_tpinfo;
 touchpad_report_t G_tpstatus;
+t_key G_fireKey, G_polarityKey, G_fragmentKey;
 
 Enemy *G_enemiesArray[MAX_ENEMY];
 Particles *G_particles;
 
 void playGame();
 
+static unsigned short image_cursor[] = { 5, 8, 1,
+0, 0, 1, 1, 1,
+1, 0, 0, 1, 1,
+1, 1, 0, 0, 1,
+1, 1, 1, 0, 0,
+1, 1, 1, 0, 0,
+1, 1, 0, 0, 1,
+1, 0, 0, 1, 1,
+0, 0, 1, 1, 1
+};
+
+inline void writeKeyToConfig(FILE* out, t_key* key)
+{
+	fputc(key->row, out);
+	fputc(key->col & 0xff, out);
+	fputc(key->col >> 8, out);
+	fputc(key->tpad_row, out);
+	fputc(key->tpad_col & 0xff, out);
+	fputc(key->tpad_col >> 8, out);
+	
+}
+
+inline void readKeyFromConfig(FILE* in, t_key* key)
+{
+	key->row = fgetc(in);
+	key->col = fgetc(in) | (fgetc(in) << 8);
+	key->tpad_row = fgetc(in);
+	key->tpad_col = fgetc(in) | (fgetc(in) << 8);
+	key->tpad_arrow = TPAD_ARROW_NONE;
+}
+
 int main(int argc, char **argv)
 {
 	UNUSED(argc);
 	int x, y, blink = 0;
-	bool donePlaying = false;
+	bool donePlaying = false, openedMenu = false;
 	G_usingTouchpad = false;
+	int difficulty = 1;
+	FILE* configFile;
+	// Inline menu vars
+	void* optionValues[TITLE_OPTIONS] = { NULL, &difficulty, &G_usingTouchpad, &G_displayBg, NULL };
+	// Custom keys vars
+	t_key* customKeys[KEYS_TO_BIND] = { &G_fireKey, &G_polarityKey, &G_fragmentKey };
+	int choice = 0;
+	
+	enable_relative_paths(argv);
+	
+	configFile = fopen(string_nKaruga_config, "rb");
+	if(configFile)
+	{
+		readKeyFromConfig(configFile, &G_fireKey);
+		readKeyFromConfig(configFile, &G_polarityKey);
+		readKeyFromConfig(configFile, &G_fragmentKey);
+		fclose(configFile);
+	}
+	else
+	{
+		G_fireKey = KEY_NSPIRE_CTRL;
+		G_polarityKey = KEY_NSPIRE_SHIFT;
+		G_fragmentKey = KEY_NSPIRE_DEL;
+	}
+	
 	if(is_touchpad)
 		G_tpinfo = touchpad_getinfo();
 	
@@ -30,8 +88,6 @@ int main(int argc, char **argv)
 		G_enemiesArray[i] = new Enemy;
 	
 	G_particles = new Particles;
-	
-	enable_relative_paths(argv);
 	
 	buildGameLUTs();
 	
@@ -42,16 +98,86 @@ int main(int argc, char **argv)
 	while(!donePlaying)
 	{
 		drawSprite(image_entries[image_LUT_titleScreen], 0, 0);
-		x = (320 - strlen(string_title) * 8) / 2;
-		y = 160;
-		if(blink % 96 < 48)
-			drawString(&x, &y, x, string_title, 0, 0xffff);
-		blink++;
+		if(!openedMenu)
+		{
+			x = (320 - strlen(string_title) * 8) / 2;
+			y = 160;
+			if(blink % 96 < 48)
+				drawString(&x, &y, x, string_title, 0, 0xffff);
+			blink++;
+			if(isKeyPressed(KEY_NSPIRE_ENTER))
+			{
+				wait_no_key_pressed();
+				openedMenu = true;
+			}
+		}
+		else if(openedMenu)
+		{
+			y = 120;
+			for(int i = 0; i < TITLE_OPTIONS; i++)
+			{
+				char parameter = string_options[i][0];
+				bool isParameter = parameter != 'n';
+				x = (320 - (strlen(string_options[i] + 1) + isParameter * 3) * 8) / 2;
+				drawString(&x, &y, 0, string_options[i] + 1, 0, 0xffff);
+				if(parameter == 'b')
+					drawString(&x, &y, 0, *(bool*)optionValues[i] ? "yes\n" : "no\n", 0, 0xffff);
+				else if(parameter == 'i')
+					drawString(&x, &y, 0, string_difficulties[*(int*)optionValues[i]], 0, 0xffff);
+			}
+			drawSprite(image_cursor, (320 - (strlen(string_options[choice] + 1) + (string_options[choice][0] != 'n') * 3) * 8) / 2 - 8, choice * 8 + 120);
+			
+			sleep(100);
+			
+			if(isKeyPressed(KEY_NSPIRE_ENTER))
+			{
+				if(choice > 0 && choice < TITLE_OPTIONS - 1)
+				{
+					if(string_options[choice][0] == 'b')
+						*(bool*)optionValues[choice] = !*(bool*)optionValues[choice];
+					else
+					{
+						*(int*)optionValues[choice] = (*(int*)optionValues[choice] + 1) % 3;
+					}
+				}
+				else if(choice)
+				{
+					wait_no_key_pressed();
+					clearBufferB();		
+					x = 0;
+					y = 0;
+					drawString(&x, &y, 0, "Press the key you want to bind to this\naction.\n\n", 0xffff, 0);
+					
+					for(int i = 0; i < KEYS_TO_BIND; i++)
+					{
+						drawString(&x, &y, 0, string_keys[i], 0xffff, 0);
+						updateScreen();
+						while(!get_key_pressed(customKeys[i]));
+						wait_no_key_pressed();
+					}
+					configFile = fopen(string_nKaruga_config, "wb");
+					if(configFile)
+					{
+						writeKeyToConfig(configFile, &G_fireKey);
+						writeKeyToConfig(configFile, &G_polarityKey);
+						writeKeyToConfig(configFile, &G_fragmentKey);
+						fclose(configFile);
+					}
+				}
+				else
+				{
+					G_fireback = difficulty > 0;
+					G_hardMode = difficulty == 2;
+					playGame();
+					openedMenu = false;
+				}
+			}
+			choice += isKeyPressed(KEY_NSPIRE_DOWN) - isKeyPressed(KEY_NSPIRE_UP);
+			choice = choice < 0 ? 0 : (choice >= TITLE_OPTIONS ? TITLE_OPTIONS - 1 : choice);
+		}
 		updateScreen();
 		
-		if(isKeyPressed(KEY_NSPIRE_ENTER))
-			playGame();
-		else if(isKeyPressed(KEY_NSPIRE_DEL))
+		if(isKeyPressed(KEY_NSPIRE_DEL))
 			donePlaying = true;
 	}
 	
@@ -69,7 +195,7 @@ void playGame()
 {
 	KeyEvent kEv = 0;
 	int levelCounter, levelTimer, enemyCounter, waveIndex, scrollOffset = 0, pxScrollStart, pxScrollEnd;
-	bool levelEnded = false, displayBg = true, inTransitionFromIntro = false;
+	bool levelEnded = false, inTransitionFromIntro = false;
 	int readKeys = 0, gpTimer = 0;
 	
 	Rect statsRect, levelRect;
@@ -324,7 +450,7 @@ void playGame()
 			
 			updateScreen();
 		
-			if(displayBg)
+			if(G_displayBg)
 			{
 				// Display a scrolling background
 				pxScrollStart = scrollOffset * 160;
@@ -385,8 +511,8 @@ void playGame()
 		
 		if(K4(kEv)) G_usingTouchpad = is_touchpad ? true : false;
 		if(K5(kEv)) G_usingTouchpad = false;
-		if(K7(kEv)) displayBg = true;
-		if(K8(kEv)) displayBg = false;
+		if(K7(kEv)) G_displayBg = true;
+		if(K8(kEv)) G_displayBg = false;
 		
 		#ifdef DEBUG_NKARUGA
 		sleep(6);

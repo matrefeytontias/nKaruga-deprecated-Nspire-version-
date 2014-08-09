@@ -100,11 +100,15 @@ void Enemy::damage(Player *_p, bool _pol, int amount, BulletArray *bArray)
 		deactivate();
 		diedThisFrame = true;
 		
-		if(_pol == polarity)
+		if(G_fireback)
 		{
-			Fixed angle = angleToPlayer(this, _p);
-			for(int i = 0; i < fireback; i++)
-				bArray->add(getx(), gety(), fixcos(angle + (rand() % 16) - 8) << 1, fixsin(angle + (rand() % 16) - 8) + (rand() % 256), image_LUT_enemy_bullet_0_light, polarity, true);
+			if(_pol == polarity || G_hardMode)
+			{
+				Fixed angle = angleToPlayer(this, _p);
+				int famount = _pol != polarity ? fireback / 2 : fireback;
+				for(int i = 0; i < famount; i++)
+					bArray->add(getx(), gety(), fixcos(angle + (rand() % 16) - 8) << 1, fixsin(angle + (rand() % 16) - 8) + (rand() % 256), image_LUT_enemy_bullet_0_light, polarity, true);
+			}
 		}
 	}
 }

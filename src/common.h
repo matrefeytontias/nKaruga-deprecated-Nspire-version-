@@ -443,6 +443,10 @@ extern Enemy **enemiesArray;
 extern int G_skipFrame, G_waveTimer, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus;
 extern int G_score, G_power;
 extern bool G_usingTouchpad;
+extern bool G_fireback, G_hardMode;
+// Custom keys
+extern t_key G_fireKey, G_polarityKey, G_fragmentKey;
+
 extern touchpad_info_t *G_tpinfo;
 extern touchpad_report_t G_tpstatus;
 extern Enemy *G_enemiesArray[MAX_ENEMY];

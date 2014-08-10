@@ -61,7 +61,7 @@ bool Bullet::handle()
 void Bullet::draw()
 {
 	static Rect br;
-	br.x = fixtoi(x) - (img[0] / 2);
-	br.y = fixtoi(y) - (img[1] / 2);
+	br.x = fixtoi(x);
+	br.y = fixtoi(y);
 	drawSprite(img, br.x, br.y);
 }

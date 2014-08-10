@@ -9,6 +9,7 @@
 int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus;
 int G_score, G_power;
 bool G_displayBg = true, G_fireback = true, G_hardMode = false;
+int G_difficulty = 1;
 bool G_usingTouchpad;
 touchpad_info_t *G_tpinfo;
 touchpad_report_t G_tpstatus;
@@ -38,7 +39,6 @@ inline void writeKeyToConfig(FILE* out, t_key* key)
 	fputc(key->tpad_row, out);
 	fputc(key->tpad_col & 0xff, out);
 	fputc(key->tpad_col >> 8, out);
-	
 }
 
 inline void readKeyFromConfig(FILE* in, t_key* key)
@@ -50,16 +50,35 @@ inline void readKeyFromConfig(FILE* in, t_key* key)
 	key->tpad_arrow = TPAD_ARROW_NONE;
 }
 
+inline void writeToConfig(FILE* out)
+{
+	writeKeyToConfig(out, &G_fireKey);
+	writeKeyToConfig(out, &G_polarityKey);
+	writeKeyToConfig(out, &G_fragmentKey);
+	fputc(G_difficulty, out);
+	fputc(G_usingTouchpad, out);
+	fputc(G_displayBg, out);
+}
+
+inline void readFromConfig(FILE* in)
+{
+	readKeyFromConfig(in, &G_fireKey);
+	readKeyFromConfig(in, &G_polarityKey);
+	readKeyFromConfig(in, &G_fragmentKey);
+	G_difficulty = fgetc(in);
+	G_usingTouchpad = !!fgetc(in);
+	G_displayBg = !!fgetc(in);
+}
+
 int main(int argc, char **argv)
 {
 	UNUSED(argc);
 	int x, y, blink = 0;
 	bool donePlaying = false, openedMenu = false;
 	G_usingTouchpad = false;
-	int difficulty = 1;
 	FILE* configFile;
 	// Inline menu vars
-	void* optionValues[TITLE_OPTIONS] = { NULL, &difficulty, &G_usingTouchpad, &G_displayBg, NULL };
+	void* optionValues[TITLE_OPTIONS] = { NULL, &G_difficulty, &G_usingTouchpad, &G_displayBg, NULL };
 	// Custom keys vars
 	t_key* customKeys[KEYS_TO_BIND] = { &G_fireKey, &G_polarityKey, &G_fragmentKey };
 	int choice = 0;
@@ -69,9 +88,7 @@ int main(int argc, char **argv)
 	configFile = fopen(string_nKaruga_config, "rb");
 	if(configFile)
 	{
-		readKeyFromConfig(configFile, &G_fireKey);
-		readKeyFromConfig(configFile, &G_polarityKey);
-		readKeyFromConfig(configFile, &G_fragmentKey);
+		readFromConfig(configFile);
 		fclose(configFile);
 	}
 	else
@@ -155,19 +172,17 @@ int main(int argc, char **argv)
 						while(!get_key_pressed(customKeys[i]));
 						wait_no_key_pressed();
 					}
-					configFile = fopen(string_nKaruga_config, "wb");
-					if(configFile)
-					{
-						writeKeyToConfig(configFile, &G_fireKey);
-						writeKeyToConfig(configFile, &G_polarityKey);
-						writeKeyToConfig(configFile, &G_fragmentKey);
-						fclose(configFile);
-					}
 				}
 				else
 				{
-					G_fireback = difficulty > 0;
-					G_hardMode = difficulty == 2;
+					configFile = fopen(string_nKaruga_config, "wb");
+					if(configFile)
+					{
+						writeToConfig(configFile);
+						fclose(configFile);
+					}
+					G_fireback = G_difficulty > 0;
+					G_hardMode = G_difficulty == 2;
 					playGame();
 					openedMenu = false;
 				}

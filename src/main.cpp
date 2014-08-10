@@ -323,9 +323,9 @@ void playGame()
 					{
 						// Constraint an enemy to another
 						G_enemiesArray[levelStream[levelCounter + 1]]->joint(levelStream[levelCounter + 2],
-										levelStream[levelCounter + 3],
-										levelStream[levelCounter + 4]);
-						levelCounter += 5;
+										itofix(levelStream[levelCounter + 3]),
+										itofix(levelStream[levelCounter + 4]), levelStream[levelCounter + 5]);
+						levelCounter += 6;
 					}
 					else if(currentLevelByte == LVLSTR_BKPT)
 					{

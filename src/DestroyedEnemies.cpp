@@ -12,7 +12,7 @@ DestroyedEnemies::~DestroyedEnemies()
 
 void DestroyedEnemies::activate(Enemy *e, int c)
 {
-	x[c] = fixtoi(e->x);
-	y[c] = fixtoi(e->y);
+	x[c] = fixtoi(e->getx());
+	y[c] = fixtoi(e->gety());
 	relevant[c] = true;
 }

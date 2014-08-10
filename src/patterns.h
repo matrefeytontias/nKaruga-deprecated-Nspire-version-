@@ -329,3 +329,38 @@ case Pattern_1_18:
 		rotationAngle += 3;
 	}
 	break;
+case Pattern_1_19:
+	if(!internal[3])
+	{
+		internal[3] = 1;
+		internal[0] = waveIndex ? 64 : - 64;
+		internal[1] = waveIndex ? -64 : 64;
+		internal[2] = -1;
+	}
+	switch(internal[2])
+	{
+		case 1:
+			y += internal[1];
+			if(y == itofix(img[1] / 2) || y == itofix(240 - img[1] / 2))
+				internal[2] = (internal[2] + 1) % 4;
+			break;
+		case 2:
+			x -= internal[0];
+			if(x == itofix(img[0] / 2) || x == itofix(320 - img[0] / 2))
+				internal[2] = (internal[2] + 1) % 4;
+			break;
+		case 3:
+			y -= internal[1];
+			if(y == itofix(img[1] / 2) || y == itofix(240 - img[1] / 2))
+				internal[2] = (internal[2] + 1) % 4;
+			break;
+		default:
+			x += internal[0];
+			if(x == itofix(img[0] / 2) || x == itofix(320 - img[0] / 2))
+				internal[2] = (internal[2] + 1) % 4;
+	}
+	break;
+case Pattern_1_20:
+	if(!(G_waveTimer % 32))
+		bArray->add(getx(), gety(), waveIndex % 2 ? itofix(1) : itofix(-1), 0, image_LUT_enemy_bullet_2_light, polarity, true);
+	break;

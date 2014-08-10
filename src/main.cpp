@@ -464,7 +464,9 @@ void playGame()
 			else
 				clearBufferW();
 		}
+		#ifndef DEBUG_NKARUGA
 		if(!has_colors) sleep(6);
+		#endif
 		
 		scrollOffset = (scrollOffset + 1) % 240;
 		G_skipFrame = (G_skipFrame + 1) % 4;

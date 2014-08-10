@@ -67,9 +67,5 @@ KeyEvent getk(void)
 	k |= (((((isKeyPressed(KEY_NSPIRE_ESC) << 1) + isKeyPressed(G_fragmentKey)) << 1) + isKeyPressed(G_polarityKey)) << 1) + isKeyPressed(G_fireKey);
 	k <<= 4;
 	k |= (((((isKeyPressed(KEY_NSPIRE_UP) << 1) + isKeyPressed(KEY_NSPIRE_RIGHT)) << 1) + isKeyPressed(KEY_NSPIRE_LEFT)) << 1) + isKeyPressed(KEY_NSPIRE_DOWN);
-	/*if(isKeyPressed(KEY_NSPIRE_UPRIGHT)) k |= 0x0c;
-	if(isKeyPressed(KEY_NSPIRE_RIGHTDOWN)) k |= 0x05;
-	if(isKeyPressed(KEY_NSPIRE_DOWNLEFT)) k |= 0x03;
-	if(isKeyPressed(KEY_NSPIRE_LEFTUP)) k |= 0x0a;*/
 	return k;
 }

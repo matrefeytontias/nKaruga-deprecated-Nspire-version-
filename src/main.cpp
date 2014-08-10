@@ -130,6 +130,11 @@ int main(int argc, char **argv)
 		}
 		else if(openedMenu)
 		{
+			fillRect(35, 118, 250, TITLE_OPTIONS * 8 + 4, 0xffff);
+			drawHLine(118, 35, 285, 0);
+			drawHLine(TITLE_OPTIONS * 8 + 118 + 4, 35, 285, 0);
+			drawVLine(35, 118, TITLE_OPTIONS * 8 + 118 + 4, 0);
+			drawVLine(285, 118, TITLE_OPTIONS * 8 + 118 + 4, 0);
 			y = 120;
 			for(int i = 0; i < TITLE_OPTIONS; i++)
 			{

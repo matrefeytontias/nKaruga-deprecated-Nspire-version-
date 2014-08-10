@@ -1,6 +1,6 @@
 #include "common.h"
 
-//#define SKIP_INTRO
+#define SKIP_INTRO
 
 const static int levelStream[] = {
 #ifndef SKIP_INTRO
@@ -125,6 +125,7 @@ const static int levelStream[] = {
 	cmd_newWave,
 #endif
 	cmd_startChapter(0),
+	/*
 	//
 	// Chapter 1
 	//
@@ -247,6 +248,7 @@ const static int levelStream[] = {
 	cmd_killed,
 	cmd_wait(128),
 	cmd_newWave,
+	*/
 	// Wave 7
 	enemy(106, 0, 64, image_LUT_enemy_ship_3_shadow, Pattern_1_13, SHADOW, 1, 30),
 	enemy(212, 0, 64, image_LUT_enemy_ship_3_light, Pattern_1_14, LIGHT, 1, 30),

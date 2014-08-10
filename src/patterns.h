@@ -160,7 +160,7 @@ case Pattern_1_13:
 	{
 		y += 128;
 	}
-	else
+	else if(internal[2] < 3)
 	{
 		if(internal[0] > 2 && internal[0] < 12)
 		{
@@ -179,6 +179,7 @@ case Pattern_1_13:
 		else if(internal[0] == 12)
 		{
 			internal[0] = 0;
+			internal[2]++;
 		}
 		else
 		{
@@ -201,6 +202,8 @@ case Pattern_1_13:
 			}
 		}
 	}
+	else
+		x -= 64;
 	break;
 case Pattern_1_14:
 	rotationAngle = -16 + fixcos(G_waveTimer) / 32;
@@ -208,7 +211,7 @@ case Pattern_1_14:
 	{
 		y += 128;
 	}
-	else
+	else if(internal[2] < 3)
 	{
 		if(internal[0] > 2 && internal[0] < 12)
 		{
@@ -227,6 +230,7 @@ case Pattern_1_14:
 		else if(internal[0] == 12)
 		{
 			internal[0] = 0;
+			internal[2]++;
 		}
 		else
 		{
@@ -249,6 +253,8 @@ case Pattern_1_14:
 			}
 		}
 	}
+	else
+		x += 64;
 	break;
 case Pattern_1_15:
 	x = fixcos(internal[0] + (waveIndex % 2 ? 128 : 0)) * 30;

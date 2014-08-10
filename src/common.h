@@ -204,7 +204,7 @@ private:
 
 // Enemy
 // For real this time
-#define MAX_ENEMY 36
+#define MAX_ENEMY 46
 
 class Enemy
 {
@@ -216,7 +216,7 @@ public:
 	void activate(int, int, int, int, int, int, bool, bool, int);
 	void deactivate();
 	void damage(Player*, bool, int, BulletArray*);
-	void joint(int, Fixed, Fixed);
+	void joint(int, Fixed, Fixed, bool);
 	Fixed getRotation();
 	void setRotation(Fixed);
 	bool getPolarity();
@@ -246,6 +246,7 @@ private:
 	int internal[6];
 	// Used to constraint an enemy to another
 	bool isJointed;
+	bool diesWithJoint;
 	int jointedTo;
 	Fixed jointX;
 	Fixed jointY;
@@ -339,7 +340,7 @@ private:
 #define cmd_wait(x) LVLSTR_CMD, LVLSTR_WAIT, x
 #define cmd_killed LVLSTR_CMD, LVLSTR_KILLED
 #define cmd_startChapter(n) LVLSTR_CMD, LVLSTR_CHAPTER, n
-#define cmd_joint(which, to, x, y) LVLSTR_CMD, LVLSTR_JOINT, which, to, x, y
+#define cmd_joint(which, to, x, y, jointDependant) LVLSTR_CMD, LVLSTR_JOINT, which, to, x, y, jointDependant
 #define cmd_bkpt LVLSTR_CMD, LVLSTR_BKPT
 
 /* 
@@ -429,6 +430,8 @@ enum
 	Pattern_1_16,
 	Pattern_1_17,
 	Pattern_1_18,
+	Pattern_1_19,
+	Pattern_1_20,
 	NB_CALLBACKS
 };
 

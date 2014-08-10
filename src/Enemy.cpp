@@ -23,40 +23,48 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 	
 	if(active)
 	{
-		// handle bullets and pattern first
-		switch(callback)
-		{
-			// Too many patterns, needs dedicated file
-			#include "patterns.h"
-		}
-		
-		er.x = fixtoi(getx());
-		er.y = fixtoi(gety());
-		
-		// Have a relatively big threshold for off-screen animations
-		if(er.x + img[0] / 2 < -80 || er.x - img[0] / 2 > 399 ||
-			er.y + img[1] / 2 < -80 || er.y - img[1] / 2 > 319)
-			deactivate();		
+		if(isJointed && diesWithJoint && !G_enemiesArray[jointedTo]->isActive())
+			deactivate();
 		else
 		{
-			// then the enemy image
-			if(!G_skipFrame)
+			// handle bullets and pattern first
+			switch(callback)
 			{
-				if(hasRotation)
+				// Too many patterns, needs dedicated file
+				#include "patterns.h"
+			}
+			
+			er.x = fixtoi(getx());
+			er.y = fixtoi(gety());
+			
+			// Have a relatively big threshold for off-screen animations
+			if(er.x + img[0] / 2 < -80 || er.x - img[0] / 2 > 399 ||
+				er.y + img[1] / 2 < -80 || er.y - img[1] / 2 > 319)
+				deactivate();		
+			else
+			{
+				// then the enemy image
+				if(!G_skipFrame)
 				{
-					drawSpriteRotated(img, &er, rotationAngle);
-				}
-				else
-				{
-					er.x -= img[0] / 2;
-					er.y -= img[1] / 2;
-					drawSprite(img, er.x, er.y);
+					if(hasRotation)
+					{
+						drawSpriteRotated(img, &er, rotationAngle);
+					}
+					else
+					{
+						er.x -= img[0] / 2;
+						er.y -= img[1] / 2;
+						drawSprite(img, er.x, er.y);
+					}
 				}
 			}
 		}
 	}
 	else
+	{
 		diedThisFrame = false;
+		isJointed = false;
+	}
 }
 
 bool Enemy::isActive()
@@ -85,8 +93,6 @@ void Enemy::activate(int _x, int _y, int _HP, int shipImgID, int callbackID, int
 void Enemy::deactivate()
 {
 	active = false;
-	diedThisFrame = false;
-	isJointed = false;
 }
 
 void Enemy::damage(Player *_p, bool _pol, int amount, BulletArray *bArray)
@@ -97,9 +103,6 @@ void Enemy::damage(Player *_p, bool _pol, int amount, BulletArray *bArray)
 	
 	if(HP <= 0)
 	{
-		deactivate();
-		diedThisFrame = true;
-		
 		if(G_fireback)
 		{
 			if(_pol == polarity || G_hardMode)
@@ -110,15 +113,18 @@ void Enemy::damage(Player *_p, bool _pol, int amount, BulletArray *bArray)
 					bArray->add(getx(), gety(), fixcos(angle + (rand() % 16) - 8) << 1, fixsin(angle + (rand() % 16) - 8) + (rand() % 256), image_LUT_enemy_bullet_0_light, polarity, true);
 			}
 		}
+		diedThisFrame = true;
+		deactivate();
 	}
 }
 
-void Enemy::joint(int _n, Fixed _x, Fixed _y)
+void Enemy::joint(int _n, Fixed _x, Fixed _y, bool _d)
 {
 	isJointed = true;
 	jointedTo = _n;
 	jointX = _x;
 	jointY = _y;
+	diesWithJoint = _d;
 }
 
 Fixed Enemy::getRotation()

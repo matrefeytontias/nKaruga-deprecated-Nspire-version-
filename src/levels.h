@@ -1,6 +1,6 @@
 #include "common.h"
 
-#define SKIP_INTRO
+//#define SKIP_INTRO
 
 const static int levelStream[] = {
 #ifndef SKIP_INTRO
@@ -125,7 +125,6 @@ const static int levelStream[] = {
 	cmd_newWave,
 #endif
 	cmd_startChapter(0),
-	/*
 	//
 	// Chapter 1
 	//
@@ -248,18 +247,17 @@ const static int levelStream[] = {
 	cmd_killed,
 	cmd_wait(128),
 	cmd_newWave,
-	*/
 	// Wave 7
 	enemy(106, 0, 64, image_LUT_enemy_ship_3_shadow, Pattern_1_13, SHADOW, 1, 30),
 	enemy(212, 0, 64, image_LUT_enemy_ship_3_light, Pattern_1_14, LIGHT, 1, 30),
 	enemy(0, 0, 1, image_LUT_enemy_ship_0_shadow, Pattern_1_15, SHADOW, 1, 5),
 	enemy(0, 0, 1, image_LUT_enemy_ship_0_shadow, Pattern_1_15, SHADOW, 1, 5),
-	cmd_joint(2, 0, 0, 0),
-	cmd_joint(3, 0, 0, 0),
+	cmd_joint(2, 0, 0, 0, 0),
+	cmd_joint(3, 0, 0, 0, 0),
 	enemy(0, 0, 1, image_LUT_enemy_ship_0_light, Pattern_1_15, LIGHT, 1, 5),
 	enemy(0, 0, 1, image_LUT_enemy_ship_0_light, Pattern_1_15, LIGHT, 1, 5),
-	cmd_joint(4, 1, 0, 0),
-	cmd_joint(5, 1, 0, 0),
+	cmd_joint(4, 1, 0, 0, 0),
+	cmd_joint(5, 1, 0, 0, 0),
 	cmd_killed,
 	cmd_wait(128),
 	cmd_newWave,
@@ -288,6 +286,43 @@ const static int levelStream[] = {
 	enemy(0, 0, 1, image_LUT_enemy_ship_0_shadow, Pattern_1_18, SHADOW, 1, 5),
 	enemy(0, 0, 1, image_LUT_enemy_ship_0_shadow, Pattern_1_18, SHADOW, 1, 5),
 	enemy(0, 0, 1, image_LUT_enemy_ship_0_shadow, Pattern_1_18, SHADOW, 1, 5),
+	cmd_killed,
+	cmd_newWave,
+	// Wave 11
+	enemy(340, 66, 120, image_LUT_enemy_ship_4_light, Pattern_1_19, LIGHT, 0, 40),
+	enemy(-20, 184, 120, image_LUT_enemy_ship_4_shadow, Pattern_1_19, SHADOW, 0, 40),
+	enemy(0, 0, 2, image_LUT_enemy_ship_4_lightball, Pattern_1_20, LIGHT, 0, 10),
+	enemy(0, 0, 2, image_LUT_enemy_ship_4_lightball, Pattern_1_20, LIGHT, 0, 10),
+	enemy(0, 0, 2, image_LUT_enemy_ship_4_lightball, Pattern_1_20, LIGHT, 0, 10),
+	enemy(0, 0, 2, image_LUT_enemy_ship_4_lightball, Pattern_1_20, LIGHT, 0, 10),
+	enemy(0, 0, 2, image_LUT_enemy_ship_4_lightball, Pattern_1_20, LIGHT, 0, 10),
+	enemy(0, 0, 2, image_LUT_enemy_ship_4_lightball, Pattern_1_20, LIGHT, 0, 10),
+	enemy(0, 0, 2, image_LUT_enemy_ship_4_lightball, Pattern_1_20, LIGHT, 0, 10),
+	enemy(0, 0, 2, image_LUT_enemy_ship_4_lightball, Pattern_1_20, LIGHT, 0, 10),
+	cmd_joint(2, 0, -22, -3, 1),
+	cmd_joint(3, 0, 22, -3, 1),
+	cmd_joint(4, 0, -22, 10, 1),
+	cmd_joint(5, 0, 22, 10, 1),
+	cmd_joint(6, 0, -22, 31, 1),
+	cmd_joint(7, 0, 22, 31, 1),
+	cmd_joint(8, 0, -22, 45, 1),
+	cmd_joint(9, 0, 22, 45, 1),
+	enemy(0, 0, 2, image_LUT_enemy_ship_4_shadowball, Pattern_1_20, SHADOW, 0, 10),
+	enemy(0, 0, 2, image_LUT_enemy_ship_4_shadowball, Pattern_1_20, SHADOW, 0, 10),
+	enemy(0, 0, 2, image_LUT_enemy_ship_4_shadowball, Pattern_1_20, SHADOW, 0, 10),
+	enemy(0, 0, 2, image_LUT_enemy_ship_4_shadowball, Pattern_1_20, SHADOW, 0, 10),
+	enemy(0, 0, 2, image_LUT_enemy_ship_4_shadowball, Pattern_1_20, SHADOW, 0, 10),
+	enemy(0, 0, 2, image_LUT_enemy_ship_4_shadowball, Pattern_1_20, SHADOW, 0, 10),
+	enemy(0, 0, 2, image_LUT_enemy_ship_4_shadowball, Pattern_1_20, SHADOW, 0, 10),
+	enemy(0, 0, 2, image_LUT_enemy_ship_4_shadowball, Pattern_1_20, SHADOW, 0, 10),
+	cmd_joint(10, 1, -22, -3, 1),
+	cmd_joint(11, 1, 22, -3, 1),
+	cmd_joint(12, 1, -22, 10, 1),
+	cmd_joint(13, 1, 22, 10, 1),
+	cmd_joint(14, 1, -22, 31, 1),
+	cmd_joint(15, 1, 22, 31, 1),
+	cmd_joint(16, 1, -22, 45, 1),
+	cmd_joint(17, 1, 22, 45, 1),
 	cmd_killed,
 	cmd_newWave,
 	LVLSTR_END

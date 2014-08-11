@@ -327,6 +327,12 @@ void playGame()
 										itofix(levelStream[levelCounter + 4]), levelStream[levelCounter + 5]);
 						levelCounter += 6;
 					}
+					else if(currentLevelByte == LVLSTR_BOSS)
+					{
+						// TODO
+						// Cinematic + fight boss
+						levelCounter += 2;
+					}
 					else if(currentLevelByte == LVLSTR_BKPT)
 					{
 						// Debug stuff

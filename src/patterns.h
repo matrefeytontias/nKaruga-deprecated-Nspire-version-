@@ -323,9 +323,13 @@ case Pattern_1_17:
 case Pattern_1_18:
 	if(!(G_waveTimer % 4))
 	{
-		x = fixcos(internal[0] + waveIndex * 21) * max(200 - internal[0], 80) + itofix(160);
-		y = fixsin(internal[0] + waveIndex * 21) * max(200 - internal[0], 80) + itofix(120);
-		internal[0] += 2;
+		x = fixcos(G_waveTimer / 2 + waveIndex * 21) * max(200 - internal[0], 80) + itofix(160);
+		y = fixsin(G_waveTimer / 2 + waveIndex * 21) * max(200 - internal[0], 80) + itofix(120);
+		
+		if(G_waveTimer < 1024)
+			internal[0] += (internal[0] < 120) * 2;
+		else
+			internal[0] -= 2;
 		rotationAngle += 3;
 	}
 	break;
@@ -333,34 +337,45 @@ case Pattern_1_19:
 	if(!internal[3])
 	{
 		internal[3] = 1;
-		internal[0] = waveIndex ? 64 : - 64;
-		internal[1] = waveIndex ? -64 : 64;
+		internal[0] = waveIndex ? 48 : -48;
+		internal[1] = waveIndex ? -48 : 48;
 		internal[2] = -1;
 	}
-	switch(internal[2])
+	if(internal[2] < 5)
 	{
-		case 1:
-			y += internal[1];
-			if(y == itofix(img[1] / 2) || y == itofix(240 - img[1] / 2))
-				internal[2] = (internal[2] + 1) % 4;
-			break;
-		case 2:
-			x -= internal[0];
-			if(x == itofix(img[0] / 2) || x == itofix(320 - img[0] / 2))
-				internal[2] = (internal[2] + 1) % 4;
-			break;
-		case 3:
-			y -= internal[1];
-			if(y == itofix(img[1] / 2) || y == itofix(240 - img[1] / 2))
-				internal[2] = (internal[2] + 1) % 4;
-			break;
-		default:
-			x += internal[0];
-			if(x == itofix(img[0] / 2) || x == itofix(320 - img[0] / 2))
-				internal[2] = (internal[2] + 1) % 4;
+		switch(internal[2] % 4)
+		{
+			case 1:
+				y += internal[1];
+				if(y <= itofix(img[1] / 2) || y >= itofix(240 - img[1] / 2 - 15))
+					internal[2]++;
+				break;
+			case 2:
+				x -= internal[0];
+				if(x <= itofix(img[0] / 2) || x >= itofix(320 - img[0] / 2))
+					internal[2]++;
+				break;
+			case 3:
+				y -= internal[1];
+				if(y <= itofix(img[1] / 2) || y >= itofix(240 - img[1] / 2 - 15))
+					internal[2]++;
+				break;
+			default:
+				x += internal[0];
+				if(x == itofix(img[0] / 2) || x == itofix(320 - img[0] / 2))
+					internal[2]++;
+		}
 	}
+	else
+		y += internal[1];
 	break;
 case Pattern_1_20:
 	if(!(G_waveTimer % 32))
 		bArray->add(getx(), gety(), waveIndex % 2 ? itofix(1) : itofix(-1), 0, image_LUT_enemy_bullet_2_light, polarity, true);
 	break;
+case Pattern_1_21:
+	if(!internal[0] && waveIndex % 2)
+		internal[0] = 128;
+	y += 48;
+	x = fixcos(internal[0]) * 14 + itofix(160);
+		internal[0]++;

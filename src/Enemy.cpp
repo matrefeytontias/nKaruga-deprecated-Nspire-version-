@@ -24,7 +24,7 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 	if(active)
 	{
 		if(isJointed && diesWithJoint && !G_enemiesArray[jointedTo]->isActive())
-			deactivate();
+			damage(p, !polarity, HP, bArray);
 		else
 		{
 			// handle bullets and pattern first

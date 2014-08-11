@@ -334,7 +334,8 @@ private:
 #define LVLSTR_KILLED 2
 #define LVLSTR_CHAPTER 3
 #define LVLSTR_JOINT 4
-#define LVLSTR_BKPT 5
+#define LVLSTR_BOSS 5
+#define LVLSTR_BKPT 6
 
 #define cmd_newWave LVLSTR_CMD, LVLSTR_NEWWAVE
 #define cmd_wait(x) LVLSTR_CMD, LVLSTR_WAIT, x
@@ -342,6 +343,7 @@ private:
 #define cmd_startChapter(n) LVLSTR_CMD, LVLSTR_CHAPTER, n
 #define cmd_joint(which, to, x, y, jointDependant) LVLSTR_CMD, LVLSTR_JOINT, which, to, x, y, jointDependant
 #define cmd_bkpt LVLSTR_CMD, LVLSTR_BKPT
+#define cmd_fightBoss(n) LVLSTR_CMD, LVLSTR_BOSS, n
 
 /* 
  * Level streams structure
@@ -432,6 +434,7 @@ enum
 	Pattern_1_18,
 	Pattern_1_19,
 	Pattern_1_20,
+	Pattern_1_21,
 	NB_CALLBACKS
 };
 

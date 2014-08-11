@@ -1,6 +1,6 @@
 #include "common.h"
 
-#define SKIP_INTRO
+//#define SKIP_INTRO
 
 const static int levelStream[] = {
 #ifndef SKIP_INTRO
@@ -125,7 +125,6 @@ const static int levelStream[] = {
 	cmd_newWave,
 #endif
 	cmd_startChapter(0),
-	/*
 	//
 	// Chapter 1
 	//
@@ -270,7 +269,6 @@ const static int levelStream[] = {
 	enemy(180, -50, 6, image_LUT_enemy_ship_2_light, Pattern_1_16, LIGHT, 0, 8),
 	cmd_killed,
 	cmd_newWave,
-	*/
 	// Wave 9
 	enemy(160, -50, 60, image_LUT_enemy_ship_3_light, Pattern_1_17, LIGHT, 1, 40),
 	cmd_killed,
@@ -369,5 +367,7 @@ const static int levelStream[] = {
 	enemy(160, 0, 1, image_LUT_enemy_ship_1_light, Pattern_1_21, LIGHT, 0, 2),
 	cmd_killed,
 	cmd_newWave,
+	// Boss
+	cmd_fightBoss(0),
 	LVLSTR_END
 	};

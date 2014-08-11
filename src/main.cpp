@@ -477,7 +477,7 @@ void playGame()
 				chainNotifsArray[i].handle();
 			
 			updateScreen();
-		
+			
 			if(G_displayBg)
 			{
 				// Display a scrolling background
@@ -539,12 +539,8 @@ void playGame()
 		}
 		G_frameChainOffset = 0;
 		
-		if(K4(kEv)) G_usingTouchpad = is_touchpad ? true : false;
-		if(K5(kEv)) G_usingTouchpad = false;
-		if(K7(kEv)) G_displayBg = true;
-		if(K8(kEv)) G_displayBg = false;
-		
 		#ifdef DEBUG_NKARUGA
+		if(isKeyPressed(KEY_NSPIRE_ENTER)) bkpt();
 		sleep(6);
 		#endif
 	}

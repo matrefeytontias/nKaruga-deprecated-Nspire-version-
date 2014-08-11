@@ -450,6 +450,7 @@ extern int G_skipFrame, G_waveTimer, G_killedThisFrame[MAX_ENEMY], G_frameChainO
 extern int G_score, G_power;
 extern bool G_usingTouchpad;
 extern bool G_fireback, G_hardMode;
+extern bool G_hasFiredOnce;
 // Custom keys
 extern t_key G_fireKey, G_polarityKey, G_fragmentKey;
 

@@ -9,6 +9,7 @@
 int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus;
 int G_score, G_power;
 bool G_displayBg = true, G_fireback = true, G_hardMode = false;
+bool G_hasFiredOnce = false;
 int G_difficulty = 1;
 bool G_usingTouchpad;
 touchpad_info_t *G_tpinfo;

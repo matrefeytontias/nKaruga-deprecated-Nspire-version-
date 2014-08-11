@@ -20,12 +20,13 @@ BulletArray::~BulletArray()
 
 void BulletArray::handle(Player *p)
 {
-	bool carryOn = true;
+	bool destroyBullet;
 	
 	// Bullets
 	for(int i = 0; i < MAX_BULLET; i++)
 	{
 		Bullet *cb = &data[i];
+		destroyBullet = false;
 		if(cb->isActive())
 		{
 			if(cb->hurtsPlayer())
@@ -39,18 +40,16 @@ void BulletArray::handle(Player *p)
 					&& p->y >= cb->y - itofix(cb->img[1] / 2) && p->y < cb->y + itofix(cb->img[1] / 2))
 					{
 						p->hurt();
-						deactivate(i);
-						carryOn = false;
+						destroyBullet = true;
 					}
 				}
 				else
 				{
-					if(sq(fixtoi(cb->x - p->x)) + sq(fixtoi(cb->y - p->y)) < sq(p->img[0][0] / 2))
+					if(sq(fixtoi(cb->x - p->x)) + sq(fixtoi(cb->y - p->y)) < sq(19)) // sqrt(player.w/2 ^2 + player.h/2 ^2)
 					{
-						deactivate(i);
+						destroyBullet = true;
 						G_score += 100;
 						G_power += G_power < MAX_POWER;
-						carryOn = false;
 					}
 				}
 			}
@@ -68,14 +67,15 @@ void BulletArray::handle(Player *p)
 						{
 							G_enemiesArray[j]->damage(p, cb->getPolarity(), 1, this);
 							G_score += 100;
-							deactivate(i);
-							carryOn = false;
-							break;
+							destroyBullet = true;
+							// The same bullet can destroy several enemies if it hits them in the same frame !
 						}
 					}
 				}
 			}
-			if(carryOn)
+			if(destroyBullet)
+				deactivate(i);
+			else
 			{
 				if(cb->handle())
 					deactivate(i);
@@ -84,12 +84,13 @@ void BulletArray::handle(Player *p)
 			}
 		}
 		else break;
-	}
+	}	
 	
 	// Power fragments
 	for(int i = 0; i < MAX_FRAGMENT; i++)
 	{
 		PowerFragment *cf = &data_homing[i];
+		destroyBullet = false;
 		if(cf->isActive())
 		{
 			if(cf->hurtsPlayer())
@@ -103,18 +104,16 @@ void BulletArray::handle(Player *p)
 					&& p->y >= cf->y - itofix(4) && p->y < cf->y + itofix(4))
 					{
 						p->hurt();
-						deactivate_homing(i);
+						destroyBullet = true;
 						G_power = min(G_power + 10, MAX_POWER);
-						carryOn = false;
 					}
 				}
 				else
 				{
 					if(sq(fixtoi(cf->x - p->x)) + sq(fixtoi(cf->y - p->y)) < sq(p->img[0][0] / 2))
 					{
-						deactivate_homing(i);
+						destroyBullet = true;
 						G_score += 100;
-						carryOn = false;
 					}
 				}
 			}
@@ -133,14 +132,14 @@ void BulletArray::handle(Player *p)
 						{
 							cf->targetE->damage(p, cf->getPolarity(), 10, this);
 							G_score += 100;
-							deactivate_homing(i);
-							carryOn = false;
-							break;
+							destroyBullet = true;
 						}
 					}
 				}
 			}
-			if(carryOn)
+			if(destroyBullet)
+				deactivate_homing(i);
+			else
 			{
 				if(cf->handle())
 					deactivate_homing(i);

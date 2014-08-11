@@ -193,7 +193,11 @@ void BulletArray::handle(Player *p)
 							// Hit, but doesn't hurt
 							cl->setAmplitude((int)sqrt(sq(fixtoi(p->x) - r->x) + sq(fixtoi(p->y) - r->y)));
 							// Using G_skipFrame as a delay
-							if(!G_skipFrame) G_power += G_power < MAX_POWER;
+							if(!G_skipFrame)
+							{
+								G_power += G_power < MAX_POWER;
+								G_score += 100;
+							}
 							// Lasers are powerful, so they push the player
 							p->x += fixcos(cl->angle) / 2;
 							p->y += fixsin(cl->angle) / 2;

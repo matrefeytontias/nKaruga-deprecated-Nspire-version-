@@ -114,10 +114,10 @@ Rect* Laser::getVector()
 
 void Laser::getSides(Rect* s1, Rect* s2)
 {
-	s1->x = x - fixtoi(fixsin(angle) * LASER_THICKNESS / 2);
-	s1->y = y - fixtoi(fixcos(angle) * LASER_THICKNESS / 2);
-	s2->x = x + fixtoi(fixsin(angle) * LASER_THICKNESS / 2);
-	s2->y = y + fixtoi(fixcos(angle) * LASER_THICKNESS / 2);
+	s1->x = x - fixtoi(fixsin(-angle) * LASER_THICKNESS / 2);
+	s1->y = y - fixtoi(fixcos(-angle) * LASER_THICKNESS / 2);
+	s2->x = x + fixtoi(fixsin(-angle) * LASER_THICKNESS / 2);
+	s2->y = y + fixtoi(fixcos(-angle) * LASER_THICKNESS / 2);
 }
 
 int Laser::getAmplitude()

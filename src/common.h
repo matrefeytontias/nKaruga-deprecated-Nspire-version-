@@ -459,7 +459,7 @@ extern void freeGameLUTs();
 extern Enemy **enemiesArray;
 
 // Global vars
-extern int G_skipFrame, G_waveTimer, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus;
+extern int G_skipFrame, G_waveTimer, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount;
 extern int G_score, G_power;
 extern bool G_usingTouchpad;
 extern bool G_fireback, G_hardMode;

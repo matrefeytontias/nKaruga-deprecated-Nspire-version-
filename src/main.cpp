@@ -6,7 +6,7 @@
 #define ENEMY_W(i) G_enemiesArray[i]->img[0]
 #define ENEMY_H(i) G_enemiesArray[i]->img[1]
 
-int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus;
+int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount;
 int G_score, G_power;
 bool G_displayBg = true, G_fireback = true, G_hardMode = false;
 bool G_hasFiredOnce;
@@ -220,7 +220,7 @@ void playGame()
 	int readKeys = 0, gpTimer = 0;
 	
 	Rect statsRect, levelRect;
-	int chainColor[3] = { 0 }, inChainCount;
+	int chainColor[3] = { 0 };
 	
 	unsigned short *bg;
 	// Variables for transition animation
@@ -262,7 +262,7 @@ void playGame()
 	G_frameChainOffset = 0;
 	G_waveTimer = 0;
 	
-	inChainCount = 0;
+	G_inChainCount = 0;
 	currentNotif = 0;
 	currentExplosion = 0;
 	gpTimer = 0;
@@ -454,7 +454,7 @@ void playGame()
 				explosionsAnims[i].handle();
 			
 			// Draw chain count
-			for(int i = 0, j = 0; i < inChainCount; i++, j += 18)
+			for(int i = 0, j = 0; i < G_inChainCount; i++, j += 18)
 				drawSprite(image_entries[chainColor[i] == LIGHT ? image_LUT_chain_hit_light : image_LUT_chain_hit_shadow], j, 12);
 			
 			// Draw power
@@ -504,21 +504,21 @@ void playGame()
 		{
 			if(G_killedThisFrame[i] != -1)
 			{
-				if(inChainCount == 3) inChainCount = 0;
+				if(G_inChainCount == 3) G_inChainCount = 0;
 				
-				if(inChainCount)
+				if(G_inChainCount)
 				{
-					if(chainColor[inChainCount - 1] != G_killedThisFrame[i])
+					if(chainColor[G_inChainCount - 1] != G_killedThisFrame[i])
 					{
-						inChainCount = 0;
+						G_inChainCount = 0;
 						G_chainStatus = 0;
 					}
 				}
 				
-				chainColor[inChainCount] = G_killedThisFrame[i];
-				inChainCount++;
+				chainColor[G_inChainCount] = G_killedThisFrame[i];
+				G_inChainCount++;
 				
-				if(inChainCount == 3)
+				if(G_inChainCount == 3)
 				{
 					G_score += 100 * (1 << min(G_chainStatus, 8));
 					for(int j = 0; j < MAX_ENEMY; j++)

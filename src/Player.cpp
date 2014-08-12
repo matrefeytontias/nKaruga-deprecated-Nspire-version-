@@ -8,7 +8,7 @@ Player::Player()
 	dying = false;
 	isSwitchingPolarity = 0;
 	fireDelay = 32;
-	lives = 4;
+	lives = 3;
 	img[LIGHT] = image_entries[image_LUT_player_ship_light];
 	img[SHADOW] = image_entries[image_LUT_player_ship_shadow];
 	img[LIGHT + SWITCHING0] = image_entries[image_LUT_player_ship_polarityswitch_0_light];
@@ -148,7 +148,7 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 			int w = image_entries[image_LUT_player_ship_light][0] / 2;
 			int h = image_entries[image_LUT_player_ship_light][1] / 2;
 			drawSprite(image_entries[image_LUT_player_ship_light], fixtoi(x) - w, fixtoi(y) - h);
-			y -= 128;
+			y -= itofix(1);
 		}
 		else dying = false;
 	}
@@ -171,6 +171,7 @@ void Player::hurt()
 	deathCounter = 0;
 	G_chainStatus = 0;
 	G_frameChainOffset = 0;
+	G_inChainCount = 0;
 	G_power = 0;
 }
 

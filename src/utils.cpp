@@ -2,7 +2,10 @@
 
 Fixed angleToPlayer(Enemy *e, Player *p)
 {
-	return (int)(atan2((double)(p->y - e->gety()), (double)(p->x - e->getx())) * 128. / M_PI);
+	static Fixed lastResult = 64;
+	if(!p->isDying())
+		lastResult = (int)(atan2((double)(p->y - e->gety()), (double)(p->x - e->getx())) * 128. / M_PI);
+	return lastResult;
 }
 
 Fixed angleToEnemy(PowerFragment *pf, Enemy *e)
@@ -12,7 +15,10 @@ Fixed angleToEnemy(PowerFragment *pf, Enemy *e)
 
 Fixed angleToPlayer(PowerFragment *pf, Player *p)
 {
-	return (int)(atan2((double)(p->y - pf->y), (double)(p->x - pf->x)) * 128. / M_PI);
+	static Fixed lastResult = 64;
+	if(!p->isDying())
+		lastResult = (int)(atan2((double)(p->y - pf->y), (double)(p->x - pf->x)) * 128. / M_PI);
+	return lastResult;
 }
 
 Enemy* findNearestEnemy(Fixed x, Fixed y)

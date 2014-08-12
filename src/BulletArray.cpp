@@ -29,10 +29,9 @@ void BulletArray::handle(Player *p)
 		destroyBullet = false;
 		if(cb->isActive())
 		{
-			if(cb->hurtsPlayer())
+			if(cb->hurtsPlayer() && !p->isDying())
 			{
-				
-				// Check collisions with player
+				// Check collisions with player if he's not dead already
 				if(cb->getPolarity() != p->getPolarity())
 				{
 					// the player has a 1px hitbox (for now) (but that actually seems to be enough)
@@ -93,7 +92,7 @@ void BulletArray::handle(Player *p)
 		destroyBullet = false;
 		if(cf->isActive())
 		{
-			if(cf->hurtsPlayer())
+			if(cf->hurtsPlayer() && !p->isDying())
 			{
 				// Check collisions with player
 				if(cf->getPolarity() != p->getPolarity())
@@ -162,52 +161,55 @@ void BulletArray::handle(Player *p)
 				r = cl->getVector();
 				cl->getSides(&r1, &r2);
 				
-				// Uses cartesian hitbox for checking collision with player
-				// First, see if the player is not too far
-				if(sq(fixtoi(p->x) - r->x) + sq(fixtoi(p->y) - r->y) <= sq(cl->getAmplitude()))
+				if(!p->isDying())
 				{
-					// if we're not too far, carry on collision checking
-					// calculate the laser's cartesian equation and apply it to each of its sides
-					// ax + by + c = 0
-					int a, b, c1, c2;
-					a = r->h;
-					b = -r->w;
-					c1 = -(a * r1.x + b * r1.y);
-					c2 = -(a * r2.x + b * r2.y);
-					
-					if(p->getPolarity() != cl->getPolarity())
+					// Uses cartesian hitbox for checking collision with player
+					// First, see if the player is not too far
+					if(sq(fixtoi(p->x) - r->x) + sq(fixtoi(p->y) - r->y) <= sq(cl->getAmplitude()))
 					{
-						int temp = a * fixtoi(p->x) + b * fixtoi(p->y);
-						// Work the player's 1 px hitbox
-						if(sign(temp + c1) != sign(temp + c2))
-							// Hit !
-							p->hurt();
-					}
-					else
-					{
-						int temp1 = a * (fixtoi(p->x) - p->img[0][0] / 2) + b * fixtoi(p->y);
-						int temp2 = a * (fixtoi(p->x) + p->img[0][0] / 2) + b * fixtoi(p->y);
+						// if we're not too far, carry on collision checking
+						// calculate the laser's cartesian equation and apply it to each of its sides
+						// ax + by + c = 0
+						int a, b, c1, c2;
+						a = r->h;
+						b = -r->w;
+						c1 = -(a * r1.x + b * r1.y);
+						c2 = -(a * r2.x + b * r2.y);
 						
-						if(sign(temp1 + c1) != sign(temp1 + c2) || sign(temp2 + c1) != sign(temp2 + c2))
+						if(p->getPolarity() != cl->getPolarity())
 						{
-							// Hit, but doesn't hurt
-							cl->setAmplitude((int)sqrt(sq(fixtoi(p->x) - r->x) + sq(fixtoi(p->y) - r->y)));
-							// Using G_skipFrame as a delay
-							if(!G_skipFrame)
-							{
-								G_power += G_power < MAX_POWER;
-								G_score += 100;
-							}
-							// Lasers are powerful, so they push the player
-							p->x += fixcos(cl->angle) / 2;
-							p->y += fixsin(cl->angle) / 2;
+							int temp = a * fixtoi(p->x) + b * fixtoi(p->y);
+							// Work the player's 1 px hitbox
+							if(sign(temp + c1) != sign(temp + c2))
+								// Hit !
+								p->hurt();
+						}
+						else
+						{
+							int temp1 = a * (fixtoi(p->x) - p->img[0][0] / 2) + b * fixtoi(p->y);
+							int temp2 = a * (fixtoi(p->x) + p->img[0][0] / 2) + b * fixtoi(p->y);
 							
-							// Add particles ! Yeeee !
-							int k = (rand() % 4) + 1;
-							for(int j = 0; j < k; j++)
+							if(sign(temp1 + c1) != sign(temp1 + c2) || sign(temp2 + c1) != sign(temp2 + c2))
 							{
-								Fixed a = cl->angle + 128 + (rand() % 64) - 32;
-								G_particles->add(p->x, p->y, fixcos(a) / 2, fixsin(a) / 2, cl->getPolarity());
+								// Hit, but doesn't hurt
+								cl->setAmplitude((int)sqrt(sq(fixtoi(p->x) - r->x) + sq(fixtoi(p->y) - r->y)));
+								// Using G_skipFrame as a delay
+								if(!G_skipFrame)
+								{
+									G_power += G_power < MAX_POWER;
+									G_score += 100;
+								}
+								// Lasers are powerful, so they push the player
+								p->x += fixcos(cl->angle) / 2;
+								p->y += fixsin(cl->angle) / 2;
+								
+								// Add particles ! Yeeee !
+								int k = (rand() % 4) + 1;
+								for(int j = 0; j < k; j++)
+								{
+									Fixed a = cl->angle + 128 + (rand() % 64) - 32;
+									G_particles->add(p->x, p->y, fixcos(a) / 2, fixsin(a) / 2, cl->getPolarity());
+								}
 							}
 						}
 					}

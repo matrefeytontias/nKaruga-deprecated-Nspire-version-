@@ -240,7 +240,7 @@ void playGame()
 	int currentNotif, currentExplosion;
 	
 	ship.x = itofix(160);
-	ship.y = itofix(220);
+	ship.y = itofix(180);
 	
 	levelCounter = 0;
 	levelTimer = 0;
@@ -540,7 +540,7 @@ void playGame()
 		G_frameChainOffset = 0;
 		
 		#ifdef DEBUG_NKARUGA
-		if(isKeyPressed(KEY_NSPIRE_ENTER)) bkpt();
+		if(isKeyPressed(KEY_NSPIRE_SPACE)) bkpt();
 		sleep(6);
 		#endif
 	}

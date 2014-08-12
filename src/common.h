@@ -200,6 +200,7 @@ private:
 	bool polarityRepeat;
 	bool dying;
 	int lives;
+	int deathCounter;
 } ;
 
 // Enemy

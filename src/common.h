@@ -212,7 +212,7 @@ class Enemy
 public:
 	Enemy();
 	~Enemy();
-	void handle(Player*, BulletArray*);
+	void handle(Player*, BulletArray*, bool);
 	bool isActive();
 	void activate(int, int, int, int, int, int, bool, bool, int);
 	void deactivate();
@@ -226,6 +226,7 @@ public:
 	void setInternal(int, int);
 	Fixed getx();
 	Fixed gety();
+	bool hurtsPlayer(Player *);
 	// x, y on-screen
 	Fixed x, y;
 	// Enemy image

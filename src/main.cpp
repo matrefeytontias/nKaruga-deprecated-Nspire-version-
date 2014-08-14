@@ -433,7 +433,7 @@ void playGame()
 														   G_enemiesArray[i]->getPolarity());
 				currentExplosion = (currentExplosion + 1) % MAX_ENEMY;
 			}
-			G_enemiesArray[i]->handle(&ship, bArray);
+			G_enemiesArray[i]->handle(&ship, bArray, !((readKeys - 1) % 4));
 		}
 		
 		bArray->handle(&ship);

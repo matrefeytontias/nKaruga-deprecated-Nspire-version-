@@ -16,13 +16,18 @@ Enemy::~Enemy()
 {
 }
 
-void Enemy::handle(Player *p, BulletArray *bArray)
+void Enemy::handle(Player *p, BulletArray *bArray, bool handlePlayerMovement)
 {
 	Rect er;
 	Fixed angle;
 	
 	if(active)
 	{
+		// Check whether the player hit this enemy
+		if(!p->isDying() && handlePlayerMovement && hurtsPlayer(p))
+		{
+			return;
+		}
 		if(isJointed && diesWithJoint && !G_enemiesArray[jointedTo]->isActive())
 			damage(p, !polarity, HP, bArray);
 		else
@@ -57,6 +62,11 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 						drawSprite(img, er.x, er.y);
 					}
 				}
+			}
+			// Check whether the enemy hit the player
+			if(!p->isDying() && active && hurtsPlayer(p))
+			{
+				return;
 			}
 		}
 	}
@@ -165,4 +175,14 @@ Fixed Enemy::getx()
 Fixed Enemy::gety()
 {
 	return isJointed ? y + G_enemiesArray[jointedTo]->gety() + jointY : y;
+}
+
+bool Enemy::hurtsPlayer(Player *player)
+{
+	if((player->x >= x && player->x < x + itofix(img[0])) && (player->y >= y && player->y <= y + itofix(img[1])))
+	{
+		player->hurt();
+		return true;
+	}
+	return false;
 }

@@ -420,6 +420,7 @@ enum image_LUT
 	image_LUT_particle_light,
 	image_LUT_particle_shadow,
 	image_LUT_powerslot,
+	image_LUT_lives,
 	image_LUT_background,
 	image_LUT_titleScreen,
 	NB_IMAGES

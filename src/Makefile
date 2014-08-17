@@ -4,6 +4,8 @@ AS = nspire-as
 GXX=nspire-g++
 LD = nspire-ld-bflt
 GCCFLAGS = -Wall -W -marm -Ofast
+HEADER_DEPENDS_DIR = .depends
+HEADER_DEPENDS_FLAG = -MM -MF $(HEADER_DEPENDS_DIR)/$<.d
 LDFLAGS = 
 ifeq ($(DEBUG),FALSE)
 	GCCFLAGS += -Os
@@ -21,14 +23,23 @@ EXE_EMU = nKaruga_emu.tns
 DISTDIR = ../
 vpath %.tns $(DISTDIR)
 
+#	include *.d
+#endif
+
 all: $(EXE) $(EXE_EMU)
 
+$(OBJS) : $(HEADER_DEPENDS_DIR)
+$(HEADER_DEPENDS_DIR):
+	mkdir $(HEADER_DEPENDS_DIR)
+
 %.o: %.c
-	$(GCC) $(GCCFLAGS) -c $<
+	$(GCC) $(GCCFLAGS) -c $< $(HEADER_DEPENDS_FLAG)
+	$(GCC) $(GCCFLAGS) -c $< -o $@
 
 %.o: %.cpp
-	$(GXX) $(GCCFLAGS) -c $<
-	
+	$(GXX) $(GCCFLAGS) -c $< $(HEADER_DEPENDS_FLAG)
+	$(GXX) $(GCCFLAGS) -c $< -o $@
+
 %.o: %.S
 	$(AS) -c $<
 
@@ -47,24 +58,9 @@ ifeq ($(DEBUG),FALSE)
 endif
 
 clean:
-	rm -f *.o *.elf $(DISTDIR)/*.gdb $(DISTDIR)/$(EXE) $(DISTDIR)/$(EXE_EMU)
+	rm -f *.o *.elf $(DISTDIR)/*.gdb $(DISTDIR)/$(EXE) $(DISTDIR)/$(EXE_EMU) .depends/*.d
+	rmdir .depends
 
-###########################
-##  Headers dependencies ##
-###########################
-Particles.cpp : common.h
-Player.cpp : common.h
-main.cpp : common.h levels.h misc_data.h
-BulletArray.cpp : common.h
-utils.cpp : common.h
-ExplosionAnim.cpp : common.h
-levels.h : common.h
-buildGameLUTs.cpp : common.h
-PowerFragment.cpp : common.h
-Enemy.cpp : common.h patterns.h
-Laser.cpp : common.h
-Bullet.cpp : common.h
-ChainNotif.cpp : common.h
-DestroyedEnemies : common.h
-n2DLib.c : n2DLib_font.h n2DLib.h
-common.h : n2DLib.h
+ifneq ($(ls .depends/*.d),)
+	include .depends/*.d
+endif

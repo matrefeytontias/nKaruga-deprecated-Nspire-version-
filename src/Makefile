@@ -35,9 +35,8 @@ all: $(EXE) $(EXE_EMU)
 main_emu.o: GCCFLAGS+= -D DEBUG_NKARUGA
 main_emu.o: main.cpp
 	$(GXX) $(GCCFLAGS) -c $< -o $@
-
-
 $(EXE): $(OBJS)
+
 $(EXE_EMU): main_emu.o  $(filter-out main.o,$(OBJS))
 
 %.tns:
@@ -49,3 +48,23 @@ endif
 
 clean:
 	rm -f *.o *.elf $(DISTDIR)/*.gdb $(DISTDIR)/$(EXE) $(DISTDIR)/$(EXE_EMU)
+
+###########################
+##  Headers dependencies ##
+###########################
+Particles.cpp : common.h
+Player.cpp : common.h
+main.cpp : common.h levels.h misc_data.h
+BulletArray.cpp : common.h
+utils.cpp : common.h
+ExplosionAnim.cpp : common.h
+levels.h : common.h
+buildGameLUTs.cpp : common.h
+PowerFragment.cpp : common.h
+Enemy.cpp : common.h patterns.h
+Laser.cpp : common.h
+Bullet.cpp : common.h
+ChainNotif.cpp : common.h
+DestroyedEnemies : common.h
+n2DLib.c : n2DLib_font.h n2DLib.h
+common.h : n2DLib.h

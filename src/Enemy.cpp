@@ -23,11 +23,6 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 	
 	if(active)
 	{
-		// Check wether the player hit the enemy
-		if(!p->isDying() && (p->x >= x && p->x < x + itofix(img[0])) && (p->y >= y && p->y <= y + itofix(img[1])))
-		{
-			p->hurt();
-		}
 		if(isJointed && diesWithJoint && !G_enemiesArray[jointedTo]->isActive())
 			damage(p, !polarity, HP, bArray);
 		else
@@ -63,8 +58,8 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 					}
 				}
 			}
-			// Check whether the enemy hit the player
-			if(!p->isDying() && active && (p->x >= x && p->x < x + itofix(img[0])) && (p->y >= y && p->y <= y + itofix(img[1])))
+			// Check wether the player hit the enemy
+			if(!p->isDying() && (p->x >= getx() - (itofix(img[0]) >> 2) && p->x < getx() + (itofix(img[0]) >> 2)) && (p->y >= gety() - (itofix(img[0]) >> 2) && p->y <= gety() + (itofix(img[1]) >> 2)))
 			{
 				p->hurt();
 			}

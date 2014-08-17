@@ -21,6 +21,14 @@ Fixed angleToPlayer(PowerFragment *pf, Player *p)
 	return lastResult;
 }
 
+Fixed angleToPlayer(Homing *h, Player *p)
+{
+	static Fixed lastResult = 64;
+	if(!p->isDying())
+		lastResult = (int)(atan2((double)(p->y - h->y), (double)(p->x - h->x)) * 128. / M_PI);
+	return lastResult;
+}
+
 Enemy* findNearestEnemy(Fixed x, Fixed y)
 {
 	static Enemy* nearest;

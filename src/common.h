@@ -46,6 +46,8 @@ extern KeyEvent getk(void);
 #define SWITCHING1 4
 
 #define MAX_BULLET 400
+#define MAX_HOMING 12
+#define HOMING_TRAILING 15
 #define MAX_FRAGMENT 12
 #define MAX_LASER 4
 #define FRAGMENT_TRAILING 7
@@ -80,11 +82,33 @@ private:
 	bool hurtPlayer;
 };
 
-// Player
-// We need it in BulletArray, and Player needs BulletArray
 class Player;
 
-// Funnily enough, we also need Enemy in BulletArray, and vice-versa
+// Only enemies can fire them
+class Homing
+{
+public:
+	Homing();
+	~Homing();
+	bool isActive();
+	void activate(Fixed, Fixed, Fixed, Player*, bool);
+	void deactivate();
+	bool getPolarity();
+	bool handle();
+	void draw();
+	Fixed x;
+	Fixed y;
+	Player* target;
+private:
+	bool polarity;
+	Fixed previousX[HOMING_TRAILING];
+	Fixed previousY[HOMING_TRAILING];
+	bool active;
+	Fixed angle;
+	Fixed rotationAngle;
+	int aimTimer;
+};
+
 class Enemy;
 
 // Both enemies and player can fire them
@@ -153,18 +177,23 @@ public:
 	~BulletArray();
 	void handle(Player*);
 	void add(Fixed, Fixed, Fixed, Fixed, int, bool, bool);
-	void add_homing(Fixed, Fixed, Fixed, Player*, bool, bool);
+	void add_fragment(Fixed, Fixed, Fixed, Player*, bool, bool);
+	void add_homing(Fixed, Fixed, Fixed, Player*, bool);
 	void fire_laser(Enemy*, bool);
 	void deactivate(int);
+	void deactivate_fragment(int);
 	void deactivate_homing(int);
 	void stop_laser(Enemy*);
 	Bullet data[MAX_BULLET];
-	PowerFragment data_homing[MAX_FRAGMENT];
+	PowerFragment data_fragment[MAX_FRAGMENT];
+	Homing data_homing[MAX_HOMING];
 	Laser data_laser[MAX_LASER];
 private:
 	// keep track of current bullet ...
 	int bulletCount;
 	// ... power fragment ...
+	int fragmentCount;
+	// ... homing ...
 	int homingCount;
 	// ... and laser
 	int laserCount;
@@ -389,6 +418,8 @@ enum image_LUT
 	image_LUT_enemy_bullet_1_shadow,
 	image_LUT_enemy_bullet_2_light,
 	image_LUT_enemy_bullet_2_shadow,
+	image_LUT_enemy_homing_bullet_light,
+	image_LUT_enemy_homing_bullet_shadow,
 	image_LUT_enemy_laser_light,
 	image_LUT_enemy_laser_shadow,
 	image_LUT_enemy_ship_0_light,
@@ -449,6 +480,7 @@ enum
 	Pattern_1_19,
 	Pattern_1_20,
 	Pattern_1_21,
+	Pattern_test,
 	NB_CALLBACKS
 };
 
@@ -477,6 +509,7 @@ extern Particles *G_particles;
 extern Fixed angleToPlayer(Enemy*, Player*);
 extern Fixed angleToEnemy(PowerFragment*, Enemy*);
 extern Fixed angleToPlayer(PowerFragment*, Player*);
+extern Fixed angleToPlayer(Homing*, Player*);
 extern Enemy* findNearestEnemy(Fixed, Fixed);
 
 #endif

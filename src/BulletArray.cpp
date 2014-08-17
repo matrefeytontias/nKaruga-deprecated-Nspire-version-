@@ -5,11 +5,14 @@ BulletArray::BulletArray()
 	for(int i = 0; i < MAX_BULLET; i++)
 		data[i].deactivate();
 	for(int i = 0; i < MAX_FRAGMENT; i++)
+		data_fragment[i].deactivate();
+	for(int i = 0; i < MAX_HOMING; i++)
 		data_homing[i].deactivate();
 	for(int i = 0; i < MAX_LASER; i++)
 		data_laser[i].deactivate();
 	
 	bulletCount = 0;
+	fragmentCount = 0;
 	homingCount = 0;
 	laserCount = 0;
 }
@@ -89,7 +92,7 @@ void BulletArray::handle(Player *p)
 	// Power fragments
 	for(int i = 0; i < MAX_FRAGMENT; i++)
 	{
-		PowerFragment *cf = &data_homing[i];
+		PowerFragment *cf = &data_fragment[i];
 		destroyBullet = false;
 		if(cf->isActive())
 		{
@@ -105,7 +108,6 @@ void BulletArray::handle(Player *p)
 					{
 						p->hurt();
 						destroyBullet = true;
-						G_power = min(G_power + 10, MAX_POWER);
 					}
 				}
 				else
@@ -114,6 +116,7 @@ void BulletArray::handle(Player *p)
 					{
 						destroyBullet = true;
 						G_score += 100;
+						G_power = min(G_power + 10, MAX_POWER);
 					}
 				}
 			}
@@ -131,9 +134,54 @@ void BulletArray::handle(Player *p)
 						cf->y + itofix(4) >= cf->targetE->gety() - itofix(cf->targetE->img[1] / 2))
 						{
 							cf->targetE->damage(p, cf->getPolarity(), 10, this);
-							G_score += 100;
+							G_score += 20;
+							if(cf->getPolarity() != cf->targetE->getPolarity()) G_score += 20;
 							destroyBullet = true;
 						}
+					}
+				}
+			}
+			if(destroyBullet)
+				deactivate_fragment(i);
+			else
+			{
+				if(cf->handle())
+					deactivate_fragment(i);
+				else if(!G_skipFrame)
+					cf->draw();
+			}
+		}
+		else break;
+	}
+	
+	// Homings
+	for(int i = 0; i < MAX_HOMING; i++)
+	{
+		Homing* ch = &data_homing[i];
+		destroyBullet = false;
+		if(ch->isActive())
+		{
+			if(!p->isDying())
+			{
+				// Check collisions with player
+				if(ch->getPolarity() != p->getPolarity())
+				{
+					// the player has a 1px hitbox (for now) (but that actually seems to be enough)
+					// homings have a 16*16 hitbox
+					if(p->x >= ch->x - itofix(8) && p->x < ch->x + itofix(8)
+					&& p->y >= ch->y - itofix(8) && p->y < ch->y + itofix(8))
+					{
+						p->hurt();
+						destroyBullet = true;
+					}
+				}
+				else
+				{
+					if(sq(fixtoi(ch->x - p->x)) + sq(fixtoi(ch->y - p->y)) < sq(p->img[0][0] / 2))
+					{
+						destroyBullet = true;
+						G_score += 100;
+						G_power = min(G_power + 10, MAX_POWER);
 					}
 				}
 			}
@@ -141,10 +189,10 @@ void BulletArray::handle(Player *p)
 				deactivate_homing(i);
 			else
 			{
-				if(cf->handle())
+				if(ch->handle())
 					deactivate_homing(i);
 				else if(!G_skipFrame)
-					cf->draw();
+					ch->draw();
 			}
 		}
 		else break;
@@ -235,11 +283,20 @@ void BulletArray::add(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, int imgID, bool 
 	}
 }
 
-void BulletArray::add_homing(Fixed _x, Fixed _y, Fixed angle, Player* targetP, bool _p, bool _h)
+void BulletArray::add_fragment(Fixed _x, Fixed _y, Fixed angle, Player* targetP, bool _p, bool _h)
 {
-	if(homingCount < MAX_FRAGMENT)
+	if(fragmentCount < MAX_FRAGMENT)
 	{
-		data_homing[homingCount].activate(_x, _y, angle, targetP, _p, _h);
+		data_fragment[fragmentCount].activate(_x, _y, angle, targetP, _p, _h);
+		fragmentCount++;
+	}
+}
+
+void BulletArray::add_homing(Fixed _x, Fixed _y, Fixed angle, Player* target, bool _p)
+{
+	if(homingCount < MAX_HOMING)
+	{
+		data_homing[homingCount].activate(_x, _y, angle, target, _p);
 		homingCount++;
 	}
 }
@@ -256,6 +313,14 @@ void BulletArray::deactivate(int n)
 	for(int i = n; i < bulletCount; i++)
 		data[i] = data[i + 1];
 	data[bulletCount].deactivate();
+}
+
+void BulletArray::deactivate_fragment(int n)
+{
+	fragmentCount--;
+	for(int i = n; i < fragmentCount; i++)
+		data_fragment[i] = data_fragment[i + 1];
+	data_fragment[fragmentCount].deactivate();
 }
 
 void BulletArray::deactivate_homing(int n)

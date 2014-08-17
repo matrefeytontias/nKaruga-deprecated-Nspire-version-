@@ -379,3 +379,5 @@ case Pattern_1_21:
 	y += 48;
 	x = fixcos(internal[0]) * 14 + itofix(160);
 		internal[0]++;
+	break;
+	

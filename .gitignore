@@ -3,3 +3,4 @@
 *.elf
 *.gdb
 src/tags
+src/.depends*

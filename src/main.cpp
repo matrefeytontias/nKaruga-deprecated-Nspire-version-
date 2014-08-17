@@ -222,14 +222,14 @@ void playGame()
 	Rect statsRect, levelRect;
 	int chainColor[3] = { 0 };
 	
-	unsigned short *bg;
+	unsigned int* bg;
 	// Variables for transition animation
 	int currentW = 0, chapterNum = 0, dX = 0, dY = 0;
 	bool drawPowerSlot = true;
 	static const char *levelStrs[5] = { "Chapter 1\nIdeal", "Chapter 2\nTrial", "Chapter 3\nFaith", "Chapter 4\nReality", "Chapter 5\nMetempsychosis" };
 	static unsigned short *levelKanjis[1] = { image_kanji_1 };
 	
-	bg = image_entries[image_LUT_background];
+	bg = (unsigned int*)image_entries[image_LUT_background];
 	
 	BulletArray* bArray = new BulletArray;
 	Player ship;
@@ -476,6 +476,13 @@ void playGame()
 			for(int i = 0; i < MAX_ENEMY; i++)
 				chainNotifsArray[i].handle();
 			
+			// Draw remaining lives
+			drawSprite(image_entries[image_LUT_lives], 0, 224);
+			statsRect.x = image_entries[image_LUT_lives][0] + 2;
+			statsRect.y = 226;
+			drawChar(&statsRect.x, &statsRect.y, 0, 'x', 0xffff, 0);
+			drawDecimal(&statsRect.x, &statsRect.y, ship.getLives() - 1, 0xffff, 0);
+			
 			updateScreen();
 			
 			if(G_displayBg)
@@ -485,9 +492,9 @@ void playGame()
 				pxScrollEnd = 160*240 - pxScrollStart;
 				// cheat using cast to copy faster since the ARM9 registers are 32-bits
 				for(int i = pxScrollStart, j = 0; i < 160 * 240; i++, j++)
-					((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int*)bg)[j];
+					((unsigned int*)BUFF_BASE_ADDRESS)[i] = bg[j];
 				for(int i = 0, j = pxScrollEnd; j < 160 * 240; i++, j++)
-					((unsigned int*)BUFF_BASE_ADDRESS)[i] = ((unsigned int*)bg)[j];
+					((unsigned int*)BUFF_BASE_ADDRESS)[i] = bg[j];
 			}
 			else
 				clearBufferW();

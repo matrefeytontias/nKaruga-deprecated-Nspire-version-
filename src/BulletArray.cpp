@@ -65,7 +65,8 @@ void BulletArray::handle(Player *p)
 						cb->y + itofix(cb->img[1] / 2) >= G_enemiesArray[j]->gety() - itofix(G_enemiesArray[j]->img[1] / 2))
 						{
 							G_enemiesArray[j]->damage(p, cb->getPolarity(), 1, this);
-							G_score += 100;
+							G_score += 20;
+							if(cb->getPolarity() != G_enemiesArray[j]->getPolarity()) G_score += 20;
 							destroyBullet = true;
 							// The same bullet can destroy several enemies if it hits them in the same frame !
 						}

@@ -71,7 +71,8 @@ void buildGameLUTs()
 	image_entries[image_LUT_particle_light] = image_particle_light;
 	image_entries[image_LUT_particle_shadow] = image_particle_shadow;
 	image_entries[image_LUT_powerslot] = image_powerslot;
-	image_entries[image_LUT_background] = image_background;
+	image_entries[image_LUT_lives] = image_lives;
+	image_entries[image_LUT_background] = image_bg;
 	image_entries[image_LUT_titleScreen] = image_titleScreen;
 }
 

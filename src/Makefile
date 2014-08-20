@@ -6,6 +6,9 @@ LD = nspire-ld-bflt
 GCCFLAGS = -Wall -W -marm -Ofast
 HEADER_DEPENDS_DIR = .depends
 HEADER_DEPENDS_FLAG = -MM -MF $(HEADER_DEPENDS_DIR)/$<.d
+DEPEND_FILE_NAMES = $(patsubst %.cpp,%.cpp.d,$(wildcard *.cpp)) $(patsubst %.c,%.c.d,$(wildcard *.c))
+# Append the directory to depend files
+DEPEND_FILES = $(foreach file, $(DEPEND_FILE_NAMES), $(HEADER_DEPENDS_DIR)/$(file))
 LDFLAGS = 
 ifeq ($(DEBUG),FALSE)
 	GCCFLAGS += -Os
@@ -23,25 +26,28 @@ EXE_EMU = nKaruga_emu.tns
 DISTDIR = ../
 vpath %.tns $(DISTDIR)
 
-#	include *.d
-#endif
+all: $(HEADER_DEPENDS_DIR) header_dependencies  $(EXE) $(EXE_EMU)
 
-all: $(EXE) $(EXE_EMU)
-
-$(OBJS) : $(HEADER_DEPENDS_DIR)
 $(HEADER_DEPENDS_DIR):
 	mkdir $(HEADER_DEPENDS_DIR)
 
-%.o: %.c
+header_dependencies: $(DEPEND_FILES)
+
+include $(wildcard $(HEADER_DEPENDS_DIR)/*.d)
+
+$(HEADER_DEPENDS_DIR)/%.cpp.d : %.cpp
 	$(GCC) $(GCCFLAGS) -c $< $(HEADER_DEPENDS_FLAG)
+
+$(HEADER_DEPENDS_DIR)/%.c.d : %.c
+	$(GCC) $(GCCFLAGS) -c $< $(HEADER_DEPENDS_FLAG)
+
+%.o: %.c
 	$(GCC) $(GCCFLAGS) -c $< -o $@
 
 %.o: %.cpp
-	$(GXX) $(GCCFLAGS) -c $< $(HEADER_DEPENDS_FLAG)
 	$(GXX) $(GCCFLAGS) -c $< -o $@
 
-%.o: %.S
-	$(AS) -c $<
+%.o: %.S $(AS) -c $<
 
 main_emu.o: GCCFLAGS+= -D DEBUG_NKARUGA
 main_emu.o: main.cpp
@@ -52,15 +58,11 @@ $(EXE_EMU): main_emu.o  $(filter-out main.o,$(OBJS))
 
 %.tns:
 	mkdir -p $(DISTDIR)
-	$(LD) $^ -o $(DISTDIR)/$@ $(LDFLAGS)
+	$(LD) $(filter-out header_dependencies,$^) -o $(DISTDIR)/$@ $(LDFLAGS)
 ifeq ($(DEBUG),FALSE)
 	@rm -f $(DISTDIR)/*.gdb
 endif
 
 clean:
-	rm -f *.o *.elf $(DISTDIR)/*.gdb $(DISTDIR)/$(EXE) $(DISTDIR)/$(EXE_EMU) .depends/*.d
-	rmdir .depends
-
-ifneq ($(ls .depends/*.d),)
-	include .depends/*.d
-endif
+	rm -f *.o *.elf $(DISTDIR)/*.gdb $(DISTDIR)/$(EXE) $(DISTDIR)/$(EXE_EMU) $(HEADER_DEPENDS_DIR)/*.d
+	rm -rf .depends

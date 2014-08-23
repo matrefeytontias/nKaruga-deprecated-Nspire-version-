@@ -3,12 +3,8 @@
 
 #include <os.h>
 #include <math.h>
-
+ 
 #include "n2DLib.h"
-
-extern "C" {
-void bufcpy(void*, void*);
-}
 
 #define UNUSED(var) (void)var
 

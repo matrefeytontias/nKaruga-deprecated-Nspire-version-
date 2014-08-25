@@ -12,7 +12,7 @@ If you use the CLI for building Ndless programs, running make in the root direct
 
 **make_nKarugaSprite.exe** is a purposely-built tool that should not be used for other projects than nKaruga.
 
-**THE PROGRAM MUST NOT BE RAN IN CLI ! DRAP-AND-DROP ANY NUMBER OF IMAGES TO IT INSTEAD.**
+**THE PROGRAM MUST NOT BE RAN IN CLI ! DRAG-AND-DROP ANY NUMBER OF IMAGES AT ONCE TO IT INSTEAD.**
 
 Running on a TI-Nspire
 ======================

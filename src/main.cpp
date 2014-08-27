@@ -6,8 +6,8 @@
 #define ENEMY_W(i) G_enemiesArray[i]->img[0]
 #define ENEMY_H(i) G_enemiesArray[i]->img[1]
 
-int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount;
-int G_score, G_power;
+int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount, G_maxChain = 0;
+int G_score, G_power, G_bossBonus = 0;
 bool G_displayBg = true, G_fireback = true, G_hardMode = false;
 bool G_hasFiredOnce;
 int G_difficulty = 1;
@@ -216,15 +216,19 @@ void playGame()
 {
 	KeyEvent kEv = 0;
 	int levelCounter, levelTimer, enemyCounter, waveIndex, scrollOffset = 0, pxScrollStart, pxScrollEnd;
-	bool levelEnded = false, inTransitionFromIntro = false;
+	bool levelEnded = false;
 	int readKeys = 0, gpTimer = 0;
 	
 	Rect statsRect, levelRect;
 	int chainColor[3] = { 0 };
 	
 	unsigned int* bg;
+	
+	// Game phase
+	int gamePhase;
+	
 	// Variables for transition animation
-	int currentW = 0, chapterNum = 0, dX = 0, dY = 0;
+	int currentW = 0, currentH = 0, chapterNum = 0, dX = 0, dY = 0;
 	bool drawPowerSlot = true;
 	static const char *levelStrs[5] = { "Chapter 1\nIdeal", "Chapter 2\nTrial", "Chapter 3\nFaith", "Chapter 4\nReality", "Chapter 5\nMetempsychosis" };
 	static unsigned short *levelKanjis[1] = { image_kanji_1 };
@@ -248,6 +252,8 @@ void playGame()
 	waveIndex = 0;
 	G_hasFiredOnce = false;
 	
+	gamePhase = PHASE_GAME;
+	
 	for(int i = 0; i < MAX_ENEMY; i++)
 	{
 		G_enemiesArray[i]->deactivate();
@@ -270,7 +276,7 @@ void playGame()
 	while(!KQUIT(kEv) && !levelEnded)
 	{
 		gpTimer++;
-		if(!inTransitionFromIntro)
+		if(gamePhase == PHASE_GAME)
 		{
 			G_waveTimer++;
 			if(!levelTimer)
@@ -314,7 +320,7 @@ void playGame()
 					{
 						// Start a new chapter
 						// Set up transition
-						inTransitionFromIntro = true;
+						gamePhase = PHASE_TRANSITION;
 						currentW = 0;
 						gpTimer = 0;
 						levelCounter++;
@@ -352,6 +358,14 @@ void playGame()
 						bkpt();
 					}
 				}
+				else if(currentLevelByte == LVLSTR_CHAPTEREND)
+				{
+					gamePhase = PHASE_RESULTS;
+					currentW = 0;
+					currentH = 0;
+					gpTimer = 0;
+					levelCounter++;
+				}
 				else if(currentLevelByte == LVLSTR_END)
 				{
 					// End of the level
@@ -371,7 +385,7 @@ void playGame()
 			else
 				levelTimer--;
 		}
-		else
+		else if(gamePhase == PHASE_TRANSITION)
 		{
 			if(!G_skipFrame) fillRect(0, 0, currentW, 240, 0);
 			if(currentW == 0)
@@ -395,8 +409,8 @@ void playGame()
 					drawSprite(levelKanjis[chapterNum], 10, 80);
 				}
 			if(gpTimer > 768)
-				inTransitionFromIntro = false;
-		}		
+				gamePhase = PHASE_GAME;
+		}
 		
 		if(!(readKeys % 4))
 		{
@@ -406,7 +420,7 @@ void playGame()
 		}
 		readKeys++;
 		
-		if(inTransitionFromIntro)
+		if(gamePhase == PHASE_TRANSITION)
 		{
 			kEv = 0;
 			G_tpstatus.x = G_tpinfo->width / 2;
@@ -483,6 +497,48 @@ void playGame()
 			drawChar(&statsRect.x, &statsRect.y, 0, 'x', 0xffff, 0);
 			drawDecimal(&statsRect.x, &statsRect.y, ship.getLives() - 1, 0xffff, 0);
 			
+			// Overwrite all of that
+			if(gamePhase == PHASE_RESULTS)
+			{
+				if(currentH == 120 && currentW == 160)
+				{
+					clearBufferB();
+					statsRect.x = (320 - stringWidth(string_results[0])) / 2;
+					statsRect.y = 16;
+					drawString(&statsRect.x, &statsRect.y, (320 - stringWidth(string_results[1])) / 2, string_results[0], 0xffff, 0);
+					if(gpTimer > 256)
+					{
+						drawString(&statsRect.x, &statsRect.y, (320 - numberWidth(G_bossBonus)) / 2, string_results[1], 0xffff, 0);
+						drawDecimal(&statsRect.x, &statsRect.y, G_bossBonus, 0xffff, 0);
+					}
+					if(gpTimer > 512)
+					{
+						statsRect.x = (320 - stringWidth(string_results[2])) / 2;
+						statsRect.y += 16;
+						drawString(&statsRect.x, &statsRect.y, (320 - numberWidth(G_score)) / 2, string_results[2], 0xffff, 0);
+						drawDecimal(&statsRect.x, &statsRect.y, G_score, 0xffff, 0);
+						statsRect.x = (320 - stringWidth(string_results[3]) - stringWidth(string_results[4]) - numberWidth(G_maxChain)) / 2;
+						statsRect.y += 16;
+						drawString(&statsRect.x, &statsRect.y, 0, string_results[3], 0xffff, 0);
+						drawDecimal(&statsRect.x, &statsRect.y, G_maxChain, 0xffff, 0);
+						drawString(&statsRect.x, &statsRect.y, (320 - stringWidth(string_results[5])) / 2, string_results[4], 0xffff, 0);
+						// don't display grade for now as it doesn't exist yet
+					}
+					if(gpTimer > 1024 && KFIRE(kEv))
+					{
+						gamePhase = PHASE_GAME;
+					}
+				}
+				else
+				{
+					if(currentH < 120) currentH++;
+					else if(currentW < 160) currentW += 2;
+						
+					fillRect(160 - currentW, 120 - currentH, currentW * 2 + 1, currentH * 2, 0);
+					gpTimer = 0;
+				}
+			}
+			
 			updateScreen();
 			
 			if(G_displayBg)
@@ -544,6 +600,7 @@ void playGame()
 				}
 			}
 		}
+		G_maxChain = max(G_chainStatus, G_maxChain);
 		G_frameChainOffset = 0;
 		
 		#ifdef DEBUG_NKARUGA

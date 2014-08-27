@@ -350,18 +350,30 @@ private:
 // x, y, HP, image ID, callback ID, polarity, has rotation ?, fireback
 #define enemy(x, y, HP, iID, cbID, p, hR, f) x, y, HP, iID, cbID, p, hR, f
 
+// Game phases
+enum
+{
+	PHASE_GAME,
+	PHASE_TRANSITION,
+	PHASE_RESULTS
+};
+
 // Special values
+#define LVLSTR_CHAPTEREND -3
 #define LVLSTR_END -2
 #define LVLSTR_CMD -1
 
 // Commands
-#define LVLSTR_NEWWAVE 0
-#define LVLSTR_WAIT 1
-#define LVLSTR_KILLED 2
-#define LVLSTR_CHAPTER 3
-#define LVLSTR_JOINT 4
-#define LVLSTR_BOSS 5
-#define LVLSTR_BKPT 6
+enum
+{
+	LVLSTR_NEWWAVE,
+	LVLSTR_WAIT,
+	LVLSTR_KILLED,
+	LVLSTR_CHAPTER,
+	LVLSTR_JOINT,
+	LVLSTR_BOSS,
+	LVLSTR_BKPT
+};
 
 #define cmd_newWave LVLSTR_CMD, LVLSTR_NEWWAVE
 #define cmd_wait(x) LVLSTR_CMD, LVLSTR_WAIT, x
@@ -488,8 +500,8 @@ extern void freeGameLUTs();
 extern Enemy **enemiesArray;
 
 // Global vars
-extern int G_skipFrame, G_waveTimer, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount;
-extern int G_score, G_power;
+extern int G_skipFrame, G_waveTimer, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount, G_maxChain;
+extern int G_score, G_power, G_bossBonus;
 extern bool G_usingTouchpad;
 extern bool G_fireback, G_hardMode;
 extern bool G_hasFiredOnce;

@@ -369,5 +369,6 @@ const static int levelStream[] = {
 	cmd_newWave,
 	// Boss
 	cmd_fightBoss(0),
+	LVLSTR_CHAPTEREND,
 	LVLSTR_END
 	};

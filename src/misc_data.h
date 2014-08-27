@@ -23,5 +23,14 @@ static const char *string_difficulties[3] = {
 	"Normal\n",
 	"Hard\n"
 };
-	
+
+static const char *string_results[6] = {
+	"BATTLE REPORT\n\n\n",
+	"Boss destroy bonus\n\n",
+	"Score (this chapter)\n\n",
+	"Max ",
+	" chains\n\n",
+	"Grade\n\n"
+};
+
 int power_fill_offsets[] = { 1, 2, 1, 5, 1, 8, 1, 10, 1, 10, 1, 10, 1, 10, 3, 10, 6, 10, 9, 10 };

@@ -337,8 +337,8 @@ case Pattern_1_19:
 	if(!internal[3])
 	{
 		internal[3] = 1;
-		internal[0] = waveIndex ? 48 : -48;
-		internal[1] = waveIndex ? -48 : 48;
+		internal[0] = waveIndex ? 64 : -64;
+		internal[1] = waveIndex ? -64 : 64;
 		internal[2] = -1;
 	}
 	if(internal[2] < 5)
@@ -352,7 +352,7 @@ case Pattern_1_19:
 				break;
 			case 2:
 				x -= internal[0];
-				if(x <= itofix(img[0] / 2) || x >= itofix(320 - img[0] / 2))
+				if(x <= itofix(img[0] / 2 + 20) || x >= itofix(320 - img[0] / 2 - 20))
 					internal[2]++;
 				break;
 			case 3:
@@ -362,7 +362,7 @@ case Pattern_1_19:
 				break;
 			default:
 				x += internal[0];
-				if(x == itofix(img[0] / 2) || x == itofix(320 - img[0] / 2))
+				if(x == itofix(img[0] / 2 + 20) || x == itofix(320 - img[0] / 2 - 20))
 					internal[2]++;
 		}
 	}

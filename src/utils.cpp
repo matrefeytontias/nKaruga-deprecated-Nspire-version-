@@ -5,8 +5,7 @@ Fixed angleToPlayer(Enemy *e, Player *p)
 	static Fixed lastResult = 64;
 	if(!p->isDying())
 		lastResult = (int)(atan2((double)(p->y - e->gety()), (double)(p->x - e->getx())) * 128. / M_PI);
-	return lastResult;
-}
+	return lastResult; }
 
 Fixed angleToEnemy(PowerFragment *pf, Enemy *e)
 {
@@ -76,7 +75,9 @@ Enemy* findNearestEnemy(Fixed x, Fixed y)
 KeyEvent getk(void)
 {
 	static KeyEvent k;
-	k = (((((isKeyPressed(KEY_NSPIRE_8) << 1) + isKeyPressed(KEY_NSPIRE_7)) << 1) + isKeyPressed(KEY_NSPIRE_5)) << 1) + isKeyPressed(KEY_NSPIRE_4);
+	k = isKeyPressed(G_pauseKey);
+	k <<= 4;
+	k |= (((((isKeyPressed(KEY_NSPIRE_8) << 1) + isKeyPressed(KEY_NSPIRE_7)) << 1) + isKeyPressed(KEY_NSPIRE_5)) << 1) + isKeyPressed(KEY_NSPIRE_4);
 	k <<= 4;
 	k |= (((((isKeyPressed(KEY_NSPIRE_ESC) << 1) + isKeyPressed(G_fragmentKey)) << 1) + isKeyPressed(G_polarityKey)) << 1) + isKeyPressed(G_fireKey);
 	k <<= 4;

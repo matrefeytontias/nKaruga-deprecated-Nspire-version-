@@ -1,13 +1,12 @@
 #include "common.h"
-#include "levels.h"
+#include "levels.h" 
 #include "../gfx/kanji.h"
 #include "misc_data.h"
 
 #define ENEMY_W(i) G_enemiesArray[i]->img[0]
 #define ENEMY_H(i) G_enemiesArray[i]->img[1]
 
-int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount, G_maxChain = 0;
-int G_score, G_power, G_bossBonus = 0;
+int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount, G_maxChain = 0; int G_score, G_power, G_bossBonus = 0;
 bool G_displayBg = true, G_fireback = true, G_hardMode = false;
 bool G_hasFiredOnce;
 int G_difficulty = 1;
@@ -149,7 +148,7 @@ int main(int argc, char **argv)
 				if(parameter == 'b')
 					drawString(&x, &y, 0, *(bool*)optionValues[i] ? "yes\n" : "no\n", 0, 0xffff);
 				else if(parameter == 'i')
-					/*drawString(&x, &y, 0, "ok", 0, 0xffff); //*/drawString(&x, &y, 0, string_difficulties[*(int*)optionValues[i]], 0, 0xffff);
+					drawString(&x, &y, 0, string_difficulties[*(int*)optionValues[i]], 0, 0xffff);
 			}
 			drawSprite(image_cursor, (320 - (strlen(string_options[choice] + 1) + (string_options[choice][0] != 'n') * 3) * 8) / 2 - 8, choice * 8 + 120);
 			
@@ -219,9 +218,10 @@ int main(int argc, char **argv)
 void playGame()
 {
 	KeyEvent kEv = 0;
-	int levelCounter, levelTimer, enemyCounter, waveIndex, scrollOffset = 0, pxScrollStart, pxScrollEnd;
+	int levelCounter, levelTimer, enemyCounter, waveIndex, scrollOffset = 0, pxScrollStart, pxScrollEnd, pauseTimer;
 	bool levelEnded = false;
 	int readKeys = 0, gpTimer = 0;
+	int x, y;
 	
 	Rect statsRect, levelRect;
 	int chainColor[3] = { 0 };
@@ -252,6 +252,7 @@ void playGame()
 	
 	levelCounter = 0;
 	levelTimer = 0;
+	pauseTimer = 0;
 	enemyCounter = 0;
 	waveIndex = 0;
 	G_hasFiredOnce = false;
@@ -423,7 +424,7 @@ void playGame()
 			kEv = getk();
 		}
 		readKeys++;
-		
+			
 		if(gamePhase == PHASE_TRANSITION)
 		{
 			kEv = 0;
@@ -463,7 +464,7 @@ void playGame()
 		
 		if(!G_skipFrame)
 		{
-			// Draw score and chains
+		// Draw score and chains
 			statsRect.x = statsRect.y = 0;
 			drawStringF(&statsRect.x, &statsRect.y, 0, 0xffff, 0, "Score : %d\n\n\n\nCH %d", G_score, G_chainStatus);
 			
@@ -543,8 +544,37 @@ void playGame()
 				}
 			}
 			
-			updateScreen();
+			updateScreen();	
+		}
+	
+		if(!pauseTimer) 
+		{
+			if(KPAUSE(kEv))
+			{
+				// Pause the game until another pauseKey is pressed
+				wait_no_key_pressed();
+
+				// Display a "paused" box. It will be cleared in the next frame.
+				x = 140, y = 116;
+				fillRect(60, 100, 200, 40, 0xffff);
+				drawHLine(100, 60, 260, 0);
+				drawHLine(140, 60, 260, 0);
+				drawString(&x, &y, 0, "Pause", 0, 0xffff);
+				updateScreen();
 			
+				while(!isKeyPressed(G_pauseKey)) 
+					sleep(5);
+				wait_no_key_pressed();
+				pauseTimer = 10;
+			}
+		}
+		else
+			pauseTimer--;
+
+		if(!G_skipFrame)
+		{
+			// The background is dispayed after to keep the enemies(power slots, player ship ...) 
+			// on the screen when pausing the game
 			if(G_displayBg)
 			{
 				// Display a scrolling background
@@ -559,6 +589,7 @@ void playGame()
 			else
 				clearBufferW();
 		}
+
 		#ifndef DEBUG_NKARUGA
 		if(!has_colors) sleep(6);
 		#endif

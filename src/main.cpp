@@ -1,6 +1,7 @@
 #include "common.h"
 #include "levels.h" 
 #include "../gfx/kanji.h"
+#include "../gfx/bossWarning.h"
 #include "misc_data.h"
 
 #define ENEMY_W(i) G_enemiesArray[i]->img[0]
@@ -342,8 +343,11 @@ void playGame()
 					}
 					else if(currentLevelByte == LVLSTR_BOSS)
 					{
+						// Cinematic
+						gamePhase = PHASE_BOSS;
+						gpTimer = 0;
 						// TODO
-						// Cinematic + fight boss
+						// fight boss
 						levelCounter += 2;
 					}
 					else if(currentLevelByte == LVLSTR_BKPT)
@@ -416,6 +420,10 @@ void playGame()
 			if(gpTimer > 768)
 				gamePhase = PHASE_GAME;
 		}
+		else if(gamePhase == PHASE_BOSS && gpTimer > 1023)
+		{
+			gamePhase = PHASE_GAME;
+		}
 		
 		if(!(readKeys % 4))
 		{
@@ -466,15 +474,19 @@ void playGame()
 		{
 		// Draw score and chains
 			statsRect.x = statsRect.y = 0;
-			drawStringF(&statsRect.x, &statsRect.y, 0, 0xffff, 0, "Score : %d\n\n\n\nCH %d", G_score, G_chainStatus);
+			if(gamePhase != PHASE_BOSS)
+			{
+				drawStringF(&statsRect.x, &statsRect.y, 0, 0xffff, 0, "Score : %d\n\n\n\nCH %d", G_score, G_chainStatus);
+				// Draw chain count
+				for(int i = 0, j = 0; i < G_inChainCount; i++, j += 18)
+					drawSprite(image_entries[chainColor[i] == LIGHT ? image_LUT_chain_hit_light : image_LUT_chain_hit_shadow], j, 12);
+			}
+			else
+				drawStringF(&statsRect.x, &statsRect.y, 0, 0xffff, 0, "Score : %d", G_score);
 			
 			// Draw explosions
 			for(int i = 0; i < MAX_ENEMY; i++)
 				explosionsAnims[i].handle();
-			
-			// Draw chain count
-			for(int i = 0, j = 0; i < G_inChainCount; i++, j += 18)
-				drawSprite(image_entries[chainColor[i] == LIGHT ? image_LUT_chain_hit_light : image_LUT_chain_hit_shadow], j, 12);
 			
 			// Draw power
 			for(int i = MAX_FRAGMENT - 1; i >= 0; i--)
@@ -543,6 +555,8 @@ void playGame()
 					gpTimer = 0;
 				}
 			}
+			else if(gamePhase == PHASE_BOSS && gpTimer < 1024)
+				drawSprite(image_bossWarning, 0, 72);
 			
 			updateScreen();	
 		}

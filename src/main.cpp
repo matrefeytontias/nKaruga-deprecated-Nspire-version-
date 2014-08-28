@@ -563,7 +563,14 @@ void playGame()
 				updateScreen();
 			
 				while(!isKeyPressed(G_pauseKey)) 
+				{
 					sleep(5);
+					if(isKeyPressed(KEY_NSPIRE_ESC))
+					{
+						kEv = 128; // KQUIT
+						break;
+					}
+				}
 				wait_no_key_pressed();
 				pauseTimer = 10;
 			}

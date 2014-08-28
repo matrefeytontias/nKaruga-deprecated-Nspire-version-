@@ -14,7 +14,7 @@ int G_difficulty = 1;
 bool G_usingTouchpad;
 touchpad_info_t *G_tpinfo;
 touchpad_report_t G_tpstatus;
-t_key G_fireKey, G_polarityKey, G_fragmentKey;
+t_key G_fireKey, G_polarityKey, G_fragmentKey, G_pauseKey;
 
 Enemy *G_enemiesArray[MAX_ENEMY];
 Particles *G_particles;
@@ -56,6 +56,7 @@ inline void writeToConfig(FILE* out)
 	writeKeyToConfig(out, &G_fireKey);
 	writeKeyToConfig(out, &G_polarityKey);
 	writeKeyToConfig(out, &G_fragmentKey);
+	writeKeyToConfig(out, &G_pauseKey);
 	fputc(G_difficulty, out);
 	fputc(G_usingTouchpad, out);
 	fputc(G_displayBg, out);
@@ -66,6 +67,7 @@ inline void readFromConfig(FILE* in)
 	readKeyFromConfig(in, &G_fireKey);
 	readKeyFromConfig(in, &G_polarityKey);
 	readKeyFromConfig(in, &G_fragmentKey);
+	readKeyFromConfig(in, &G_pauseKey);
 	G_difficulty = fgetc(in);
 	G_usingTouchpad = !!fgetc(in);
 	G_displayBg = !!fgetc(in);
@@ -81,7 +83,7 @@ int main(int argc, char **argv)
 	// Inline menu vars
 	void* optionValues[TITLE_OPTIONS] = { NULL, &G_difficulty, &G_usingTouchpad, &G_displayBg, NULL };
 	// Custom keys vars
-	t_key* customKeys[KEYS_TO_BIND] = { &G_fireKey, &G_polarityKey, &G_fragmentKey };
+	t_key* customKeys[KEYS_TO_BIND] = { &G_fireKey, &G_polarityKey, &G_fragmentKey, &G_pauseKey };
 	int choice = 0;
 	
 	enable_relative_paths(argv);
@@ -97,6 +99,7 @@ int main(int argc, char **argv)
 		G_fireKey = KEY_NSPIRE_CTRL;
 		G_polarityKey = KEY_NSPIRE_SHIFT;
 		G_fragmentKey = KEY_NSPIRE_DEL;
+		G_pauseKey = KEY_NSPIRE_P;
 	}
 	
 	if(is_touchpad)
@@ -146,7 +149,7 @@ int main(int argc, char **argv)
 				if(parameter == 'b')
 					drawString(&x, &y, 0, *(bool*)optionValues[i] ? "yes\n" : "no\n", 0, 0xffff);
 				else if(parameter == 'i')
-					drawString(&x, &y, 0, string_difficulties[*(int*)optionValues[i]], 0, 0xffff);
+					/*drawString(&x, &y, 0, "ok", 0, 0xffff); //*/drawString(&x, &y, 0, string_difficulties[*(int*)optionValues[i]], 0, 0xffff);
 			}
 			drawSprite(image_cursor, (320 - (strlen(string_options[choice] + 1) + (string_options[choice][0] != 'n') * 3) * 8) / 2 - 8, choice * 8 + 120);
 			
@@ -162,6 +165,7 @@ int main(int argc, char **argv)
 					{
 						*(int*)optionValues[choice] = (*(int*)optionValues[choice] + 1) % 3;
 					}
+					wait_no_key_pressed();
 				}
 				else if(choice)
 				{

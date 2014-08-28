@@ -558,39 +558,39 @@ void playGame()
 			else if(gamePhase == PHASE_BOSS && gpTimer < 1024)
 				drawSprite(image_bossWarning, 0, 72);
 			
+			if(!pauseTimer) 
+			{
+				if(KPAUSE(kEv))
+				{
+					// Pause the game until another pauseKey is pressed
+					wait_no_key_pressed();
+
+					// Display a "paused" box. It will be cleared in the next frame.
+					x = 140, y = 116;
+					fillRect(60, 100, 200, 40, 0xffff);
+					drawHLine(100, 60, 260, 0);
+					drawHLine(140, 60, 260, 0);
+					drawString(&x, &y, 0, "Pause", 0, 0xffff);
+					updateScreen();
+				
+					while(!isKeyPressed(G_pauseKey)) 
+					{
+						sleep(5);
+						if(isKeyPressed(KEY_NSPIRE_ESC))
+						{
+							kEv = 128; // KQUIT
+							break;
+						}
+					}
+					wait_no_key_pressed();
+					pauseTimer = 10;
+				}
+			}
+			else
+				pauseTimer--;
+			
 			updateScreen();	
 		}
-	
-		if(!pauseTimer) 
-		{
-			if(KPAUSE(kEv))
-			{
-				// Pause the game until another pauseKey is pressed
-				wait_no_key_pressed();
-
-				// Display a "paused" box. It will be cleared in the next frame.
-				x = 140, y = 116;
-				fillRect(60, 100, 200, 40, 0xffff);
-				drawHLine(100, 60, 260, 0);
-				drawHLine(140, 60, 260, 0);
-				drawString(&x, &y, 0, "Pause", 0, 0xffff);
-				updateScreen();
-			
-				while(!isKeyPressed(G_pauseKey)) 
-				{
-					sleep(5);
-					if(isKeyPressed(KEY_NSPIRE_ESC))
-					{
-						kEv = 128; // KQUIT
-						break;
-					}
-				}
-				wait_no_key_pressed();
-				pauseTimer = 10;
-			}
-		}
-		else
-			pauseTimer--;
 
 		if(!G_skipFrame)
 		{

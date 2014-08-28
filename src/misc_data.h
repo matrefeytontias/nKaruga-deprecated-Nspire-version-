@@ -11,11 +11,12 @@ static const char *string_options[TITLE_OPTIONS] = {
 	"nConfigure controls\n"
 };
 
-#define KEYS_TO_BIND 3
+#define KEYS_TO_BIND 4
 static const char *string_keys[KEYS_TO_BIND] = {
 	"Fire\n",
 	"Switch polarity\n",
-	"Release power\n"
+	"Release power\n",
+	"Pause the game\n"
 };
 
 static const char *string_difficulties[3] = {

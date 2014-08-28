@@ -1,5 +1,5 @@
 #include "common.h"
-#include "levels.h"
+#include "levels.h" 
 #include "../gfx/kanji.h"
 #include "../gfx/bossWarning.h"
 #include "misc_data.h"
@@ -7,15 +7,14 @@
 #define ENEMY_W(i) G_enemiesArray[i]->img[0]
 #define ENEMY_H(i) G_enemiesArray[i]->img[1]
 
-int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount, G_maxChain = 0;
-int G_score, G_power, G_bossBonus = 0;
+int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount, G_maxChain = 0; int G_score, G_power, G_bossBonus = 0;
 bool G_displayBg = true, G_fireback = true, G_hardMode = false;
 bool G_hasFiredOnce;
 int G_difficulty = 1;
 bool G_usingTouchpad;
 touchpad_info_t *G_tpinfo;
 touchpad_report_t G_tpstatus;
-t_key G_fireKey, G_polarityKey, G_fragmentKey;
+t_key G_fireKey, G_polarityKey, G_fragmentKey, G_pauseKey;
 
 Enemy *G_enemiesArray[MAX_ENEMY];
 Particles *G_particles;
@@ -57,6 +56,7 @@ inline void writeToConfig(FILE* out)
 	writeKeyToConfig(out, &G_fireKey);
 	writeKeyToConfig(out, &G_polarityKey);
 	writeKeyToConfig(out, &G_fragmentKey);
+	writeKeyToConfig(out, &G_pauseKey);
 	fputc(G_difficulty, out);
 	fputc(G_usingTouchpad, out);
 	fputc(G_displayBg, out);
@@ -67,6 +67,7 @@ inline void readFromConfig(FILE* in)
 	readKeyFromConfig(in, &G_fireKey);
 	readKeyFromConfig(in, &G_polarityKey);
 	readKeyFromConfig(in, &G_fragmentKey);
+	readKeyFromConfig(in, &G_pauseKey);
 	G_difficulty = fgetc(in);
 	G_usingTouchpad = !!fgetc(in);
 	G_displayBg = !!fgetc(in);
@@ -82,7 +83,7 @@ int main(int argc, char **argv)
 	// Inline menu vars
 	void* optionValues[TITLE_OPTIONS] = { NULL, &G_difficulty, &G_usingTouchpad, &G_displayBg, NULL };
 	// Custom keys vars
-	t_key* customKeys[KEYS_TO_BIND] = { &G_fireKey, &G_polarityKey, &G_fragmentKey };
+	t_key* customKeys[KEYS_TO_BIND] = { &G_fireKey, &G_polarityKey, &G_fragmentKey, &G_pauseKey };
 	int choice = 0;
 	
 	enable_relative_paths(argv);
@@ -98,6 +99,7 @@ int main(int argc, char **argv)
 		G_fireKey = KEY_NSPIRE_CTRL;
 		G_polarityKey = KEY_NSPIRE_SHIFT;
 		G_fragmentKey = KEY_NSPIRE_DEL;
+		G_pauseKey = KEY_NSPIRE_P;
 	}
 	
 	if(is_touchpad)
@@ -163,6 +165,7 @@ int main(int argc, char **argv)
 					{
 						*(int*)optionValues[choice] = (*(int*)optionValues[choice] + 1) % 3;
 					}
+					wait_no_key_pressed();
 				}
 				else if(choice)
 				{
@@ -216,9 +219,10 @@ int main(int argc, char **argv)
 void playGame()
 {
 	KeyEvent kEv = 0;
-	int levelCounter, levelTimer, enemyCounter, waveIndex, scrollOffset = 0, pxScrollStart, pxScrollEnd;
+	int levelCounter, levelTimer, enemyCounter, waveIndex, scrollOffset = 0, pxScrollStart, pxScrollEnd, pauseTimer;
 	bool levelEnded = false;
 	int readKeys = 0, gpTimer = 0;
+	int x, y;
 	
 	Rect statsRect, levelRect;
 	int chainColor[3] = { 0 };
@@ -249,6 +253,7 @@ void playGame()
 	
 	levelCounter = 0;
 	levelTimer = 0;
+	pauseTimer = 0;
 	enemyCounter = 0;
 	waveIndex = 0;
 	G_hasFiredOnce = false;
@@ -427,7 +432,7 @@ void playGame()
 			kEv = getk();
 		}
 		readKeys++;
-		
+			
 		if(gamePhase == PHASE_TRANSITION)
 		{
 			kEv = 0;
@@ -467,7 +472,7 @@ void playGame()
 		
 		if(!G_skipFrame)
 		{
-			// Draw score and chains
+		// Draw score and chains
 			statsRect.x = statsRect.y = 0;
 			if(gamePhase != PHASE_BOSS)
 			{
@@ -553,8 +558,44 @@ void playGame()
 			else if(gamePhase == PHASE_BOSS && gpTimer < 1024)
 				drawSprite(image_bossWarning, 0, 72);
 			
-			updateScreen();
+			updateScreen();	
+		}
+	
+		if(!pauseTimer) 
+		{
+			if(KPAUSE(kEv))
+			{
+				// Pause the game until another pauseKey is pressed
+				wait_no_key_pressed();
+
+				// Display a "paused" box. It will be cleared in the next frame.
+				x = 140, y = 116;
+				fillRect(60, 100, 200, 40, 0xffff);
+				drawHLine(100, 60, 260, 0);
+				drawHLine(140, 60, 260, 0);
+				drawString(&x, &y, 0, "Pause", 0, 0xffff);
+				updateScreen();
 			
+				while(!isKeyPressed(G_pauseKey)) 
+				{
+					sleep(5);
+					if(isKeyPressed(KEY_NSPIRE_ESC))
+					{
+						kEv = 128; // KQUIT
+						break;
+					}
+				}
+				wait_no_key_pressed();
+				pauseTimer = 10;
+			}
+		}
+		else
+			pauseTimer--;
+
+		if(!G_skipFrame)
+		{
+			// The background is dispayed after to keep the enemies(power slots, player ship ...) 
+			// on the screen when pausing the game
 			if(G_displayBg)
 			{
 				// Display a scrolling background
@@ -569,6 +610,7 @@ void playGame()
 			else
 				clearBufferW();
 		}
+
 		#ifndef DEBUG_NKARUGA
 		if(!has_colors) sleep(6);
 		#endif

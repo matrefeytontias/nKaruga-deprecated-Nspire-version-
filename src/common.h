@@ -31,6 +31,7 @@ typedef int Fixed;
 #define K5(x) (x & 512)
 #define K7(x) (x & 1024)
 #define K8(x) (x & 2048)
+#define KPAUSE(x) (x & 4096)
 
 extern KeyEvent getk(void);
 
@@ -507,7 +508,7 @@ extern bool G_usingTouchpad;
 extern bool G_fireback, G_hardMode;
 extern bool G_hasFiredOnce;
 // Custom keys
-extern t_key G_fireKey, G_polarityKey, G_fragmentKey;
+extern t_key G_fireKey, G_polarityKey, G_fragmentKey, G_pauseKey;
 
 extern touchpad_info_t *G_tpinfo;
 extern touchpad_report_t G_tpstatus;

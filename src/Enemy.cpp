@@ -48,7 +48,7 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 				{
 					if(hasRotation)
 					{
-						drawSpriteRotated(img, &er, rotationAngle);
+						drawSpriteRotated(img, &er, &er, rotationAngle);
 					}
 					else
 					{

@@ -79,7 +79,7 @@ void Homing::draw()
 	r.x = fixtoi(x);
 	r.y = fixtoi(y);
 	
-	drawSpriteRotated(image_entries[polarity ? image_LUT_enemy_homing_bullet_shadow : image_LUT_enemy_homing_bullet_light], &r, rotationAngle);
+	drawSprite(image_entries[polarity ? image_LUT_enemy_homing_bullet_shadow : image_LUT_enemy_homing_bullet_light], r.x, r.y);
 	
 	rotationAngle++;
 	

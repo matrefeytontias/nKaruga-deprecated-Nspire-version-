@@ -220,7 +220,7 @@ void playGame()
 {
 	KeyEvent kEv = 0;
 	int levelCounter, levelTimer, enemyCounter, waveIndex, scrollOffset = 0, pxScrollStart, pxScrollEnd, pauseTimer;
-	bool levelEnded = false;
+	bool levelEnded = false, parsedEnemy = true;
 	int readKeys = 0, gpTimer = 0;
 	int x, y;
 	
@@ -287,109 +287,114 @@ void playGame()
 			G_waveTimer++;
 			if(!levelTimer)
 			{
-				// Load the current enemy from the level stream
-				int currentLevelByte = levelStream[levelCounter];
-				if(currentLevelByte == LVLSTR_CMD)
+				do
 				{
-					levelCounter++;
-					currentLevelByte = levelStream[levelCounter];
-					if(currentLevelByte == LVLSTR_NEWWAVE)
+					parsedEnemy = false;
+					// Load the current byte from the level stream
+					int currentLevelByte = levelStream[levelCounter];
+					if(currentLevelByte == LVLSTR_CMD)
 					{
-						// Start a new wave
-						G_waveTimer = 0;
-						waveIndex = 0;
 						levelCounter++;
-						enemyCounter = 0;
-					}
-					else if(currentLevelByte == LVLSTR_WAIT)
-					{
-						// Wait some frames
-						levelTimer = levelStream[levelCounter + 1];
-						levelCounter += 2;
-					}
-					else if(currentLevelByte == LVLSTR_KILLED)
-					{
-						// Wait for every enemy to be killed before progressing
-						int levelCanProgress = 1;
-						for(int i = 0; i < MAX_ENEMY; i++)
+						currentLevelByte = levelStream[levelCounter];
+						if(currentLevelByte == LVLSTR_NEWWAVE)
 						{
-							if(G_enemiesArray[i]->isActive())
-							{
-								levelCanProgress = 0;
-								break;
-							}
+							// Start a new wave
+							G_waveTimer = 0;
+							waveIndex = 0;
+							levelCounter++;
+							enemyCounter = 0;
 						}
-						if(levelCanProgress) levelCounter++;
-						else levelCounter--;
+						else if(currentLevelByte == LVLSTR_WAIT)
+						{
+							// Wait some frames
+							levelTimer = levelStream[levelCounter + 1];
+							levelCounter += 2;
+						}
+						else if(currentLevelByte == LVLSTR_KILLED)
+						{
+							// Wait for every enemy to be killed before progressing
+							int levelCanProgress = 1;
+							for(int i = 0; i < MAX_ENEMY; i++)
+							{
+								if(G_enemiesArray[i]->isActive())
+								{
+									levelCanProgress = 0;
+									break;
+								}
+							}
+							if(levelCanProgress) levelCounter++;
+							else levelCounter--;
+						}
+						else if(currentLevelByte == LVLSTR_CHAPTER)
+						{
+							// Start a new chapter
+							// Set up transition
+							gamePhase = PHASE_TRANSITION;
+							currentW = 0;
+							gpTimer = 0;
+							levelCounter++;
+							chapterNum = levelStream[levelCounter];
+							levelCounter++;
+						}
+						else if(currentLevelByte == LVLSTR_JOINT)
+						{
+							// Constraint an enemy to another
+							G_enemiesArray[levelStream[levelCounter + 1]]->joint(levelStream[levelCounter + 2],
+											itofix(levelStream[levelCounter + 3]),
+											itofix(levelStream[levelCounter + 4]), levelStream[levelCounter + 5]);
+							levelCounter += 6;
+						}
+						else if(currentLevelByte == LVLSTR_BOSS)
+						{
+							// Cinematic
+							gamePhase = PHASE_BOSS;
+							gpTimer = 0;
+							// TODO
+							// fight boss
+							levelCounter += 2;
+						}
+						else if(currentLevelByte == LVLSTR_BKPT)
+						{
+							// Debug stuff
+							printf("Current enemy : %d\nCurrent wave timer : %d\nGlobal timer : %d\nCurrent wave index : %d\n",
+							enemyCounter, G_waveTimer, gpTimer, waveIndex);
+							for(int i = 0; i < enemyCounter; i++)
+								printf("Enemy %d :\nX,Y : %d, %d\n", i, fixtoi(G_enemiesArray[i]->getx()), fixtoi(G_enemiesArray[i]->gety()));
+							bkpt();
+							levelCounter++;
+						}
+						else
+						{
+							// You messed up your level stream bro
+							printf("Error : %d : unknown command !\n", currentLevelByte);
+							bkpt();
+						}
 					}
-					else if(currentLevelByte == LVLSTR_CHAPTER)
+					else if(currentLevelByte == LVLSTR_CHAPTEREND)
 					{
-						// Start a new chapter
-						// Set up transition
-						gamePhase = PHASE_TRANSITION;
+						gamePhase = PHASE_RESULTS;
 						currentW = 0;
+						currentH = 0;
 						gpTimer = 0;
 						levelCounter++;
-						chapterNum = levelStream[levelCounter];
-						levelCounter++;
 					}
-					else if(currentLevelByte == LVLSTR_JOINT)
+					else if(currentLevelByte == LVLSTR_END)
 					{
-						// Constraint an enemy to another
-						G_enemiesArray[levelStream[levelCounter + 1]]->joint(levelStream[levelCounter + 2],
-										itofix(levelStream[levelCounter + 3]),
-										itofix(levelStream[levelCounter + 4]), levelStream[levelCounter + 5]);
-						levelCounter += 6;
-					}
-					else if(currentLevelByte == LVLSTR_BOSS)
-					{
-						// Cinematic
-						gamePhase = PHASE_BOSS;
-						gpTimer = 0;
-						// TODO
-						// fight boss
-						levelCounter += 2;
-					}
-					else if(currentLevelByte == LVLSTR_BKPT)
-					{
-						// Debug stuff
-						printf("Current enemy : %d\nCurrent wave timer : %d\nGlobal timer : %d\nCurrent wave index : %d\n",
-						enemyCounter, G_waveTimer, gpTimer, waveIndex);
-						for(int i = 0; i < enemyCounter; i++)
-							printf("Enemy %d :\nX,Y : %d, %d\n", i, fixtoi(G_enemiesArray[i]->getx()), fixtoi(G_enemiesArray[i]->gety()));
-						bkpt();
-						levelCounter++;
+						// End of the level
+						levelEnded = true;
 					}
 					else
 					{
-						// You messed up your level stream bro
-						printf("Error : %d : unknown command !\n", currentLevelByte);
-						bkpt();
+						// Dunno what it is ? Then it's an enemy by default
+						G_enemiesArray[enemyCounter]->activate(itofix(levelStream[levelCounter]), itofix(levelStream[levelCounter + 1]), levelStream[levelCounter + 2],
+															levelStream[levelCounter + 3], levelStream[levelCounter + 4], waveIndex, levelStream[levelCounter + 5],
+															levelStream[levelCounter + 6], levelStream[levelCounter + 7]);
+						levelCounter += 8;
+						enemyCounter = (enemyCounter + 1) % MAX_ENEMY;
+						waveIndex++;
+						parsedEnemy = true;
 					}
-				}
-				else if(currentLevelByte == LVLSTR_CHAPTEREND)
-				{
-					gamePhase = PHASE_RESULTS;
-					currentW = 0;
-					currentH = 0;
-					gpTimer = 0;
-					levelCounter++;
-				}
-				else if(currentLevelByte == LVLSTR_END)
-				{
-					// End of the level
-					levelEnded = true;
-				}
-				else
-				{
-					// Dunno what it is ? Then it's an enemy by default
-					G_enemiesArray[enemyCounter]->activate(itofix(levelStream[levelCounter]), itofix(levelStream[levelCounter + 1]), levelStream[levelCounter + 2],
-														levelStream[levelCounter + 3], levelStream[levelCounter + 4], waveIndex, levelStream[levelCounter + 5],
-														levelStream[levelCounter + 6], levelStream[levelCounter + 7]);
-					levelCounter += 8;
-					enemyCounter = (enemyCounter + 1) % MAX_ENEMY;
-					waveIndex++;
-				}
+				} while(parsedEnemy);
 			}
 			else
 				levelTimer--;

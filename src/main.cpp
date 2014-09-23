@@ -1,4 +1,5 @@
 #include "common.h"
+#include "ExplosionEffect.h"
 #include "levels.h" 
 #include "../gfx/kanji.h"
 #include "../gfx/bossWarning.h"
@@ -112,9 +113,10 @@ int main(int argc, char **argv)
 	
 	buildGameLUTs();
 	
-	// Init display
+	// Init things
 	initBuffering();
 	clearBufferW();
+	initExplosionEngine();
 
 	while(!donePlaying)
 	{
@@ -211,6 +213,7 @@ int main(int argc, char **argv)
 	
 	delete G_particles;
 	
+	deinitExplosionEngine();
 	deinitBuffering();
 	
 	return 0;
@@ -427,7 +430,7 @@ void playGame()
 		}
 		else if(gamePhase == PHASE_BOSS && gpTimer > 1023)
 		{
-			gamePhase = PHASE_GAME;
+			gamePhase = PHASE_EXPLODE;
 		}
 		
 		if(!(readKeys % 4))
@@ -562,6 +565,13 @@ void playGame()
 			}
 			else if(gamePhase == PHASE_BOSS && gpTimer < 1024)
 				drawSprite(image_bossWarning, 0, 72);
+			else if(gamePhase == PHASE_EXPLODE)
+			{
+				if(gpTimer == 1024)
+					initExplosionEffect(160, 120, 256, 0);
+				else
+					if(renderExplosionEffect()) gamePhase = PHASE_GAME;
+			}
 			
 			if(!pauseTimer) 
 			{

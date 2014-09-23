@@ -33,7 +33,7 @@ typedef int Fixed;
 #define K8(x) (x & 2048)
 #define KPAUSE(x) (x & 4096)
 
-extern KeyEvent getk(void);
+extern KeyEvent getk();
 
 // Bullets
 
@@ -62,7 +62,7 @@ public:
 	~Bullet();
 	Rect* makeRect();
 	bool isActive();
-	void activate(Fixed, Fixed, Fixed, Fixed, int, bool, bool);
+	void activate(Fixed x, Fixed y, Fixed dx, Fixed dy, int imageID, bool polarity, bool hurtsPlayer);
 	void deactivate();
 	bool getPolarity();
 	bool hurtsPlayer();
@@ -88,7 +88,7 @@ public:
 	Homing();
 	~Homing();
 	bool isActive();
-	void activate(Fixed, Fixed, Fixed, Player*, bool);
+	void activate(Fixed x, Fixed y, Fixed initialAngle, Player *target, bool polarity);
 	void deactivate();
 	bool getPolarity();
 	bool handle();
@@ -115,7 +115,7 @@ public:
 	PowerFragment();
 	~PowerFragment();
 	bool isActive();
-	void activate(Fixed, Fixed, Fixed, Player*, bool, bool);
+	void activate(Fixed x, Fixed y, Fixed initialAngle, Player *target, bool polarity, bool hurtsPlayer);
 	void deactivate();
 	bool getPolarity();
 	bool hurtsPlayer();
@@ -146,15 +146,15 @@ public:
 	Laser();
 	~Laser();
 	bool isActive();
-	void activate(Enemy*, bool);
+	void activate(Enemy *origin, bool polarity);
 	void deactivate();
 	void handle();
 	void draw();
 	bool getPolarity();
 	Rect* getVector();
-	void getSides(Rect*, Rect*);
+	void getSides(Rect *side1, Rect *side2);
 	int getAmplitude();
-	void setAmplitude(int);
+	void setAmplitude(int amp);
 	Fixed angle;
 	Enemy *origin;
 	int x;
@@ -172,15 +172,15 @@ class BulletArray
 public:
 	BulletArray();
 	~BulletArray();
-	void handle(Player*);
-	void add(Fixed, Fixed, Fixed, Fixed, int, bool, bool);
-	void add_fragment(Fixed, Fixed, Fixed, Player*, bool, bool);
-	void add_homing(Fixed, Fixed, Fixed, Player*, bool);
-	void fire_laser(Enemy*, bool);
-	void deactivate(int);
-	void deactivate_fragment(int);
-	void deactivate_homing(int);
-	void stop_laser(Enemy*);
+	void handle(Player *player);
+	void add(Fixed x, Fixed y, Fixed dx, Fixed dy, int imageID, bool polarity, bool hurtsPlayer);
+	void add_fragment(Fixed x, Fixed y, Fixed initialAngle, Player *target, bool polarity, bool hurtsPlayer);
+	void add_homing(Fixed x, Fixed y, Fixed initialAngle, Player *target, bool polarity);
+	void fire_laser(Enemy *origin, bool polarity);
+	void deactivate(int offset);
+	void deactivate_fragment(int offset);
+	void deactivate_homing(int offset);
+	void stop_laser(Enemy *origin);
 	Bullet data[MAX_BULLET];
 	PowerFragment data_fragment[MAX_FRAGMENT];
 	Homing data_homing[MAX_HOMING];
@@ -202,7 +202,7 @@ class Player
 public:
 	Player();
 	~Player();
-	void handle(KeyEvent, BulletArray*);
+	void handle(KeyEvent k, BulletArray *bArray);
 	bool getPolarity();
 	void switchPolarity();
 	void hurt();
@@ -238,18 +238,18 @@ class Enemy
 public:
 	Enemy();
 	~Enemy();
-	void handle(Player*, BulletArray*);
+	void handle(Player *player, BulletArray *bArray);
 	bool isActive();
-	void activate(int, int, int, int, int, int, bool, bool, int);
+	void activate(int x, int y, int HP, int shipImgID, int callbackID, int waveIndex, bool polarity, bool hasRotation, int firebackAmount);
 	void deactivate();
-	void damage(Player*, bool, int, BulletArray*);
-	void joint(int, Fixed, Fixed, bool);
+	void damage(Player *player, bool polarity, int amount, BulletArray *bArray);
+	void joint(int offset, Fixed x, Fixed y, bool diesWithJoint);
 	Fixed getRotation();
-	void setRotation(Fixed);
+	void setRotation(Fixed angle);
 	bool getPolarity();
 	int getWaveIndex();
-	int getInternal(int);
-	void setInternal(int, int);
+	int getInternal(int num);
+	void setInternal(int num, int value);
 	Fixed getx();
 	Fixed gety();
 	// x, y on-screen
@@ -287,7 +287,7 @@ class DestroyedEnemies
 public:
 	DestroyedEnemies();
 	~DestroyedEnemies();
-	void activate(Enemy*, int);
+	void activate(Enemy *origin, int offset);
 	int x[MAX_ENEMY];
 	int y[MAX_ENEMY];
 	bool relevant[MAX_ENEMY];
@@ -316,7 +316,7 @@ class Particles
 public:
 	Particles();
 	~Particles();
-	void add(Fixed, Fixed, Fixed, Fixed, bool);
+	void add(Fixed x, Fixed y, Fixed dx, Fixed dy, bool polarity);
 	void handle();
 private:
 	Fixed x[MAX_PARTICLE];
@@ -334,7 +334,7 @@ class ChainNotif
 public:
 	ChainNotif();
 	~ChainNotif();
-	void activate(int, int, int);
+	void activate(int x, int y, int value);
 	void handle();
 private:
 	int x, backupX;
@@ -357,6 +357,7 @@ enum
 	PHASE_GAME,
 	PHASE_TRANSITION,
 	PHASE_BOSS,
+	PHASE_EXPLODE,
 	PHASE_RESULTS
 };
 
@@ -520,6 +521,6 @@ extern Fixed angleToPlayer(Enemy*, Player*);
 extern Fixed angleToEnemy(PowerFragment*, Enemy*);
 extern Fixed angleToPlayer(PowerFragment*, Player*);
 extern Fixed angleToPlayer(Homing*, Player*);
-extern Enemy* findNearestEnemy(Fixed, Fixed);
+extern Enemy* findNearestEnemy(Fixed x, Fixed y);
 
 #endif

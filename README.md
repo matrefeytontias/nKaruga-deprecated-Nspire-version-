@@ -10,14 +10,14 @@ To build the executable, you'll need everything that is in the nKaruga/src and n
 
 If you use the CLI for building Ndless programs, running make in the root directory will be enough.
 
-**make_nKarugaSprite.exe** is a purposely-built tool that should not be used for other projects than nKaruga.
+**make_nKarugaSprite.exe** is a purpose-built tool that should not be used for other projects than nKaruga.
 
 **THE PROGRAM MUST NOT BE RAN IN CLI ! DRAG-AND-DROP ANY NUMBER OF IMAGES AT ONCE TO IT INSTEAD.**
 
 Running on a TI-Nspire
 ======================
 
-You need **at least** Ndless 3.1 installed to run nKaruga on your TI-Nspire. That means nKaruga will only run on your TI-Nspire if the installed OS is Ndless 3.1 or higher-compatible.
+You need **at least** Ndless 3.1 installed to run nKaruga on your TI-Nspire. That means nKaruga will only run on your TI-Nspire if the installed OS is Ndless 3.1 or higher-compatible. nKaruga is also compatible with Ndless 3.6.
 
 Use nKaruga.tns on real hardware, and nKaruga_emu.tns on an Nspire emulator (else it's waaaaaay too fast).
 
@@ -28,20 +28,40 @@ Ikaruga is a danmaku (*bullet hell*) SHMUP (SHoot-theM-UP) with a twist : enemy 
 
 When you fire at an enemy, there are two situations : either the bullet hitting the enemy is of the opposite polarity, in this case the bullet inflicts double damages ; or the bullet is of the same polarity, in this case the bullet only inflicts normal damage but the enemy will fireback bullets of its own polarity when dying.
 
-Commands for this beta :
+The main menu
+=============
+
+# Play
+
+You get it I think. Press it to get in the game.
+
+# Difficulty
+
+Repeatedly press ENTER to loop through the three possible difficulties.
+
+* Easy : enemies never fire back when killed.
+* Normal : enemies fire back when killed by bullets of their polarity.
+* Hard : enemies always fire back. Be ready for it.
+
+# Use touchpad for movement
+
+Enable this so you can sweep your fingers on the touchpad to move your ship instead of using the arrow keys. Obviously, this will only work if your calc has a touchpad.
+
+# Use scrolling background
+
+Disable this if you're really concerned about battery usage or use a TI-Nspire that doesn't have a color screen. If you don't understand why, just try.
+
+# Configure controls
+
+Here you can customize your controls for nKaruga. Simply press the key you want the displayed action to be binded to.
+
+Default commands :
 * CTRL   : fire
 * SHIFT  : switch polarity
 * DEL    : release power
 * arrows : move
-* ESC  : quit
-
-Temporary debug commands:
-* 4 : enable touchpad (obviously, it only works with touchpad Nspires)
-* 5 : disable touchpad
-* 7 : enable background
-* 8 : disable background
-
-The beta ends when all enemies are defeated or quitted the screen.
+* P      : pause the game
+* ESC    : quit
 
 Scoring (a whole lot)
 =====================

@@ -55,7 +55,7 @@ void BulletArray::handle(Player *p)
 					}
 				}
 			}
-			else
+			else if(!cb->hurtsPlayer())
 			{
 				// Check collisions with enemies (there are much more enemies than players)
 				for(int j = 0; j < MAX_ENEMY; j++)

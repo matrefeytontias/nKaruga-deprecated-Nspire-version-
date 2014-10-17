@@ -24,9 +24,14 @@ void ExplosionAnim::activate(int _x, int _y, bool _p)
 
 void ExplosionAnim::handle()
 {
+	Rect r;
 	if(counter)
 	{
+		// Isn't a drawing candidate
 		drawSprite(image_entries[(polarity ? image_LUT_explosion_shadow_0 : image_LUT_explosion_light_0) + (6 * FRAME_DELAY - counter) / FRAME_DELAY], x, y);
+		//~ r.x = x;
+		//~ r.y = y;
+		//~ DC->add(image_entries[(polarity ? image_LUT_explosion_shadow_0 : image_LUT_explosion_light_0) + (6 * FRAME_DELAY - counter) / FRAME_DELAY], &r);
 		counter--;
 	}
 }

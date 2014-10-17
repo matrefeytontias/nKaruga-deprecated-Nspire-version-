@@ -17,6 +17,8 @@ touchpad_info_t *G_tpinfo;
 touchpad_report_t G_tpstatus;
 t_key G_fireKey, G_polarityKey, G_fragmentKey, G_pauseKey;
 
+DrawingCandidates *DC;
+
 Enemy *G_enemiesArray[MAX_ENEMY];
 Particles *G_particles;
 
@@ -110,6 +112,9 @@ int main(int argc, char **argv)
 		G_enemiesArray[i] = new Enemy;
 	
 	G_particles = new Particles;
+	
+	DC = new DrawingCandidates;
+	DC->init();
 	
 	buildGameLUTs();
 	
@@ -213,10 +218,25 @@ int main(int argc, char **argv)
 	
 	delete G_particles;
 	
+	DC->release();
+	
+	delete DC;
+	
 	deinitExplosionEngine();
 	deinitBuffering();
 	
 	return 0;
+}
+
+int getBossPhase(int timer)
+{
+	if(timer < 1023)
+		return PHASE_BOSSCINEMATIC;
+	else
+	{
+		if(isKeyPressed(KEY_NSPIRE_ENTER)) return PHASE_BOSSEXPLODE;
+		else return PHASE_BOSSFIGHT;
+	}
 }
 
 void playGame()
@@ -233,7 +253,8 @@ void playGame()
 	unsigned int* bg;
 	
 	// Game phase
-	int gamePhase;
+	int gamePhase;//, bossPhase;
+	bool fightingBoss = false;
 	
 	// Variables for transition animation
 	int currentW = 0, currentH = 0, chapterNum = 0, dX = 0, dY = 0;
@@ -350,7 +371,8 @@ void playGame()
 						else if(currentLevelByte == LVLSTR_BOSS)
 						{
 							// Cinematic
-							gamePhase = PHASE_BOSS;
+							fightingBoss = true;
+							gamePhase = PHASE_BOSSCINEMATIC;
 							gpTimer = 0;
 							// TODO
 							// fight boss
@@ -428,10 +450,9 @@ void playGame()
 			if(gpTimer > 768)
 				gamePhase = PHASE_GAME;
 		}
-		else if(gamePhase == PHASE_BOSS && gpTimer > 1023)
-		{
-			gamePhase = PHASE_EXPLODE;
-		}
+		
+		if(fightingBoss)
+			gamePhase = getBossPhase(gpTimer);
 		
 		if(!(readKeys % 4))
 		{
@@ -471,6 +492,12 @@ void playGame()
 			G_enemiesArray[i]->handle(&ship, bArray);
 		}
 		
+		//
+		// Test
+		//
+		if(gamePhase == PHASE_BOSSFIGHT)
+			drawSprite(bossImage_entries[bossImage_LUT_1_body], 0, 0);
+		
 		bArray->handle(&ship);
 		
 		G_particles->handle();
@@ -478,11 +505,15 @@ void playGame()
 		if(!ship.getLives())
 			levelEnded = 1;
 		
+		// Draw everything that has to be drawn
+		DC->flush();
+		
+		// Things drawn within this block MUST NOT be candidates
 		if(!G_skipFrame)
 		{
-		// Draw score and chains
+			// Draw score and chains
 			statsRect.x = statsRect.y = 0;
-			if(gamePhase != PHASE_BOSS)
+			if(gamePhase != PHASE_BOSSCINEMATIC)
 			{
 				drawStringF(&statsRect.x, &statsRect.y, 0, 0xffff, 0, "Score : %d\n\n\n\nCH %d", G_score, G_chainStatus);
 				// Draw chain count
@@ -563,14 +594,18 @@ void playGame()
 					gpTimer = 0;
 				}
 			}
-			else if(gamePhase == PHASE_BOSS && gpTimer < 1024)
+			else if(gamePhase == PHASE_BOSSCINEMATIC)
 				drawSprite(image_bossWarning, 0, 72);
-			else if(gamePhase == PHASE_EXPLODE)
+			else if(gamePhase == PHASE_BOSSEXPLODE)
 			{
 				if(gpTimer == 1024)
 					initExplosionEffect(160, 120, 256, 0);
 				else
-					if(renderExplosionEffect()) gamePhase = PHASE_GAME;
+					if(renderExplosionEffect())
+					{
+						fightingBoss = false;
+						gamePhase = PHASE_GAME;
+					}
 			}
 			
 			if(!pauseTimer) 
@@ -605,10 +640,7 @@ void playGame()
 				pauseTimer--;
 			
 			updateScreen();	
-		}
-
-		if(!G_skipFrame)
-		{
+			
 			// The background is dispayed after to keep the enemies(power slots, player ship ...) 
 			// on the screen when pausing the game
 			if(G_displayBg)

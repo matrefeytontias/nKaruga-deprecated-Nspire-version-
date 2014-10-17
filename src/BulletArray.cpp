@@ -82,7 +82,7 @@ void BulletArray::handle(Player *p)
 			{
 				if(cb->handle())
 					deactivate(i);
-				else if(!G_skipFrame)
+				else
 					cb->draw();
 			}
 		}
@@ -147,7 +147,7 @@ void BulletArray::handle(Player *p)
 			{
 				if(cf->handle())
 					deactivate_fragment(i);
-				else if(!G_skipFrame)
+				else
 					cf->draw();
 			}
 		}
@@ -191,7 +191,7 @@ void BulletArray::handle(Player *p)
 			{
 				if(ch->handle())
 					deactivate_homing(i);
-				else if(!G_skipFrame)
+				else
 					ch->draw();
 			}
 		}
@@ -265,7 +265,7 @@ void BulletArray::handle(Player *p)
 				}
 				
 				cl->handle();
-				if(!G_skipFrame) cl->draw();
+				cl->draw();
 			}
 			else
 				cl->deactivate();

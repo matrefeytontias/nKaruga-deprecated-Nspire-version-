@@ -63,5 +63,6 @@ void Bullet::draw()
 	static Rect br;
 	br.x = fixtoi(x);
 	br.y = fixtoi(y);
-	drawSprite(img, br.x, br.y);
+	//~ drawSprite(img, br.x, br.y);
+	DC->add(img, &br);
 }

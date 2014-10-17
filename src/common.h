@@ -8,7 +8,7 @@
 
 #define UNUSED(var) (void)var
 
-// Add those functions for C++ compiler under linux
+// Add those functions for C++ compiler under Linux
 #if defined(__cplusplus) && !defined(min) && !defined(max)
 #define max(a, b) (a > b)
 #define min(a, b) (a < b)
@@ -53,6 +53,35 @@ extern KeyEvent getk();
 
 #define LASER_SPEED 2
 #define LASER_THICKNESS 25
+
+class DrawingCandidate
+{
+public:
+	DrawingCandidate(unsigned short *img, Rect *pos);
+	DrawingCandidate(unsigned short *img, Rect *pos, Rect *center, Fixed angle);
+	~DrawingCandidate();
+	void draw();
+private:
+	Rect pos, center;
+	bool rotates, centered;
+	Fixed angle;
+	unsigned short *img;
+};
+
+class DrawingCandidates
+{
+public:
+	DrawingCandidates();
+	~DrawingCandidates();
+	void init();
+	void add(unsigned short *img, Rect *pos);
+	void add(unsigned short *img, Rect *pos, Rect *center, Fixed angle);
+	void flush();
+	void release();
+private:
+	DrawingCandidate **data;
+	int candidatesCount;
+};
 
 // Both enemies and player can fire them
 class Bullet
@@ -281,6 +310,15 @@ private:
 	int fireback;
 };
 
+// The really big bad ones
+class BossEnemy
+{
+public:
+	BossEnemy();
+	~BossEnemy();
+	void activate(int pattersNb, int *barPerPattern, int callbackID); // drawing is taken care of by the callback code
+};
+
 // Used to hold information on killed enemies in order to get the position for ChainNotifs
 class DestroyedEnemies
 {
@@ -310,7 +348,7 @@ private:
 
 // Particles
 // Because they are pretty *_*
-#define MAX_PARTICLE 128
+#define MAX_PARTICLE 256
 class Particles
 {
 public:
@@ -348,7 +386,7 @@ private:
 };
 
 // Level streams
-// x, y, HP, image ID, callback ID, polarity, has rotation ?, fireback
+// x, y, HP, image ID, callback ID, polarity, has rotation ?, fireback amount
 #define enemy(x, y, HP, iID, cbID, p, hR, f) x, y, HP, iID, cbID, p, hR, f
 
 // Game phases
@@ -356,8 +394,9 @@ enum
 {
 	PHASE_GAME,
 	PHASE_TRANSITION,
-	PHASE_BOSS,
-	PHASE_EXPLODE,
+	PHASE_BOSSCINEMATIC,
+	PHASE_BOSSFIGHT,
+	PHASE_BOSSEXPLODE,
 	PHASE_RESULTS
 };
 
@@ -386,16 +425,10 @@ enum
 #define cmd_bkpt LVLSTR_CMD, LVLSTR_BKPT
 #define cmd_fightBoss(n) LVLSTR_CMD, LVLSTR_BOSS, n
 
-/* 
- * Level streams structure
- * x, y, HP, imageID, bulletImgID, callbackID, polarity, hasRotation
- * or
- * LVLSTR_CMD, command [, value]
-*/
-
 // LUT-related
 
-enum image_LUT
+// Base images LUT
+enum
 {
 	image_LUT_player_ship_light,
 	image_LUT_player_ship_shadow,
@@ -468,6 +501,14 @@ enum image_LUT
 	NB_IMAGES
 };
 
+// Boss images LUT
+enum
+{
+	bossImage_LUT_1_body,
+	NB_BOSS_IMAGES
+};
+
+// Enemies' patterns
 enum
 {
 	Pattern_1_1,
@@ -491,17 +532,27 @@ enum
 	Pattern_1_19,
 	Pattern_1_20,
 	Pattern_1_21,
-	Pattern_test,
 	NB_CALLBACKS
 };
 
+#define HP_PER_BAR 200
+
+// Bosses' patterns
+enum
+{
+	Boss_Pattern_1,
+	NB_BOSS_CALLBACKS
+};
+
 extern unsigned short *image_entries[NB_IMAGES];
+extern unsigned short *bossImage_entries[NB_BOSS_IMAGES];
 
 extern void buildGameLUTs();
 extern void freeGameLUTs();
 
 extern Enemy **enemiesArray;
 
+extern DrawingCandidates *DC;
 // Global vars
 extern int G_skipFrame, G_waveTimer, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount, G_maxChain;
 extern int G_score, G_power, G_bossBonus;

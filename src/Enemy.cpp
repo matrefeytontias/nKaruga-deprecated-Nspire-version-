@@ -37,25 +37,24 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 			er.x = fixtoi(getx());
 			er.y = fixtoi(gety());
 			
-			// Have a relatively big threshold for off-screen animations
+			// Have a relatively big threshold for off-screen movement
 			if(er.x + img[0] / 2 < -80 || er.x - img[0] / 2 > 399 ||
 				er.y + img[1] / 2 < -80 || er.y - img[1] / 2 > 319)
-				deactivate();		
+				deactivate();
 			else
 			{
 				// then the enemy image
-				if(!G_skipFrame)
+				if(hasRotation)
 				{
-					if(hasRotation)
-					{
-						drawSpriteRotated(img, &er, NULL, rotationAngle);
-					}
-					else
-					{
-						er.x -= img[0] / 2;
-						er.y -= img[1] / 2;
-						drawSprite(img, er.x, er.y);
-					}
+					//~ drawSpriteRotated(img, &er, NULL, rotationAngle);
+					DC->add(img, &er, NULL, rotationAngle);
+				}
+				else
+				{
+					er.x -= img[0] / 2;
+					er.y -= img[1] / 2;
+					//~ drawSprite(img, er.x, er.y);
+					DC->add(img, &er);
 				}
 			}
 			// Check wether the player hit the enemy

@@ -34,7 +34,11 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 		r.x = fixtoi(x) - (img[(isSwitchingPolarity / 8) * 2][0] / 2);
 		r.y = fixtoi(y) - (img[(isSwitchingPolarity / 8) * 2][1] / 2);
 		
-		if(!G_skipFrame) drawSprite(img[((isSwitchingPolarity / 8) * 2) + (polarity ? SHADOW : LIGHT)], r.x, r.y);
+		//~ if(!G_skipFrame) 
+		//~ {
+			//~ drawSprite(img[((isSwitchingPolarity / 8) * 2) + (polarity ? SHADOW : LIGHT)], r.x, r.y);
+			DC->add(img[((isSwitchingPolarity / 8) * 2) + (polarity ? SHADOW : LIGHT)], &r);
+		//~ }
 		
 		if(isSwitchingPolarity)
 		{
@@ -129,7 +133,10 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 			{
 				int w = image_entries[image_LUT_player_explosion_0][0] / 2;
 				int h = image_entries[image_LUT_player_explosion_0][1] / 2;
-				drawSprite(image_entries[image_LUT_player_explosion_0 + deathCounter], fixtoi(x) - w, fixtoi(y) - h);
+				//~ drawSprite(image_entries[image_LUT_player_explosion_0 + deathCounter], fixtoi(x) - w, fixtoi(y) - h);
+				r.x = fixtoi(x) - w;
+				r.y = fixtoi(y) - h;
+				DC->add(image_entries[image_LUT_player_explosion_0 + deathCounter], &r);
 				deathCounter++;
 			}
 		}
@@ -147,7 +154,10 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 		{
 			int w = image_entries[image_LUT_player_ship_light][0] / 2;
 			int h = image_entries[image_LUT_player_ship_light][1] / 2;
-			drawSprite(image_entries[image_LUT_player_ship_light], fixtoi(x) - w, fixtoi(y) - h);
+			//~ drawSprite(image_entries[image_LUT_player_ship_light], fixtoi(x) - w, fixtoi(y) - h);
+			r.x = fixtoi(x) - w;
+			r.y = fixtoi(y) - h;
+			DC->add(image_entries[image_LUT_player_ship_light], &r);
 			y -= itofix(1);
 		}
 		else dying = false;

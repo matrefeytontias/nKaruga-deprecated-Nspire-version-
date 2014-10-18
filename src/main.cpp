@@ -230,12 +230,11 @@ int main(int argc, char **argv)
 
 int getBossPhase(int timer)
 {
-	if(timer < 1023)
+	if(timer < 1024)
 		return PHASE_BOSSCINEMATIC;
 	else
 	{
-		if(isKeyPressed(KEY_NSPIRE_ENTER)) return PHASE_BOSSEXPLODE;
-		else return PHASE_BOSSFIGHT;
+		return PHASE_BOSSEXPLODEINIT;
 	}
 }
 
@@ -496,7 +495,7 @@ void playGame()
 		// Test
 		//
 		if(gamePhase == PHASE_BOSSFIGHT)
-			drawSprite(bossImage_entries[bossImage_LUT_1_body], 0, 0);
+			drawSprite(bossImage_entries[bossImage_LUT_1_body], 160 - bossImage_entries[bossImage_LUT_1_body][0] / 2, 120 - bossImage_entries[bossImage_LUT_1_body][1] / 2);
 		
 		bArray->handle(&ship);
 		
@@ -596,16 +595,16 @@ void playGame()
 			}
 			else if(gamePhase == PHASE_BOSSCINEMATIC)
 				drawSprite(image_bossWarning, 0, 72);
+			else if(gamePhase == PHASE_BOSSEXPLODEINIT)
+			{
+				initExplosionEffect(160, 120, 256, 0);
+				gamePhase = PHASE_BOSSEXPLODE;
+				fightingBoss = false;
+			}
 			else if(gamePhase == PHASE_BOSSEXPLODE)
 			{
-				if(gpTimer == 1024)
-					initExplosionEffect(160, 120, 256, 0);
-				else
-					if(renderExplosionEffect())
-					{
-						fightingBoss = false;
-						gamePhase = PHASE_GAME;
-					}
+				if(renderExplosionEffect())
+					gamePhase = PHASE_GAME;
 			}
 			
 			if(!pauseTimer) 

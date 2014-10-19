@@ -11,6 +11,7 @@
 int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount, G_maxChain = 0; int G_score, G_power, G_bossBonus = 0;
 bool G_displayBg = true, G_fireback = true, G_hardMode = false;
 bool G_hasFiredOnce;
+bool G_fightingBoss;
 int G_difficulty = 1;
 bool G_usingTouchpad;
 touchpad_info_t *G_tpinfo;
@@ -234,7 +235,8 @@ int getBossPhase(int timer)
 		return PHASE_BOSSCINEMATIC;
 	else
 	{
-		return PHASE_BOSSEXPLODEINIT;
+		//~ return PHASE_BOSSEXPLODEINIT;
+		return PHASE_BOSSFIGHT;
 	}
 }
 
@@ -252,8 +254,10 @@ void playGame()
 	unsigned int* bg;
 	
 	// Game phase
-	int gamePhase;//, bossPhase;
-	bool fightingBoss = false;
+	int gamePhase;
+	G_fightingBoss = false;
+	BossEnemy bossEnemy;
+	BossData bossData;
 	
 	// Variables for transition animation
 	int currentW = 0, currentH = 0, chapterNum = 0, dX = 0, dY = 0;
@@ -370,12 +374,15 @@ void playGame()
 						else if(currentLevelByte == LVLSTR_BOSS)
 						{
 							// Cinematic
-							fightingBoss = true;
+							G_fightingBoss = true;
 							gamePhase = PHASE_BOSSCINEMATIC;
 							gpTimer = 0;
 							// TODO
 							// fight boss
-							levelCounter += 2;
+							levelCounter++;
+							bossData = createBossData(levelStream[levelCounter]);
+							bossEnemy.activate(&bossData);
+							levelCounter++;
 						}
 						else if(currentLevelByte == LVLSTR_BKPT)
 						{
@@ -449,8 +456,16 @@ void playGame()
 			if(gpTimer > 768)
 				gamePhase = PHASE_GAME;
 		}
+		else if(gamePhase == PHASE_BOSSFIGHT)
+		{
+			if(bossEnemy.handle(&ship, bArray))
+			{
+				gamePhase = PHASE_BOSSEXPLODEINIT;
+				G_fightingBoss = false;
+			}
+		}
 		
-		if(fightingBoss)
+		if(G_fightingBoss)
 			gamePhase = getBossPhase(gpTimer);
 		
 		if(!(readKeys % 4))
@@ -491,13 +506,7 @@ void playGame()
 			G_enemiesArray[i]->handle(&ship, bArray);
 		}
 		
-		//
-		// Test
-		//
-		if(gamePhase == PHASE_BOSSFIGHT)
-			drawSprite(bossImage_entries[bossImage_LUT_1_body], 160 - bossImage_entries[bossImage_LUT_1_body][0] / 2, 120 - bossImage_entries[bossImage_LUT_1_body][1] / 2);
-		
-		bArray->handle(&ship);
+		bArray->handle(&ship, &bossEnemy);
 		
 		G_particles->handle();
 		
@@ -561,12 +570,12 @@ void playGame()
 					statsRect.x = (320 - stringWidth(string_results[0])) / 2;
 					statsRect.y = 16;
 					drawString(&statsRect.x, &statsRect.y, (320 - stringWidth(string_results[1])) / 2, string_results[0], 0xffff, 0);
-					if(gpTimer > 256)
+					if(gpTimer > 128)
 					{
 						drawString(&statsRect.x, &statsRect.y, (320 - numberWidth(G_bossBonus)) / 2, string_results[1], 0xffff, 0);
 						drawDecimal(&statsRect.x, &statsRect.y, G_bossBonus, 0xffff, 0);
 					}
-					if(gpTimer > 512)
+					if(gpTimer > 256)
 					{
 						statsRect.x = (320 - stringWidth(string_results[2])) / 2;
 						statsRect.y += 16;
@@ -579,7 +588,7 @@ void playGame()
 						drawString(&statsRect.x, &statsRect.y, (320 - stringWidth(string_results[5])) / 2, string_results[4], 0xffff, 0);
 						// don't display grade for now as it doesn't exist yet
 					}
-					if(gpTimer > 1024 && KFIRE(kEv))
+					if(gpTimer > 384 && KFIRE(kEv))
 					{
 						gamePhase = PHASE_GAME;
 					}
@@ -599,7 +608,6 @@ void playGame()
 			{
 				initExplosionEffect(160, 120, 256, 0);
 				gamePhase = PHASE_BOSSEXPLODE;
-				fightingBoss = false;
 			}
 			else if(gamePhase == PHASE_BOSSEXPLODE)
 			{

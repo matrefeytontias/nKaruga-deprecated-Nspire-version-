@@ -151,16 +151,6 @@ int Enemy::getWaveIndex()
 	return waveIndex;
 }
 
-int Enemy::getInternal(int w)
-{
-	return internal[w];
-}
-
-void Enemy::setInternal(int w, int v)
-{
-	internal[w] = v;
-}
-
 Fixed Enemy::getx()
 {
 	return isJointed ? x + G_enemiesArray[jointedTo]->getx() + jointX : x;

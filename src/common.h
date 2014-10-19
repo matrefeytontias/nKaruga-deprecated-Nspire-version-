@@ -3,7 +3,7 @@
 
 #include <os.h>
 #include <math.h>
- 
+
 #include "n2DLib.h"
 
 #define UNUSED(var) (void)var
@@ -195,13 +195,15 @@ private:
 	Fixed amplitude;
 };
 
+class BossEnemy;
+
 // BulletArray
 class BulletArray
 {
 public:
 	BulletArray();
 	~BulletArray();
-	void handle(Player *player);
+	void handle(Player *player, BossEnemy *be);
 	void add(Fixed x, Fixed y, Fixed dx, Fixed dy, int imageID, bool polarity, bool hurtsPlayer);
 	void add_fragment(Fixed x, Fixed y, Fixed initialAngle, Player *target, bool polarity, bool hurtsPlayer);
 	void add_homing(Fixed x, Fixed y, Fixed initialAngle, Player *target, bool polarity);
@@ -210,11 +212,11 @@ public:
 	void deactivate_fragment(int offset);
 	void deactivate_homing(int offset);
 	void stop_laser(Enemy *origin);
+private:
 	Bullet data[MAX_BULLET];
 	PowerFragment data_fragment[MAX_FRAGMENT];
 	Homing data_homing[MAX_HOMING];
 	Laser data_laser[MAX_LASER];
-private:
 	// keep track of current bullet ...
 	int bulletCount;
 	// ... power fragment ...
@@ -277,8 +279,6 @@ public:
 	void setRotation(Fixed angle);
 	bool getPolarity();
 	int getWaveIndex();
-	int getInternal(int num);
-	void setInternal(int num, int value);
 	Fixed getx();
 	Fixed gety();
 	// x, y on-screen
@@ -310,13 +310,59 @@ private:
 	int fireback;
 };
 
-// The really big bad ones
+/* Bosses' data' format
+ * - Number of patterns
+ * - For each pattern :
+ *   - Amount of HP
+ *   - Collision callback ID (called to test collision between the boss and bullets, it can change depending on the boss's state)
+ * - Array of every needed images
+ * 
+ * The callback is supposed to handle all patterns by testing the amount of HP.
+ * Exceptionally, drawing should be taken care of in the callback using drawing candidates since bosses have complex graphical behaviors.
+ */
+
+// Init callback (initialization hook)
+typedef void (*boss_ib)(BossEnemy*);
+// Behavior callback (handle behavior)
+typedef void (*boss_cb)(BossEnemy*, Player*, BulletArray*);
+// Collision callback (handle collision)
+typedef int (*boss_ccb)(BossEnemy*, Bullet*);
+
+typedef struct
+{
+	int HP;
+	boss_ib initCallback;
+	boss_cb callback;
+	// Every following member contains this amount of data, because it's pattern-specific
+	int patternsNb;
+	// Self-explanatory
+	int *HPperPattern;
+	// Collision callbacks, handling collisions between the boss and bullets
+	// One per pattern
+	boss_ccb *collisionCallbacks;
+} BossData;
+
+// The really big bad one
 class BossEnemy
 {
 public:
 	BossEnemy();
 	~BossEnemy();
-	void activate(int pattersNb, int *barPerPattern, int callbackID); // drawing is taken care of by the callback code
+	void activate(BossData *d); // drawing is taken care of by the callback code
+	int handle(Player *p, BulletArray *bArray);
+	void damage(int amount);
+	Fixed x, y;
+	int HP;
+	int currentPattern;
+	int *HPperPattern;
+	int patternsNb;
+	boss_ib initCallback;
+	boss_cb callback;
+	// Collision callbacks, handling collisions between the boss and bullets
+	boss_ccb *collisionCallbacks;
+private:
+	// LOTS of internal registers
+	int internal[32];
 };
 
 // Used to hold information on killed enemies in order to get the position for ChainNotifs
@@ -506,6 +552,11 @@ enum
 enum
 {
 	bossImage_LUT_1_body,
+	bossImage_LUT_1_leftarm_armed,
+	bossImage_LUT_1_rightarm_armed1,
+	bossImage_LUT_1_rightarm_armed2,
+	bossImage_LUT_1_leftarm_nonarmed,
+	bossImage_LUT_1_rightarm_nonarmed,
 	NB_BOSS_IMAGES
 };
 
@@ -536,8 +587,6 @@ enum
 	NB_CALLBACKS
 };
 
-#define HP_PER_BAR 200
-
 // Bosses' patterns
 enum
 {
@@ -557,6 +606,7 @@ extern DrawingCandidates *DC;
 // Global vars
 extern int G_skipFrame, G_waveTimer, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount, G_maxChain;
 extern int G_score, G_power, G_bossBonus;
+extern bool G_fightingBoss;
 extern bool G_usingTouchpad;
 extern bool G_fireback, G_hardMode;
 extern bool G_hasFiredOnce;
@@ -574,5 +624,6 @@ extern Fixed angleToEnemy(PowerFragment*, Enemy*);
 extern Fixed angleToPlayer(PowerFragment*, Player*);
 extern Fixed angleToPlayer(Homing*, Player*);
 extern Enemy* findNearestEnemy(Fixed x, Fixed y);
+extern BossData createBossData(int bossID);
 
 #endif

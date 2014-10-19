@@ -2,7 +2,7 @@
 
 //#define SKIP_INTRO
 
-const static int levelStream[] = {
+const static int levelStream[] = {/*
 #ifndef SKIP_INTRO
 	cmd_wait(256),
 	//
@@ -367,7 +367,7 @@ const static int levelStream[] = {
 	enemy(160, 0, 1, image_LUT_enemy_ship_1_light, Pattern_1_21, LIGHT, 0, 2),
 	cmd_killed,
 	cmd_newWave,
-	// Boss
+	// Boss*/
 	cmd_fightBoss(0),
 	LVLSTR_CHAPTEREND,
 	LVLSTR_END

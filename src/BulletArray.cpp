@@ -21,9 +21,10 @@ BulletArray::~BulletArray()
 {
 }
 
-void BulletArray::handle(Player *p)
+void BulletArray::handle(Player *p, BossEnemy *be)
 {
 	bool destroyBullet;
+	int bossDamaged;
 	
 	// Bullets
 	for(int i = 0; i < MAX_BULLET; i++)
@@ -73,6 +74,17 @@ void BulletArray::handle(Player *p)
 							destroyBullet = true;
 							// The same bullet can destroy several enemies if it hits them in the same frame !
 						}
+					}
+				}
+				
+				// and possibly bosses
+				if(G_fightingBoss)
+				{
+					bossDamaged = (be->collisionCallbacks[be->currentPattern])(be, cb);
+					if(bossDamaged)
+					{
+						destroyBullet = true;
+						be->damage(bossDamaged);
 					}
 				}
 			}

@@ -81,7 +81,12 @@ void buildGameLUTs()
 	image_entries[image_LUT_titleScreen] = image_titleScreen;
 	
 	// Boss images
-	bossImage_entries[bossImage_LUT_1_body] = bossimage_1_body;
+	bossImage_entries[bossImage_LUT_1_body] = bossImage_1_body;
+	bossImage_entries[bossImage_LUT_1_leftarm_armed] = bossImage_1_leftarm_armed;
+	bossImage_entries[bossImage_LUT_1_rightarm_armed1] = bossImage_1_rightarm_armed1;
+	bossImage_entries[bossImage_LUT_1_rightarm_armed2] = bossImage_1_rightarm_armed2;
+	bossImage_entries[bossImage_LUT_1_leftarm_nonarmed] = bossImage_1_leftarm_nonarmed;
+	bossImage_entries[bossImage_LUT_1_rightarm_nonarmed] = bossImage_1_rightarm_nonarmed;
 }
 
 void freeGameLUTs()

@@ -1,6 +1,6 @@
 #include "common.h"
 
-const static int levelStream[] = {/*
+const static int levelStream[] = {
 	cmd_wait(256),
 	//
 	// Introduction 1
@@ -364,7 +364,7 @@ const static int levelStream[] = {/*
 	cmd_killed,
 	cmd_newWave,
 	cmd_wait(256),
-	// Boss*/
+	// Boss
 	cmd_fightBoss(0),
 	LVLSTR_CHAPTEREND,
 	LVLSTR_END

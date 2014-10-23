@@ -1,5 +1,4 @@
 #include "common.h"
-
 #include "bossData.h"
 
 BossData createBossData(int bossID)
@@ -7,7 +6,7 @@ BossData createBossData(int bossID)
 	BossData result;
 	result.patternsNb = bossPatternsNb[bossID];
 	result.HPperPattern = bossHPperPat[bossID];
-	result.initCallback = bossIBdata[bossID];
+	result.initCallbacks = bossIBdata[bossID];
 	result.callback = bossCBdata[bossID];
 	result.collisionCallbacks = bossCCBdata[bossID];
 	
@@ -31,21 +30,69 @@ void BossEnemy::activate(BossData *d)
 		internal[i] = 0;
 	patternsNb = d->patternsNb;
 	HPperPattern = d->HPperPattern;
-	initCallback = d->initCallback;
+	initCallbacks = d->initCallbacks;
 	callback = d->callback;
 	collisionCallbacks = d->collisionCallbacks;
 	currentPattern = 0;
-	(d->initCallback)(this);
+	// Mark for initialization callback execution
+	readyToGo = false;
+	initCallbackCalled = false;
+	hurtable = false;
 }
 
 // Return 1 if dead
 int BossEnemy::handle(Player *p, BulletArray *bArray)
 {
-	(callback)(this, p, bArray);
+	if(readyToGo)
+	{
+		int mHP = HP - getHPsum(HPperPattern, currentPattern + 1, patternsNb - 1);
+		int color = mHP / HP_PER_BAR + 1;
+		mHP %= HP_PER_BAR;
+		int limit = 240 - mHP * 240 / HP_PER_BAR;
+		fillRect(316, 0, 4, limit, color_HPbars[color - 1]);
+		fillRect(316, limit, 4, 239 - limit, color_HPbars[color]);
+		
+		(callback)(this, p, bArray);
+	}
+	else
+	{
+		(initCallbacks[currentPattern])(this);
+	}
+	
 	return HP < 1;
 }
 
 void BossEnemy::damage(int amount)
 {
 	HP -= amount;
+}
+
+bool BossEnemy::isHurtable()
+{
+	return hurtable;
+}
+
+void BossEnemy::makeHurtable()
+{
+	hurtable = true;
+}
+
+void BossEnemy::setInternal(int offset, int value)
+{
+	internal[offset] = value;
+}
+
+void BossEnemy::incInternal(int offset)
+{
+	internal[offset]++;
+}
+
+void BossEnemy::decInternal(int offset)
+{
+	internal[offset]--;
+}
+
+int BossEnemy::getInternal(int offset)
+{
+	return internal[offset];
 }

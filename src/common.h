@@ -197,6 +197,10 @@ private:
 
 class BossEnemy;
 
+#define SCORE_HIT 20
+#define SCORE_HIT_OP 40
+#define SCORE_ABSORB 100
+
 // BulletArray
 class BulletArray
 {
@@ -331,14 +335,14 @@ typedef int (*boss_ccb)(BossEnemy*, Bullet*);
 typedef struct
 {
 	int HP;
-	boss_ib initCallback;
 	boss_cb callback;
 	// Every following member contains this amount of data, because it's pattern-specific
 	int patternsNb;
 	// Self-explanatory
 	int *HPperPattern;
+	// Initialization callbacks, handling pre-battle cinematics and such
+	boss_ib *initCallbacks;
 	// Collision callbacks, handling collisions between the boss and bullets
-	// One per pattern
 	boss_ccb *collisionCallbacks;
 } BossData;
 
@@ -351,16 +355,28 @@ public:
 	void activate(BossData *d); // drawing is taken care of by the callback code
 	int handle(Player *p, BulletArray *bArray);
 	void damage(int amount);
+	bool isHurtable();
+	void makeHurtable();
+	void setInternal(int offset, int value);
+	void incInternal(int offset);
+	void decInternal(int offset);
+	int getInternal(int offset);
 	Fixed x, y;
+	Fixed angle;
 	int HP;
+	int maxHP;
 	int currentPattern;
 	int *HPperPattern;
 	int patternsNb;
-	boss_ib initCallback;
+	bool readyToGo;
+	bool initCallbackCalled;
+	// Initialization callbacks, handling pre-battle cinematics and such
+	boss_ib *initCallbacks;
 	boss_cb callback;
 	// Collision callbacks, handling collisions between the boss and bullets
 	boss_ccb *collisionCallbacks;
 private:
+	bool hurtable;
 	// LOTS of internal registers
 	int internal[32];
 };
@@ -390,6 +406,23 @@ private:
 	int y;
 	int counter;
 	bool polarity;
+};
+
+class EnemiesArray
+{
+public:
+	EnemiesArray();
+	~EnemiesArray();
+	void add(int x, int y, int HP, int shipImgID, int callbackID, int waveIndex, bool polarity, bool hasRotation, int firebackAmount);
+	void handle(Player *p, BulletArray *bArray);
+	void handleExplosions();
+	void resetEnemyCounter();
+	Enemy data[MAX_ENEMY];
+	DestroyedEnemies deadEnemies;
+private:
+	ExplosionAnim explosionsAnims[MAX_ENEMY];
+	int currentExplosion;
+	int currentEnemy;
 };
 
 // Particles
@@ -545,6 +578,8 @@ enum
 	image_LUT_lives,
 	image_LUT_background,
 	image_LUT_titleScreen,
+	image_LUT_boss1_enemy_ship_light,
+	image_LUT_boss1_enemy_ship_shadow,
 	NB_IMAGES
 };
 
@@ -584,14 +619,8 @@ enum
 	Pattern_1_19,
 	Pattern_1_20,
 	Pattern_1_21,
+	Pattern_1_boss,
 	NB_CALLBACKS
-};
-
-// Bosses' patterns
-enum
-{
-	Boss_Pattern_1,
-	NB_BOSS_CALLBACKS
 };
 
 extern unsigned short *image_entries[NB_IMAGES];
@@ -599,8 +628,6 @@ extern unsigned short *bossImage_entries[NB_BOSS_IMAGES];
 
 extern void buildGameLUTs();
 extern void freeGameLUTs();
-
-extern Enemy **enemiesArray;
 
 extern DrawingCandidates *DC;
 // Global vars
@@ -615,7 +642,7 @@ extern t_key G_fireKey, G_polarityKey, G_fragmentKey, G_pauseKey;
 
 extern touchpad_info_t *G_tpinfo;
 extern touchpad_report_t G_tpstatus;
-extern Enemy *G_enemiesArray[MAX_ENEMY];
+extern EnemiesArray *G_enemiesArray;
 extern Particles *G_particles;
 
 // Utils

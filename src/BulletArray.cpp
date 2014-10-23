@@ -51,7 +51,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 					if(sq(fixtoi(cb->x - p->x)) + sq(fixtoi(cb->y - p->y)) < sq(19)) // sqrt(player.w/2 ^2 + player.h/2 ^2)
 					{
 						destroyBullet = true;
-						G_score += 100;
+						G_score += SCORE_ABSORB;
 						G_power += G_power < MAX_POWER;
 					}
 				}
@@ -61,24 +61,23 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				// Check collisions with enemies (there are much more enemies than players)
 				for(int j = 0; j < MAX_ENEMY; j++)
 				{
-					if(G_enemiesArray[j]->isActive())
+					if(G_enemiesArray->data[j].isActive())
 					{
-						if(cb->x - itofix(cb->img[0] / 2) <= G_enemiesArray[j]->getx() + itofix(G_enemiesArray[j]->img[0] / 2) &&
-						cb->x + itofix(cb->img[0] / 2) >= G_enemiesArray[j]->getx() - itofix(G_enemiesArray[j]->img[0] / 2) &&
-						cb->y - itofix(cb->img[1] / 2) <= G_enemiesArray[j]->gety() + itofix(G_enemiesArray[j]->img[1] / 2) &&
-						cb->y + itofix(cb->img[1] / 2) >= G_enemiesArray[j]->gety() - itofix(G_enemiesArray[j]->img[1] / 2))
+						if(cb->x - itofix(cb->img[0] / 2) <= G_enemiesArray->data[j].getx() + itofix(G_enemiesArray->data[j].img[0] / 2) &&
+						cb->x + itofix(cb->img[0] / 2) >= G_enemiesArray->data[j].getx() - itofix(G_enemiesArray->data[j].img[0] / 2) &&
+						cb->y - itofix(cb->img[1] / 2) <= G_enemiesArray->data[j].gety() + itofix(G_enemiesArray->data[j].img[1] / 2) &&
+						cb->y + itofix(cb->img[1] / 2) >= G_enemiesArray->data[j].gety() - itofix(G_enemiesArray->data[j].img[1] / 2))
 						{
-							G_enemiesArray[j]->damage(p, cb->getPolarity(), 1, this);
-							G_score += 20;
-							if(cb->getPolarity() != G_enemiesArray[j]->getPolarity()) G_score += 20;
+							G_enemiesArray->data[j].damage(p, cb->getPolarity(), 1, this);
+							G_score += cb->getPolarity() != G_enemiesArray->data[j].getPolarity() ? SCORE_HIT_OP : SCORE_HIT;
 							destroyBullet = true;
-							// The same bullet can destroy several enemies if it hits them in the same frame !
+							// The same bullet can destroy several enemies if it hits them *during the same frame* !
 						}
 					}
 				}
 				
 				// and possibly bosses
-				if(G_fightingBoss)
+				if(G_fightingBoss && be->isHurtable())
 				{
 					bossDamaged = (be->collisionCallbacks[be->currentPattern])(be, cb);
 					if(bossDamaged)
@@ -127,7 +126,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 					if(sq(fixtoi(cf->x - p->x)) + sq(fixtoi(cf->y - p->y)) < sq(p->img[0][0] / 2))
 					{
 						destroyBullet = true;
-						G_score += 100;
+						G_score += SCORE_ABSORB * 10;
 						G_power = min(G_power + 10, MAX_POWER);
 					}
 				}
@@ -146,8 +145,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 						cf->y + itofix(4) >= cf->targetE->gety() - itofix(cf->targetE->img[1] / 2))
 						{
 							cf->targetE->damage(p, cf->getPolarity(), 10, this);
-							G_score += 20;
-							if(cf->getPolarity() != cf->targetE->getPolarity()) G_score += 20;
+							G_score += cf->getPolarity() != cf->targetE->getPolarity() ? SCORE_HIT_OP : SCORE_HIT;
 							destroyBullet = true;
 						}
 					}
@@ -192,8 +190,8 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 					if(sq(fixtoi(ch->x - p->x)) + sq(fixtoi(ch->y - p->y)) < sq(p->img[0][0] / 2))
 					{
 						destroyBullet = true;
-						G_score += 100;
-						G_power = min(G_power + 10, MAX_POWER);
+						G_score += SCORE_ABSORB * 5;
+						G_power = min(G_power + 5, MAX_POWER);
 					}
 				}
 			}
@@ -258,7 +256,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 								if(!G_skipFrame)
 								{
 									G_power += G_power < MAX_POWER;
-									G_score += 100;
+									G_score += SCORE_ABSORB;
 								}
 								// Lasers are powerful, so they push the player
 								p->x += fixcos(cl->angle) / 2;

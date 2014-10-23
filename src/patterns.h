@@ -380,4 +380,16 @@ case Pattern_1_21:
 	x = fixcos(internal[0]) * 14 + itofix(160);
 	internal[0]++;
 	break;
-	
+case Pattern_1_boss:
+	if(y < itofix(20))
+		y += 128;
+	else
+	{
+		rotationAngle++;
+		if(!(G_waveTimer % 64))
+		{
+			angle = angleToPlayer(this, p);
+			bArray->add(getx(), gety(), fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_1_light, polarity, true);
+		}
+	}
+	break;

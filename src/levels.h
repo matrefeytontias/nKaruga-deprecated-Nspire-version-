@@ -1,9 +1,6 @@
 #include "common.h"
 
-//#define SKIP_INTRO
-
 const static int levelStream[] = {/*
-#ifndef SKIP_INTRO
 	cmd_wait(256),
 	//
 	// Introduction 1
@@ -123,7 +120,6 @@ const static int levelStream[] = {/*
 	enemy(0, 0, 1, image_LUT_enemy_ship_1_light, Pattern_1_2, LIGHT, 0, 2),
 	cmd_killed,
 	cmd_newWave,
-#endif
 	cmd_startChapter(0),
 	//
 	// Chapter 1
@@ -367,6 +363,7 @@ const static int levelStream[] = {/*
 	enemy(160, 0, 1, image_LUT_enemy_ship_1_light, Pattern_1_21, LIGHT, 0, 2),
 	cmd_killed,
 	cmd_newWave,
+	cmd_wait(256),
 	// Boss*/
 	cmd_fightBoss(0),
 	LVLSTR_CHAPTEREND,

@@ -23,7 +23,7 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 	
 	if(active)
 	{
-		if(isJointed && diesWithJoint && !G_enemiesArray[jointedTo]->isActive())
+		if(isJointed && diesWithJoint && !G_enemiesArray->data[jointedTo].isActive())
 			damage(p, !polarity, HP, bArray);
 		else
 		{
@@ -153,11 +153,11 @@ int Enemy::getWaveIndex()
 
 Fixed Enemy::getx()
 {
-	return isJointed ? x + G_enemiesArray[jointedTo]->getx() + jointX : x;
+	return isJointed ? x + G_enemiesArray->data[jointedTo].getx() + jointX : x;
 }
 
 Fixed Enemy::gety()
 {
-	return isJointed ? y + G_enemiesArray[jointedTo]->gety() + jointY : y;
+	return isJointed ? y + G_enemiesArray->data[jointedTo].gety() + jointY : y;
 }
 

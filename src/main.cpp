@@ -5,8 +5,8 @@
 #include "../gfx/bossWarning.h"
 #include "misc_data.h"
 
-#define ENEMY_W(i) G_enemiesArray[i]->img[0]
-#define ENEMY_H(i) G_enemiesArray[i]->img[1]
+#define ENEMY_W(i) G_enemiesArray->data[i].img[0]
+#define ENEMY_H(i) G_enemiesArray->data[i].img[1]
 
 int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount, G_maxChain = 0; int G_score, G_power, G_bossBonus = 0;
 bool G_displayBg = true, G_fireback = true, G_hardMode = false;
@@ -20,7 +20,7 @@ t_key G_fireKey, G_polarityKey, G_fragmentKey, G_pauseKey;
 
 DrawingCandidates *DC;
 
-Enemy *G_enemiesArray[MAX_ENEMY];
+EnemiesArray *G_enemiesArray;
 Particles *G_particles;
 
 void playGame();
@@ -109,8 +109,7 @@ int main(int argc, char **argv)
 	if(is_touchpad)
 		G_tpinfo = touchpad_getinfo();
 	
-	for(int i = 0; i < MAX_ENEMY; i++)
-		G_enemiesArray[i] = new Enemy;
+	G_enemiesArray = new EnemiesArray;
 	
 	G_particles = new Particles;
 	
@@ -214,8 +213,7 @@ int main(int argc, char **argv)
 			donePlaying = true;
 	}
 	
-	for(int i = 0; i < MAX_ENEMY; i++)
-		delete G_enemiesArray[i];
+	delete G_enemiesArray;
 	
 	delete G_particles;
 	
@@ -243,7 +241,7 @@ int getBossPhase(int timer)
 void playGame()
 {
 	KeyEvent kEv = 0;
-	int levelCounter, levelTimer, enemyCounter, waveIndex, scrollOffset = 0, pxScrollStart, pxScrollEnd, pauseTimer;
+	int levelCounter, levelTimer, waveIndex, scrollOffset = 0, pxScrollStart, pxScrollEnd, pauseTimer;
 	bool levelEnded = false, parsedEnemy = true;
 	int readKeys = 0, gpTimer = 0;
 	int x, y;
@@ -271,9 +269,7 @@ void playGame()
 	Player ship;
 	
 	ChainNotif chainNotifsArray[MAX_ENEMY];
-	DestroyedEnemies deadEnemies;
-	ExplosionAnim explosionsAnims[MAX_ENEMY];
-	int currentNotif, currentExplosion;
+	int currentNotif;
 	
 	ship.x = itofix(160);
 	ship.y = itofix(180);
@@ -281,7 +277,6 @@ void playGame()
 	levelCounter = 0;
 	levelTimer = 0;
 	pauseTimer = 0;
-	enemyCounter = 0;
 	waveIndex = 0;
 	G_hasFiredOnce = false;
 	
@@ -289,7 +284,7 @@ void playGame()
 	
 	for(int i = 0; i < MAX_ENEMY; i++)
 	{
-		G_enemiesArray[i]->deactivate();
+		G_enemiesArray->data[i].deactivate();
 		G_killedThisFrame[i] = 0;
 	}
 	
@@ -303,15 +298,15 @@ void playGame()
 	
 	G_inChainCount = 0;
 	currentNotif = 0;
-	currentExplosion = 0;
 	gpTimer = 0;
 	
 	while(!KQUIT(kEv) && !levelEnded)
 	{
+		//~ printf("(%d, %d)\n", fixtoi(ship.x), fixtoi(ship.y));
 		gpTimer++;
+		G_waveTimer++;
 		if(gamePhase == PHASE_GAME)
 		{
-			G_waveTimer++;
 			if(!levelTimer)
 			{
 				do
@@ -329,7 +324,7 @@ void playGame()
 							G_waveTimer = 0;
 							waveIndex = 0;
 							levelCounter++;
-							enemyCounter = 0;
+							G_enemiesArray->resetEnemyCounter();
 						}
 						else if(currentLevelByte == LVLSTR_WAIT)
 						{
@@ -343,7 +338,7 @@ void playGame()
 							int levelCanProgress = 1;
 							for(int i = 0; i < MAX_ENEMY; i++)
 							{
-								if(G_enemiesArray[i]->isActive())
+								if(G_enemiesArray->data[i].isActive())
 								{
 									levelCanProgress = 0;
 									break;
@@ -365,8 +360,8 @@ void playGame()
 						}
 						else if(currentLevelByte == LVLSTR_JOINT)
 						{
-							// Constraint an enemy to another
-							G_enemiesArray[levelStream[levelCounter + 1]]->joint(levelStream[levelCounter + 2],
+							// Constrain an enemy to another
+							G_enemiesArray->data[levelStream[levelCounter + 1]].joint(levelStream[levelCounter + 2],
 											itofix(levelStream[levelCounter + 3]),
 											itofix(levelStream[levelCounter + 4]), levelStream[levelCounter + 5]);
 							levelCounter += 6;
@@ -377,7 +372,6 @@ void playGame()
 							G_fightingBoss = true;
 							gamePhase = PHASE_BOSSCINEMATIC;
 							gpTimer = 0;
-							// TODO
 							// fight boss
 							levelCounter++;
 							bossData = createBossData(levelStream[levelCounter]);
@@ -387,10 +381,13 @@ void playGame()
 						else if(currentLevelByte == LVLSTR_BKPT)
 						{
 							// Debug stuff
-							printf("Current enemy : %d\nCurrent wave timer : %d\nGlobal timer : %d\nCurrent wave index : %d\n",
-							enemyCounter, G_waveTimer, gpTimer, waveIndex);
-							for(int i = 0; i < enemyCounter; i++)
-								printf("Enemy %d :\nX,Y : %d, %d\n", i, fixtoi(G_enemiesArray[i]->getx()), fixtoi(G_enemiesArray[i]->gety()));
+							printf("Current wave timer : %d\nGlobal timer : %d\nCurrent wave index : %d\n",
+							G_waveTimer, gpTimer, waveIndex);
+							for(int i = 0; i < MAX_ENEMY; i++)
+							{
+								if(G_enemiesArray->data[i].isActive())
+									printf("Enemy %d :\nX,Y : %d, %d\n", i, fixtoi(G_enemiesArray->data[i].getx()), fixtoi(G_enemiesArray->data[i].gety()));
+							}
 							bkpt();
 							levelCounter++;
 						}
@@ -417,11 +414,10 @@ void playGame()
 					else
 					{
 						// Dunno what it is ? Then it's an enemy by default
-						G_enemiesArray[enemyCounter]->activate(itofix(levelStream[levelCounter]), itofix(levelStream[levelCounter + 1]), levelStream[levelCounter + 2],
+						G_enemiesArray->add(itofix(levelStream[levelCounter]), itofix(levelStream[levelCounter + 1]), levelStream[levelCounter + 2],
 															levelStream[levelCounter + 3], levelStream[levelCounter + 4], waveIndex, levelStream[levelCounter + 5],
 															levelStream[levelCounter + 6], levelStream[levelCounter + 7]);
 						levelCounter += 8;
-						enemyCounter = (enemyCounter + 1) % MAX_ENEMY;
 						waveIndex++;
 						parsedEnemy = true;
 					}
@@ -491,20 +487,7 @@ void playGame()
 		
 		ship.handle(kEv, bArray);
 		
-		for(int i = 0; i < MAX_ENEMY; i++)
-		{
-			G_killedThisFrame[i] = -1;
-			if(G_enemiesArray[i]->diedThisFrame)
-			{
-				G_killedThisFrame[i] = G_enemiesArray[i]->getPolarity();
-				deadEnemies.activate(G_enemiesArray[i], i);
-				explosionsAnims[currentExplosion].activate(fixtoi(G_enemiesArray[i]->getx()),
-														   fixtoi(G_enemiesArray[i]->gety()),
-														   G_enemiesArray[i]->getPolarity());
-				currentExplosion = (currentExplosion + 1) % MAX_ENEMY;
-			}
-			G_enemiesArray[i]->handle(&ship, bArray);
-		}
+		G_enemiesArray->handle(&ship, bArray);
 		
 		bArray->handle(&ship, &bossEnemy);
 		
@@ -532,8 +515,7 @@ void playGame()
 				drawStringF(&statsRect.x, &statsRect.y, 0, 0xffff, 0, "Score : %d", G_score);
 			
 			// Draw explosions
-			for(int i = 0; i < MAX_ENEMY; i++)
-				explosionsAnims[i].handle();
+			G_enemiesArray->handleExplosions();
 			
 			// Draw power
 			for(int i = MAX_FRAGMENT - 1; i >= 0; i--)
@@ -666,7 +648,7 @@ void playGame()
 		}
 
 		#ifndef DEBUG_NKARUGA
-		if(!has_colors) sleep(6);
+		if(!has_colors) sleep(4);
 		#endif
 		
 		scrollOffset = (scrollOffset + 1) % 240;
@@ -696,14 +678,14 @@ void playGame()
 					G_score += 100 * (1 << min(G_chainStatus, 8));
 					for(int j = 0; j < MAX_ENEMY; j++)
 					{
-						if(deadEnemies.relevant[j])
+						if(G_enemiesArray->deadEnemies.relevant[j])
 						{
 							if(j == i)
 							{
-								chainNotifsArray[currentNotif].activate(deadEnemies.x[j], deadEnemies.y[j], 100 * (1 << min(G_chainStatus, 8)));
+								chainNotifsArray[currentNotif].activate(G_enemiesArray->deadEnemies.x[j], G_enemiesArray->deadEnemies.y[j], 100 * (1 << min(G_chainStatus, 8)));
 								currentNotif = (currentNotif + 1) % MAX_ENEMY;
 							}
-							deadEnemies.relevant[j] = false;
+							G_enemiesArray->deadEnemies.relevant[j] = false;
 						}
 					}
 					G_chainStatus++;
@@ -714,7 +696,6 @@ void playGame()
 		G_frameChainOffset = 0;
 		
 		#ifdef DEBUG_NKARUGA
-		if(isKeyPressed(KEY_NSPIRE_SPACE)) bkpt();
 		sleep(6);
 		#endif
 	}

@@ -1,6 +1,6 @@
 #include "common.h"
 
-const static int levelStream[] = {/*
+const static int levelStream[] = {
 	cmd_wait(256),
 	//
 	// Introduction 1

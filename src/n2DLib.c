@@ -9,8 +9,10 @@ extern "C" {
  *  Buffering  *
  *             */
 
-unsigned short *BUFF_BASE_ADDRESS, *ALT_SCREEN_BASE_ADDRESS, *INV_BUFF;
+unsigned short *BUFF_BASE_ADDRESS, *ALT_SCREEN_BASE_ADDRESS, *INV_BUFF, *temp;
+unsigned short *BUFF_ORIGINAL; // take care of aligning the buffer to 8 bytes
 void *SCREEN_BACKUP;
+int swapped = 0;
 
 void initBuffering()
 {
@@ -23,18 +25,20 @@ void initBuffering()
 	if(is_classic)
 		*(int32_t*)(0xC000001C) = (*((int32_t*)0xC000001C) & ~0x0e) | 0x08;
 	
-	ALT_SCREEN_BASE_ADDRESS = (unsigned short*)malloc(BUFF_BYTES_SIZE);
-	if(!ALT_SCREEN_BASE_ADDRESS)
+	BUFF_ORIGINAL = (unsigned short*)malloc(BUFF_BYTES_SIZE + 8);
+	if(!BUFF_ORIGINAL)
 	{
 		free(BUFF_BASE_ADDRESS);
 		*((int32_t*)0xC000001C) = (*((int32_t*)0xC000001C) & ~0x0e) | 0x04;
 		*(void**)0xC0000010 = SCREEN_BACKUP;
 		exit(0);
 	}
+	
+	ALT_SCREEN_BASE_ADDRESS = (int)BUFF_ORIGINAL % 8 ? BUFF_ORIGINAL + 8 - ((int)BUFF_ORIGINAL % 8) : BUFF_ORIGINAL;
 	INV_BUFF = (unsigned short*)malloc(BUFF_BYTES_SIZE);
 	if(!INV_BUFF)
 	{
-		free(ALT_SCREEN_BASE_ADDRESS);
+		free(BUFF_ORIGINAL);
 		free(BUFF_BASE_ADDRESS);
 		*((int32_t*)0xC000001C) = (*((int32_t*)0xC000001C) & ~0x0e) | 0x04;
 		*(void**)0xC0000010 = SCREEN_BACKUP;
@@ -47,10 +51,13 @@ void initBuffering()
 void updateScreen()
 {
 	unsigned int *dest, *src, i, c;
+	// I use different methods for refreshing the screen for GS and color screens because according to my tests, the fastest for one isn't the fastest for the other
 	if(has_colors)
 	{
-		// Screen-access delays make this the fastest method
-		memcpy(ALT_SCREEN_BASE_ADDRESS, BUFF_BASE_ADDRESS, BUFF_BYTES_SIZE);
+		dest = (unsigned int*)ALT_SCREEN_BASE_ADDRESS;
+		src = (unsigned int*)BUFF_BASE_ADDRESS;
+		for(i = 0; i < 160 * 240; i++)
+			*dest++ = *src++;
 	}
 	else
 	{
@@ -59,12 +66,17 @@ void updateScreen()
 		for(i = 0; i < 160 * 240; i++)
 		{
 			c = *src++;
-			// c holds two 16-bits colors, decompose them while keeping them that way
 			c = ~c;
-			*dest++ = (( ((c & 0x1f) << 3) + (((c >> 5) & 0x3f) << 2) + (((c >> 11) & 0x1f) << 3) ) & 0xffff) + 
-				((( (((c >> 16) & 0x1f) << 3) + (((c >> 21) & 0x3f) << 2) + (((c >> 27) & 0x1f) << 3)) & 0xffff) << 16);
+			// c holds two 16-bits colors, decompose them while keeping them that way
+			*dest++ = ((c & 0x1f) + (((c >> 5) & 0x3f) >> 1) + ((c >> 11) & 0x1f)) / 3
+				+ ((((c >> 16) & 0x1f) + (((c >> 21) & 0x3f) >> 1) + ((c >> 27) & 0x1f)) / 3 << 16);
+			
 		}
-		memcpy(ALT_SCREEN_BASE_ADDRESS, INV_BUFF, BUFF_BYTES_SIZE);
+		
+		temp = *(void**)0xC0000010;
+		*(void**)0xC0000010 = INV_BUFF;
+		INV_BUFF = temp;
+		swapped = !swapped;
 	}
 }
 
@@ -74,9 +86,105 @@ void deinitBuffering()
 	if(is_classic)
 		*((int32_t*)0xC000001C) = (*((int32_t*)0xC000001C) & ~0x0e) | 0x04;
 	*(void**)(0xC0000010) = SCREEN_BACKUP;
+	if(swapped)
+	{
+		temp = *(void**)0xC0000010;
+		*(void**)0xC0000010 = INV_BUFF;
+		INV_BUFF = temp;
+	}
 	free(INV_BUFF);
-	free(ALT_SCREEN_BASE_ADDRESS);
+	free(BUFF_ORIGINAL);
 	free(BUFF_BASE_ADDRESS);
+}
+
+/*                 *
+ * Hardware timers *
+ *                 */
+// Everything on HW timers is by aeTIos and Streetwalrus from http://www.omnimaga.org/
+
+#define TIMER 0x900D0000
+unsigned timer_ctl_bkp[2], timer_load_bkp[2];
+
+void timer_init(unsigned timer)
+{
+	/* Timer configuration :
+		- timers not freezed
+		- timers decreasing
+		- timers count to 0 and stop until a new value is loaded
+	*/
+	if (is_cx)
+	{
+		volatile unsigned *timer_ctl = (unsigned *) (TIMER + 0x08 + 0x20 * timer);
+		volatile unsigned *timer_load = (unsigned *) (TIMER + 0x20 * timer);
+
+		timer_ctl_bkp[timer] = *timer_ctl;
+		timer_load_bkp[timer] = *timer_load;
+
+		*timer_ctl &= ~(1 << 7);
+		*timer_ctl = 0b01100011;
+		*timer_ctl |= (1 << 7);
+	}
+	else
+	{
+		volatile unsigned *timer_ctl = (unsigned *) (TIMER + 0x08 + 0x0C * timer);
+		volatile unsigned *timer_divider = (unsigned *) (TIMER + 0x04 + 0x0C * timer);
+
+		timer_ctl_bkp[timer] = *timer_ctl;
+		timer_load_bkp[timer] = *timer_divider;
+		
+		*timer_ctl = 0;
+		*timer_divider = 0;
+	}
+}
+
+void timer_restore(unsigned timer)
+{
+	if (is_cx)
+	{
+		volatile unsigned *timer_ctl = (unsigned *) (TIMER + 0x08 + 0x20 * timer);
+		volatile unsigned *timer_load = (unsigned *) (TIMER + 0x20 * timer);
+
+		*timer_ctl &= ~(1 << 7);
+		*timer_ctl = timer_ctl_bkp[timer] & ~(1 << 7);
+		*timer_load = timer_load_bkp[timer];
+		*timer_ctl = timer_ctl_bkp[timer];
+	}
+	else
+	{
+		volatile unsigned *timer_ctl = (unsigned *) (TIMER + 0x08 + 0x0C * timer);
+		volatile unsigned *timer_divider = (unsigned *) (TIMER + 0x04 + 0x0C * timer);
+
+		*timer_ctl = timer_ctl_bkp[timer];
+		*timer_divider = timer_load_bkp[timer];
+	}
+}
+
+void timer_load(unsigned timer, unsigned value)
+{
+	if (is_cx)
+	{
+		volatile unsigned *timer_load = (unsigned *) (TIMER + 0x20 * timer);
+		*timer_load = value;
+	}
+	else
+	{
+		volatile unsigned *timer_value = (unsigned *) (TIMER + 0x0C * timer);
+		*timer_value = value;
+	}
+}
+
+unsigned timer_read(unsigned timer)
+{
+	if (is_cx)
+	{
+		volatile unsigned *timer_value = (unsigned *) (TIMER + 0x04 + 0x20 * timer);
+		return *timer_value;
+	}
+	else
+	{
+		volatile unsigned *timer_value = (unsigned *) (TIMER + 0x0C * timer);
+		return *timer_value;
+	}
 }
 
 /*         *

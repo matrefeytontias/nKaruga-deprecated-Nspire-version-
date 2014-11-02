@@ -61,7 +61,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				// Check collisions with enemies (there are much more enemies than players)
 				for(int j = 0; j < MAX_ENEMY; j++)
 				{
-					if(G_enemiesArray->data[j].isActive())
+					if(G_enemiesArray->data[j].isActive() && !G_enemiesArray->data[j].isGhost())
 					{
 						if(cb->x - itofix(cb->img[0] / 2) <= G_enemiesArray->data[j].getx() + itofix(G_enemiesArray->data[j].img[0] / 2) &&
 						cb->x + itofix(cb->img[0] / 2) >= G_enemiesArray->data[j].getx() - itofix(G_enemiesArray->data[j].img[0] / 2) &&
@@ -287,8 +287,7 @@ void BulletArray::add(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, int imgID, bool 
 {
 	if(bulletCount < MAX_BULLET)
 	{
-		unsigned short *img = image_entries[imgID];
-		data[bulletCount].activate(_x - itofix(img[0] / 2), _y - itofix(img[1] / 2), _dx, _dy, imgID, _p, _h);
+		data[bulletCount].activate(_x, _y, _dx, _dy, imgID, _p, _h);
 		bulletCount++;
 	}
 }
@@ -306,6 +305,7 @@ void BulletArray::add_homing(Fixed _x, Fixed _y, Fixed angle, Player* target, bo
 {
 	if(homingCount < MAX_HOMING)
 	{
+		printf("%d\n", angle);
 		data_homing[homingCount].activate(_x, _y, angle, target, _p);
 		homingCount++;
 	}

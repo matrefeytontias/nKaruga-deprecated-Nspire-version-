@@ -386,10 +386,48 @@ case Pattern_1_boss:
 	else
 	{
 		rotationAngle++;
-		if(!(G_waveTimer % 64))
+		if(!(G_waveTimer % 96))
 		{
 			angle = angleToPlayer(this, p);
 			bArray->add(getx(), gety(), fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_1_light, polarity, true);
 		}
 	}
+	break;
+case Pattern_1_bossGrenade:
+	// internal[0] is timer before explosion
+	// internal[1] and [2] are the dx/dy to position
+	// internal[3] is the time to wait before explosion
+	if(!internal[0])
+	{
+		internal[3] = 256 + (rand() % 128);
+		internal[2] = (itofix(120) - y) * 2 / internal[3];
+		switch(waveIndex % 4)
+		{
+			case 0:
+				internal[1] = itofix(20) - x;
+				break;
+			case 1:
+				internal[1] = itofix(110) - x;
+				break;
+			case 2:
+				internal[1] = itofix(210) - x;
+				break;
+			default:
+				internal[1] = itofix(300) - x;
+		}
+		internal[1] /= internal[3] / 2;
+	}
+	if(y < itofix(120))
+	{
+		x += fixmul(internal[1], internal[3] - internal[0]);
+		y += fixmul(internal[2], internal[3] - internal[0]);
+	}
+	if(internal[0] >= internal[3])
+	{
+		for(int i = 0; i < 32; i++)
+			bArray->add(getx(), gety(), fixcos(i * 8), fixsin(i * 8), image_LUT_enemy_bullet_0_light, polarity, true);
+		damage(p, !polarity, HP, bArray);
+	}
+	internal[0]++;
+	rotationAngle++;
 	break;

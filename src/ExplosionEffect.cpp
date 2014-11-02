@@ -9,6 +9,8 @@ unsigned char explosionBuffer[320][240];
 #define MAX_EXPLOSION_PARTICLE 500
 ExpParticle *explosionArray[MAX_EXPLOSION_PARTICLE];
 colorRGB palette[256];
+Rect areaToCheck;
+bool explosionGoing = false;
 
 //
 // ExpParticle class
@@ -48,27 +50,24 @@ bool ExpParticle::isActive()
 
 void ExpParticle::update()
 {
-	if(active)
+	if(fixtoi(x) > 0 && fixtoi(x) < 319 && fixtoi(y) > 0 && fixtoi(y) < 239)
 	{
-		if(fixtoi(x) > 0 && fixtoi(x) < 319 && fixtoi(y) > 0 && fixtoi(y) < 239)
-		{
-			explosionBuffer[fixtoi(x)][fixtoi(y)] = cIndex;
-			explosionBuffer[fixtoi(x) - 1][fixtoi(y)] = cIndex;
-			explosionBuffer[fixtoi(x) + 1][fixtoi(y)] = cIndex;
-			explosionBuffer[fixtoi(x)][fixtoi(y) - 1] = cIndex;
-			explosionBuffer[fixtoi(x)][fixtoi(y) + 1] = cIndex;
+		explosionBuffer[fixtoi(x)][fixtoi(y)] = cIndex;
+		explosionBuffer[fixtoi(x) - 1][fixtoi(y)] = cIndex;
+		explosionBuffer[fixtoi(x) + 1][fixtoi(y)] = cIndex;
+		explosionBuffer[fixtoi(x)][fixtoi(y) - 1] = cIndex;
+		explosionBuffer[fixtoi(x)][fixtoi(y) + 1] = cIndex;
 
-			if(cIndex != 0)
-				cIndex -= 2;
-			else
-				deactivate();
-			x += dx;
-			y += dy;
-			dy += gravity;
-		}
+		if(cIndex != 0)
+			cIndex -= 2;
 		else
-			active = false;
+			deactivate();
+		x += dx;
+		y += dy;
+		dy += gravity;
 	}
+	else
+		active = false;
 }
 
 //
@@ -149,28 +148,45 @@ void initExplosionEngine()
 
 void initExplosionEffect(int x, int y, int coef, Fixed g)
 {
+	int am = clamp(coef, 0, MAX_EXPLOSION_PARTICLE);
 	// Empty explosion buffer
 	for(int j = 0; j < 240; j++)
 		for(int i = 0; i < 320; i++)
 			explosionBuffer[i][j] = 0;
 	
-	// Activate particles
 	for(int i = 0; i < MAX_EXPLOSION_PARTICLE; i++)
+		explosionArray[i]->deactivate();
+	
+	// Activate particles
+	for(int i = 0; i < am; i++)
 	{
 		Fixed a = rand() % 256;
-		Fixed r = fixmul((rand() % itofix(5)) - itofix(3), coef);
+		Fixed r = fixmul((rand() % itofix(5)) - itofix(3), coef / 2);
 		explosionArray[i]->activate(x, y, fixmul(fixcos(a), r), fixmul(fixsin(a), r), g);
 	}
+	explosionGoing = false;
 }
 
 // Returns whether or not the effect finished
-bool renderExplosionEffect()
+bool updateExplosionEffect()
 {
 	bool effectDone = true;
+	areaToCheck.x = 319;
+	areaToCheck.y = 239;
+	areaToCheck.w = 1;
+	areaToCheck.h = 1;
+	
 	// Handle particles
 	for(int i = 0; i < MAX_EXPLOSION_PARTICLE; i++)
 	{
-		explosionArray[i]->update();
+		if(explosionArray[i]->isActive())
+		{
+			explosionArray[i]->update();
+			areaToCheck.x = max(1, min(areaToCheck.x, fixtoi(explosionArray[i]->x)));
+			areaToCheck.y = max(1, min(areaToCheck.y, fixtoi(explosionArray[i]->y)));
+			areaToCheck.w = min(319, max(areaToCheck.w, fixtoi(explosionArray[i]->x)));
+			areaToCheck.h = min(239, max(areaToCheck.h, fixtoi(explosionArray[i]->y)));
+		}
 	}
 	
 	// Erase unwanted parts
@@ -180,9 +196,9 @@ bool renderExplosionEffect()
 		explosionBuffer[0][i] = explosionBuffer[319][i] = 0;
 	
 	// Shift the fire buffer
-	for(int y = 1; y < 239; y++)
+	for(int y = areaToCheck.y; y < areaToCheck.h; y++)
 	{
-		for(int x = 1; x < 319; x++)
+		for(int x = areaToCheck.x; x < areaToCheck.w; x++)
 		{
 			int temp;
 			int x1 = x - 1, x2 = x + 1, y1 = y - 1, y2 = y + 1;
@@ -208,21 +224,28 @@ bool renderExplosionEffect()
 			explosionBuffer[x][y] = temp;
 		}
 	}
+	
+	explosionGoing = !effectDone;
+	return effectDone;
+}
 
-	// Then draw it
-	for(int y = 0; y < 240; y++)
+void renderExplosionEffect()
+{
+	if(explosionGoing)
 	{
-		for(int x = 0; x < 320; x++)
+		// Draw it
+		for(int y = areaToCheck.y; y < areaToCheck.h; y++)
 		{
-			if(explosionBuffer[x][y])
+			for(int x = areaToCheck.x; x < areaToCheck.w; x++)
 			{
-				colorRGB curC = palette[explosionBuffer[x][y]];
-				setPixelRGB(x, y, curC.r, curC.g, curC.b);
+				if(explosionBuffer[x][y])
+				{
+					colorRGB curC = palette[explosionBuffer[x][y]];
+					setPixelRGB(x, y, curC.r, curC.g, curC.b);
+				}
 			}
 		}
 	}
-	
-	return effectDone;
 }
 
 void deinitExplosionEngine()

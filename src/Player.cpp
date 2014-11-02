@@ -31,8 +31,8 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 	if(!dying)
 	{
 		// Display the player
-		r.x = fixtoi(x) - (img[(isSwitchingPolarity / 8) * 2][0] / 2);
-		r.y = fixtoi(y) - (img[(isSwitchingPolarity / 8) * 2][1] / 2);
+		r.x = fixtoi(x);
+		r.y = fixtoi(y);
 		
 		//~ if(!G_skipFrame) 
 		//~ {
@@ -131,11 +131,8 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 			// Uses frameskipping as a counter
 			if(!G_skipFrame)
 			{
-				int w = image_entries[image_LUT_player_explosion_0][0] / 2;
-				int h = image_entries[image_LUT_player_explosion_0][1] / 2;
-				//~ drawSprite(image_entries[image_LUT_player_explosion_0 + deathCounter], fixtoi(x) - w, fixtoi(y) - h);
-				r.x = fixtoi(x) - w;
-				r.y = fixtoi(y) - h;
+				r.x = fixtoi(x);
+				r.y = fixtoi(y);
 				DC->add(image_entries[image_LUT_player_explosion_0 + deathCounter], &r);
 				deathCounter++;
 			}
@@ -152,11 +149,9 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 		// get the player back in the game !
 		else if(y > itofix(180))
 		{
-			int w = image_entries[image_LUT_player_ship_light][0] / 2;
-			int h = image_entries[image_LUT_player_ship_light][1] / 2;
 			//~ drawSprite(image_entries[image_LUT_player_ship_light], fixtoi(x) - w, fixtoi(y) - h);
-			r.x = fixtoi(x) - w;
-			r.y = fixtoi(y) - h;
+			r.x = fixtoi(x);
+			r.y = fixtoi(y);
 			DC->add(image_entries[image_LUT_player_ship_light], &r);
 			y -= itofix(1);
 		}

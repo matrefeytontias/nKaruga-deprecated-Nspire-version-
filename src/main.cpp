@@ -302,7 +302,6 @@ void playGame()
 	
 	while(!KQUIT(kEv) && !levelEnded)
 	{
-		//~ printf("(%d, %d)\n", fixtoi(ship.x), fixtoi(ship.y));
 		gpTimer++;
 		G_waveTimer++;
 		if(gamePhase == PHASE_GAME)
@@ -416,7 +415,7 @@ void playGame()
 						// Dunno what it is ? Then it's an enemy by default
 						G_enemiesArray->add(itofix(levelStream[levelCounter]), itofix(levelStream[levelCounter + 1]), levelStream[levelCounter + 2],
 															levelStream[levelCounter + 3], levelStream[levelCounter + 4], waveIndex, levelStream[levelCounter + 5],
-															levelStream[levelCounter + 6], levelStream[levelCounter + 7]);
+															levelStream[levelCounter + 6], levelStream[levelCounter + 7], false);
 						levelCounter += 8;
 						waveIndex++;
 						parsedEnemy = true;
@@ -504,7 +503,7 @@ void playGame()
 		{
 			// Draw score and chains
 			statsRect.x = statsRect.y = 0;
-			if(gamePhase != PHASE_BOSSCINEMATIC)
+			if(!G_fightingBoss)
 			{
 				drawStringF(&statsRect.x, &statsRect.y, 0, 0xffff, 0, "Score : %d\n\n\n\nCH %d", G_score, G_chainStatus);
 				// Draw chain count
@@ -533,8 +532,9 @@ void playGame()
 			drawPowerSlot = !drawPowerSlot;
 			
 			// Draw score-chaining notifs
-			for(int i = 0; i < MAX_ENEMY; i++)
-				chainNotifsArray[i].handle();
+			if(!G_fightingBoss)
+				for(int i = 0; i < MAX_ENEMY; i++)
+					chainNotifsArray[i].handle();
 			
 			// Draw remaining lives
 			drawSprite(image_entries[image_LUT_lives], 0, 224);
@@ -588,12 +588,12 @@ void playGame()
 				drawSprite(image_bossWarning, 0, 72);
 			else if(gamePhase == PHASE_BOSSEXPLODEINIT)
 			{
-				initExplosionEffect(160, 120, 256, 0);
+				initExplosionEffect(160, 120, 500, 0);
 				gamePhase = PHASE_BOSSEXPLODE;
 			}
 			else if(gamePhase == PHASE_BOSSEXPLODE)
 			{
-				if(renderExplosionEffect())
+				if(updateExplosionEffect())
 					gamePhase = PHASE_GAME;
 			}
 			
@@ -628,6 +628,8 @@ void playGame()
 			else
 				pauseTimer--;
 			
+			renderExplosionEffect();
+			
 			updateScreen();	
 			
 			// The background is dispayed after to keep the enemies(power slots, player ship ...) 
@@ -648,52 +650,55 @@ void playGame()
 		}
 
 		#ifndef DEBUG_NKARUGA
-		if(!has_colors) sleep(4);
+		if(!has_colors) sleep(2);
 		#endif
 		
 		scrollOffset = (scrollOffset + 1) % 240;
 		G_skipFrame = (G_skipFrame + 1) % 4;
 		
 		// handle chaining
-		for(int i = 0; i < MAX_ENEMY; i++)
+		if(!G_fightingBoss)
 		{
-			if(G_killedThisFrame[i] != -1)
+			for(int i = 0; i < MAX_ENEMY; i++)
 			{
-				if(G_inChainCount == 3) G_inChainCount = 0;
-				
-				if(G_inChainCount)
+				if(G_killedThisFrame[i] != -1)
 				{
-					if(chainColor[G_inChainCount - 1] != G_killedThisFrame[i])
+					if(G_inChainCount == 3) G_inChainCount = 0;
+					
+					if(G_inChainCount)
 					{
-						G_inChainCount = 0;
-						G_chainStatus = 0;
-					}
-				}
-				
-				chainColor[G_inChainCount] = G_killedThisFrame[i];
-				G_inChainCount++;
-				
-				if(G_inChainCount == 3)
-				{
-					G_score += 100 * (1 << min(G_chainStatus, 8));
-					for(int j = 0; j < MAX_ENEMY; j++)
-					{
-						if(G_enemiesArray->deadEnemies.relevant[j])
+						if(chainColor[G_inChainCount - 1] != G_killedThisFrame[i])
 						{
-							if(j == i)
-							{
-								chainNotifsArray[currentNotif].activate(G_enemiesArray->deadEnemies.x[j], G_enemiesArray->deadEnemies.y[j], 100 * (1 << min(G_chainStatus, 8)));
-								currentNotif = (currentNotif + 1) % MAX_ENEMY;
-							}
-							G_enemiesArray->deadEnemies.relevant[j] = false;
+							G_inChainCount = 0;
+							G_chainStatus = 0;
 						}
 					}
-					G_chainStatus++;
+					
+					chainColor[G_inChainCount] = G_killedThisFrame[i];
+					G_inChainCount++;
+					
+					if(G_inChainCount == 3)
+					{
+						G_score += 100 * (1 << min(G_chainStatus, 8));
+						for(int j = 0; j < MAX_ENEMY; j++)
+						{
+							if(G_enemiesArray->deadEnemies.relevant[j])
+							{
+								if(j == i)
+								{
+									chainNotifsArray[currentNotif].activate(G_enemiesArray->deadEnemies.x[j], G_enemiesArray->deadEnemies.y[j], 100 * (1 << min(G_chainStatus, 8)));
+									currentNotif = (currentNotif + 1) % MAX_ENEMY;
+								}
+								G_enemiesArray->deadEnemies.relevant[j] = false;
+							}
+						}
+						G_chainStatus++;
+					}
 				}
 			}
+			G_maxChain = max(G_chainStatus, G_maxChain);
+			G_frameChainOffset = 0;
 		}
-		G_maxChain = max(G_chainStatus, G_maxChain);
-		G_frameChainOffset = 0;
 		
 		#ifdef DEBUG_NKARUGA
 		sleep(6);

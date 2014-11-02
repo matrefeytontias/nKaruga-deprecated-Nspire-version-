@@ -12,15 +12,16 @@ public:
 	void deactivate();
 	bool isActive();
 	void update();
-private:
 	Fixed x, y, dx, dy, gravity;
+private:
 	unsigned char cIndex;
 	bool active;
 };
 
 extern void initExplosionEngine();
 extern void initExplosionEffect(int x, int y, int coef, Fixed g);
-extern bool renderExplosionEffect();
+extern bool updateExplosionEffect();
+extern void renderExplosionEffect();
 extern void deinitExplosionEngine();
 
 #endif

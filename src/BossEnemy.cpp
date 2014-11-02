@@ -52,10 +52,12 @@ int BossEnemy::handle(Player *p, BulletArray *bArray)
 		fillRect(316, 0, 4, limit, color_HPbars[color - 1]);
 		fillRect(316, limit, 4, 239 - limit, color_HPbars[color]);
 		
+		hurtable = true;
 		(callback)(this, p, bArray);
 	}
 	else
 	{
+		hurtable = false;
 		(initCallbacks[currentPattern])(this);
 	}
 	

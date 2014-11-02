@@ -131,7 +131,6 @@ private:
 	Fixed previousY[HOMING_TRAILING];
 	bool active;
 	Fixed angle;
-	Fixed rotationAngle;
 	int aimTimer;
 };
 
@@ -275,7 +274,7 @@ public:
 	~Enemy();
 	void handle(Player *player, BulletArray *bArray);
 	bool isActive();
-	void activate(int x, int y, int HP, int shipImgID, int callbackID, int waveIndex, bool polarity, bool hasRotation, int firebackAmount);
+	void activate(int x, int y, int HP, int shipImgID, int callbackID, int waveIndex, bool polarity, bool hasRotation, int firebackAmount, bool ghost);
 	void deactivate();
 	void damage(Player *player, bool polarity, int amount, BulletArray *bArray);
 	void joint(int offset, Fixed x, Fixed y, bool diesWithJoint);
@@ -283,6 +282,7 @@ public:
 	void setRotation(Fixed angle);
 	bool getPolarity();
 	int getWaveIndex();
+	bool isGhost();
 	Fixed getx();
 	Fixed gety();
 	// x, y on-screen
@@ -292,6 +292,8 @@ public:
 	bool diedThisFrame;
 private:
 	bool active;
+	// Ghost enemies have no interaction with anything
+	bool ghost;
 	int HP;
 	// Does the enemy use rotation (achieved in the pattern)
 	bool hasRotation;
@@ -366,6 +368,7 @@ public:
 	int HP;
 	int maxHP;
 	int currentPattern;
+	int lastPattern;
 	int *HPperPattern;
 	int patternsNb;
 	bool readyToGo;
@@ -413,10 +416,11 @@ class EnemiesArray
 public:
 	EnemiesArray();
 	~EnemiesArray();
-	void add(int x, int y, int HP, int shipImgID, int callbackID, int waveIndex, bool polarity, bool hasRotation, int firebackAmount);
+	void add(int x, int y, int HP, int shipImgID, int callbackID, int waveIndex, bool polarity, bool hasRotation, int firebackAmount, bool ghost);
 	void handle(Player *p, BulletArray *bArray);
 	void handleExplosions();
 	void resetEnemyCounter();
+	void destroyAllEnemies(Player *p, BulletArray *bArray);
 	Enemy data[MAX_ENEMY];
 	DestroyedEnemies deadEnemies;
 private:
@@ -580,6 +584,8 @@ enum
 	image_LUT_titleScreen,
 	image_LUT_boss1_enemy_ship_light,
 	image_LUT_boss1_enemy_ship_shadow,
+	image_LUT_boss1_grenade_light,
+	image_LUT_boss1_grenade_shadow,
 	NB_IMAGES
 };
 
@@ -620,6 +626,7 @@ enum
 	Pattern_1_20,
 	Pattern_1_21,
 	Pattern_1_boss,
+	Pattern_1_bossGrenade,
 	NB_CALLBACKS
 };
 

@@ -55,7 +55,7 @@ bool Bullet::handle()
 	y += dy;
 				
 	// Bullets have a threshold of 30
-	return x + itofix(img[0]) < itofix(-30) || x > itofix(349) || y + itofix(img[1]) < itofix(-30) || y > itofix(279);
+	return x + itofix(img[0] / 2) < itofix(-30) || x - itofix(img[0] / 2) > itofix(349) || y + itofix(img[1] / 2) < itofix(-30) || y - itofix(img[1] / 2) > itofix(279);
 }
 
 void Bullet::draw()

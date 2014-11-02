@@ -11,9 +11,9 @@ EnemiesArray::~EnemiesArray()
 	
 }
 
-void EnemiesArray::add(int x, int y, int HP, int shipImgID, int callbackID, int waveIndex, bool polarity, bool hasRotation, int firebackAmount)
+void EnemiesArray::add(int x, int y, int HP, int shipImgID, int callbackID, int waveIndex, bool polarity, bool hasRotation, int firebackAmount, bool ghost)
 {
-	data[currentEnemy].activate(x, y, HP, shipImgID, callbackID, waveIndex, polarity, hasRotation, firebackAmount);
+	data[currentEnemy].activate(x, y, HP, shipImgID, callbackID, waveIndex, polarity, hasRotation, firebackAmount, ghost);
 	currentEnemy++;
 	currentEnemy %= MAX_ENEMY;
 }
@@ -46,4 +46,11 @@ void EnemiesArray::handleExplosions()
 void EnemiesArray::resetEnemyCounter()
 {
 	currentEnemy = 0;
+}
+
+void EnemiesArray::destroyAllEnemies(Player *p, BulletArray *bArray)
+{
+	for(int i = 0; i < MAX_ENEMY; i++)
+		if(data[i].isActive())
+			data[i].damage(p, data[i].getPolarity(), 5000, bArray);
 }

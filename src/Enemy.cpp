@@ -51,16 +51,17 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 				}
 				else
 				{
-					er.x -= img[0] / 2;
-					er.y -= img[1] / 2;
 					//~ drawSprite(img, er.x, er.y);
 					DC->add(img, &er);
 				}
 			}
-			// Check wether the player hit the enemy
-			if(!p->isDying() && (p->x >= getx() - (itofix(img[0]) / 2) && p->x < getx() + (itofix(img[0]) / 2)) && (p->y >= gety() - (itofix(img[0]) / 2) && p->y <= gety() + (itofix(img[1]) / 2)))
+			if(!ghost)
 			{
-				p->hurt();
+				// Check wether the player hit the enemy
+				if(!p->isDying() && (p->x >= getx() - (itofix(img[0]) / 2) && p->x < getx() + (itofix(img[0]) / 2)) && (p->y >= gety() - (itofix(img[0]) / 2) && p->y <= gety() + (itofix(img[1]) / 2)))
+				{
+					p->hurt();
+				}
 			}
 		}
 	}
@@ -76,7 +77,7 @@ bool Enemy::isActive()
 	return active;
 }
 
-void Enemy::activate(int _x, int _y, int _HP, int shipImgID, int callbackID, int _waveIndex, bool _polarity, bool _hasRotation, int _f)
+void Enemy::activate(int _x, int _y, int _HP, int shipImgID, int callbackID, int _waveIndex, bool _polarity, bool _hasRotation, int _f, bool _ghost)
 {
 	HP = _HP;
 	x = _x;
@@ -91,6 +92,7 @@ void Enemy::activate(int _x, int _y, int _HP, int shipImgID, int callbackID, int
 	waveIndex = _waveIndex;
 	for(int i = 0; i < 6; i++)
 		internal[i] = 0;
+	ghost = _ghost;
 	active = true;
 }
 
@@ -149,6 +151,11 @@ bool Enemy::getPolarity()
 int Enemy::getWaveIndex()
 {
 	return waveIndex;
+}
+
+bool Enemy::isGhost()
+{
+	return ghost;
 }
 
 Fixed Enemy::getx()

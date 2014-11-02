@@ -23,8 +23,7 @@ void Homing::activate(Fixed _x, Fixed _y, Fixed initialAngle, Player *_target, b
 	target = _target;
 	polarity = _p;
 	
-	aimTimer = 128;
-	rotationAngle = 0;
+	aimTimer = 192;
 	active = true;
 	for(int i = 0; i < HOMING_TRAILING; i++)
 	{
@@ -60,11 +59,14 @@ bool Homing::handle()
 	
 	if(aimTimer)
 	{
-		if(((angle - angleToPlayer(this, target)) & 0xff) > 128)
-			angle++;
-		else
-			angle--;
-		angle &= 0xff;
+		if(aimTimer % 2)
+		{
+			if(((angle - angleToPlayer(this, target)) & 0xff) > 128)
+				angle++;
+			else
+				angle--;
+			angle &= 0xff;
+		}
 		aimTimer--;
 	}
 	
@@ -79,10 +81,7 @@ void Homing::draw()
 	r.x = fixtoi(x);
 	r.y = fixtoi(y);
 	
-	//~ drawSprite(image_entries[polarity ? image_LUT_enemy_homing_bullet_shadow : image_LUT_enemy_homing_bullet_light], r.x, r.y);
 	DC->add(image_entries[polarity ? image_LUT_enemy_homing_bullet_shadow : image_LUT_enemy_homing_bullet_light], &r);
-	
-	rotationAngle++;
 	
 	for(int i = 0; i < FRAGMENT_TRAILING; i++)
 	{

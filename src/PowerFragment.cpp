@@ -117,16 +117,16 @@ void PowerFragment::draw()
 {
 	static Rect r;
 	
-	r.x = fixtoi(x) - 4;
-	r.y = fixtoi(y) - 4;
+	r.x = fixtoi(x);
+	r.y = fixtoi(y);
 	
 	//~ drawSprite(image_entries[polarity ? image_LUT_player_homing_bullet_shadow_0 : image_LUT_player_homing_bullet_light_0], r.x, r.y);
 	DC->add(image_entries[polarity ? image_LUT_player_homing_bullet_shadow_0 : image_LUT_player_homing_bullet_light_0], &r);
 	
 	for(int i = 0; i < FRAGMENT_TRAILING; i++)
 	{
-		r.x = fixtoi(previousX[i]) - 4;
-		r.y = fixtoi(previousY[i]) - 4;
+		r.x = fixtoi(previousX[i]);
+		r.y = fixtoi(previousY[i]);
 		//~ drawSprite(image_entries[(polarity ? image_LUT_player_homing_bullet_shadow_1 : image_LUT_player_homing_bullet_light_1) + i / ((FRAGMENT_TRAILING + 1) / 2)], r.x, r.y);
 		DC->add(image_entries[(polarity ? image_LUT_player_homing_bullet_shadow_1 : image_LUT_player_homing_bullet_light_1) + i / ((FRAGMENT_TRAILING + 1) / 2)], &r);
 	}

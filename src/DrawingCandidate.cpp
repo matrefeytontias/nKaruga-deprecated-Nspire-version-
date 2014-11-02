@@ -3,8 +3,8 @@
 DrawingCandidate::DrawingCandidate(unsigned short *_img, Rect *_pos)
 {
 	img = _img;
-	pos.x = _pos->x;
-	pos.y = _pos->y;
+	pos.x = _pos->x - img[0] / 2;
+	pos.y = _pos->y - img[1] / 2;
 	rotates = false;
 }
 

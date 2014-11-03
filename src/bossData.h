@@ -43,6 +43,10 @@ int bossHPperPat[BOSS_NB][MAX_PATTERNS_PER_BOSS] = {
 	{ 200, HP_PER_BAR, HP_PER_BAR * 3 }
 };
 
+int bossTimeoutPerPat[BOSS_NB][MAX_PATTERNS_PER_BOSS] = {
+	{ 80, 55, 0 }
+};
+
 /*
  * #####
  * UTILS
@@ -62,7 +66,7 @@ int getPatternID(BossEnemy *be)
 	int i;
 	for(i = 0; i < be->patternsNb; i++)
 	{
-		if(be->HP > getHPsum(be->HPperPattern, i, be->patternsNb - 1))
+		if(be->HP > getHPsum(be->HPperPattern, i, be->patternsNb - 1) || (be->getTimeout() <= be->timeoutPerPattern[i] && i > be->currentPattern))
 			break;
 	}
 	return i - 1;

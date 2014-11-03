@@ -342,6 +342,7 @@ typedef struct
 	int patternsNb;
 	// Self-explanatory
 	int *HPperPattern;
+	int *timeoutPerPattern;
 	// Initialization callbacks, handling pre-battle cinematics and such
 	boss_ib *initCallbacks;
 	// Collision callbacks, handling collisions between the boss and bullets
@@ -363,6 +364,7 @@ public:
 	void incInternal(int offset);
 	void decInternal(int offset);
 	int getInternal(int offset);
+	int getTimeout();
 	Fixed x, y;
 	Fixed angle;
 	int HP;
@@ -370,6 +372,7 @@ public:
 	int currentPattern;
 	int lastPattern;
 	int *HPperPattern;
+	int *timeoutPerPattern;
 	int patternsNb;
 	bool readyToGo;
 	bool initCallbackCalled;
@@ -379,6 +382,7 @@ public:
 	// Collision callbacks, handling collisions between the boss and bullets
 	boss_ccb *collisionCallbacks;
 private:
+	int remainingTime;
 	bool hurtable;
 	// LOTS of internal registers
 	int internal[32];

@@ -6,6 +6,7 @@ BossData createBossData(int bossID)
 	BossData result;
 	result.patternsNb = bossPatternsNb[bossID];
 	result.HPperPattern = bossHPperPat[bossID];
+	result.timeoutPerPattern = bossTimeoutPerPat[bossID];
 	result.initCallbacks = bossIBdata[bossID];
 	result.callback = bossCBdata[bossID];
 	result.collisionCallbacks = bossCCBdata[bossID];
@@ -30,6 +31,7 @@ void BossEnemy::activate(BossData *d)
 		internal[i] = 0;
 	patternsNb = d->patternsNb;
 	HPperPattern = d->HPperPattern;
+	timeoutPerPattern = d->timeoutPerPattern;
 	initCallbacks = d->initCallbacks;
 	callback = d->callback;
 	collisionCallbacks = d->collisionCallbacks;
@@ -38,6 +40,7 @@ void BossEnemy::activate(BossData *d)
 	readyToGo = false;
 	initCallbackCalled = false;
 	hurtable = false;
+	remainingTime = 100;
 }
 
 // Return 1 if dead
@@ -54,6 +57,13 @@ int BossEnemy::handle(Player *p, BulletArray *bArray)
 		
 		hurtable = true;
 		(callback)(this, p, bArray);
+		// Timer 1 counts the second
+		//~ printf("%d\n", timer_read(1));
+		if(!timer_read(1))
+		{
+			remainingTime--;
+			timer_load(1, 32768);
+		}
 	}
 	else
 	{
@@ -97,4 +107,9 @@ void BossEnemy::decInternal(int offset)
 int BossEnemy::getInternal(int offset)
 {
 	return internal[offset];
+}
+
+int BossEnemy::getTimeout()
+{
+	return remainingTime;
 }

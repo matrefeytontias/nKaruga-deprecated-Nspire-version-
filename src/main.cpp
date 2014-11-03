@@ -122,6 +122,8 @@ int main(int argc, char **argv)
 	initBuffering();
 	clearBufferW();
 	initExplosionEngine();
+	timer_init(1);
+	timer_load(1, 0);
 
 	while(!donePlaying)
 	{
@@ -223,6 +225,8 @@ int main(int argc, char **argv)
 	
 	deinitExplosionEngine();
 	deinitBuffering();
+	
+	timer_restore(1);
 	
 	return 0;
 }
@@ -511,7 +515,9 @@ void playGame()
 					drawSprite(image_entries[chainColor[i] == LIGHT ? image_LUT_chain_hit_light : image_LUT_chain_hit_shadow], j, 12);
 			}
 			else
-				drawStringF(&statsRect.x, &statsRect.y, 0, 0xffff, 0, "Score : %d", G_score);
+			{
+				drawStringF(&statsRect.x, &statsRect.y, 0, 0xffff, 0, "Score : %d\nTime : %d", G_score, bossEnemy.getTimeout());
+			}
 			
 			// Draw explosions
 			G_enemiesArray->handleExplosions();

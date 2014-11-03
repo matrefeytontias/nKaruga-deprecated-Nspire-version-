@@ -264,6 +264,7 @@ void playGame()
 	int gamePhase;
 	G_fightingBoss = false;
 	BossData bossData;
+	int bossBonus = 0;
 	
 	// Variables for transition animation
 	int currentW = 0, currentH = 0, chapterNum = 0, dX = 0, dY = 0;
@@ -571,6 +572,8 @@ void playGame()
 					}
 					if(gpTimer > 256)
 					{
+						G_score += bossBonus;
+						bossBonus = 0;
 						// Score
 						statsRect.x = (320 - stringWidth(string_results[2])) / 2;
 						statsRect.y += 16;
@@ -606,7 +609,7 @@ void playGame()
 			{
 				initExplosionEffect(160, 120, 500, 0);
 				gamePhase = PHASE_BOSSEXPLODE;
-				G_score += G_bossEnemy->getTimeout() * 10000;
+				bossBonus = G_bossEnemy->getTimeout() * 10000;
 			}
 			else if(gamePhase == PHASE_BOSSEXPLODE)
 			{
@@ -628,7 +631,7 @@ void playGame()
 					drawHLine(140, 60, 260, 0);
 					drawString(&x, &y, 0, "Pause", 0, 0xffff);
 					updateScreen();
-				
+					
 					while(!isKeyPressed(G_pauseKey)) 
 					{
 						sleep(5);

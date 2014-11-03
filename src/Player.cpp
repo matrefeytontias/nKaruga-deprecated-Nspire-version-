@@ -8,7 +8,7 @@ Player::Player()
 	dying = false;
 	isSwitchingPolarity = 0;
 	fireDelay = 32;
-	lives = 3;
+	lives = 5;
 	img[LIGHT] = image_entries[image_LUT_player_ship_light];
 	img[SHADOW] = image_entries[image_LUT_player_ship_shadow];
 	img[LIGHT + SWITCHING0] = image_entries[image_LUT_player_ship_polarityswitch_0_light];

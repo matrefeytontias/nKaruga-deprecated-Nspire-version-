@@ -16,7 +16,7 @@ BossData createBossData(int bossID)
 
 BossEnemy::BossEnemy()
 {
-	
+	HP = 0;
 }
 
 BossEnemy::~BossEnemy()
@@ -26,7 +26,6 @@ BossEnemy::~BossEnemy()
 
 void BossEnemy::activate(BossData *d)
 {
-	HP = d->HP;
 	for(int i = 0; i < 32; i++)
 		internal[i] = 0;
 	patternsNb = d->patternsNb;
@@ -40,7 +39,7 @@ void BossEnemy::activate(BossData *d)
 	readyToGo = false;
 	initCallbackCalled = false;
 	hurtable = false;
-	remainingTime = 100;
+	remainingTime = timeoutPerPattern[0];
 }
 
 // Return 1 if dead
@@ -58,12 +57,13 @@ int BossEnemy::handle(Player *p, BulletArray *bArray)
 		hurtable = true;
 		(callback)(this, p, bArray);
 		// Timer 1 counts the second
-		//~ printf("%d\n", timer_read(1));
 		if(!timer_read(1))
 		{
 			remainingTime--;
 			timer_load(1, 32768);
 		}
+		if(!remainingTime)
+			HP = 0;
 	}
 	else
 	{

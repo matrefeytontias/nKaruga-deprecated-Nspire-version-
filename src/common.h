@@ -135,6 +135,7 @@ private:
 };
 
 class Enemy;
+class BossEnemy;
 
 // Both enemies and player can fire them
 class PowerFragment
@@ -156,6 +157,7 @@ public:
 	Fixed angle;
 	Enemy *targetE;
 	Player *targetP;
+	BossEnemy *targetB;
 private:
 	Fixed previousX[FRAGMENT_TRAILING];
 	Fixed previousY[FRAGMENT_TRAILING];
@@ -332,7 +334,7 @@ typedef void (*boss_ib)(BossEnemy*);
 // Behavior callback (handle behavior)
 typedef void (*boss_cb)(BossEnemy*, Player*, BulletArray*);
 // Collision callback (handle collision)
-typedef int (*boss_ccb)(BossEnemy*, Bullet*);
+typedef int (*boss_ccb)(BossEnemy*, Bullet*, int);
 
 typedef struct
 {
@@ -643,7 +645,7 @@ extern void freeGameLUTs();
 extern DrawingCandidates *DC;
 // Global vars
 extern int G_skipFrame, G_waveTimer, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount, G_maxChain;
-extern int G_score, G_power, G_bossBonus;
+extern int G_score, G_power;
 extern bool G_fightingBoss;
 extern bool G_usingTouchpad;
 extern bool G_fireback, G_hardMode;
@@ -654,14 +656,17 @@ extern t_key G_fireKey, G_polarityKey, G_fragmentKey, G_pauseKey;
 extern touchpad_info_t *G_tpinfo;
 extern touchpad_report_t G_tpstatus;
 extern EnemiesArray *G_enemiesArray;
+extern BossEnemy *G_bossEnemy;
 extern Particles *G_particles;
 
 // Utils
 extern Fixed angleToPlayer(Enemy*, Player*);
 extern Fixed angleToEnemy(PowerFragment*, Enemy*);
+extern Fixed angleToBoss(PowerFragment*, BossEnemy*);
 extern Fixed angleToPlayer(PowerFragment*, Player*);
 extern Fixed angleToPlayer(Homing*, Player*);
 extern Enemy* findNearestEnemy(Fixed x, Fixed y);
+extern int distance(int x1, int y1, int x2, int y2);
 extern BossData createBossData(int bossID);
 
 #endif

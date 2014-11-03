@@ -44,7 +44,7 @@ int bossHPperPat[BOSS_NB][MAX_PATTERNS_PER_BOSS] = {
 };
 
 int bossTimeoutPerPat[BOSS_NB][MAX_PATTERNS_PER_BOSS] = {
-	{ 80, 55, 0 }
+	{ 100, 80, 55 }
 };
 
 /*
@@ -64,12 +64,23 @@ int getHPsum(int *a, int start, int end)
 int getPatternID(BossEnemy *be)
 {
 	int i;
+	int HPdone = -1, timeDone = -1;
 	for(i = 0; i < be->patternsNb; i++)
 	{
-		if(be->HP > getHPsum(be->HPperPattern, i, be->patternsNb - 1) || (be->getTimeout() <= be->timeoutPerPattern[i] && i > be->currentPattern))
+		if(HPdone < 0)
+		{
+			if(be->HP > getHPsum(be->HPperPattern, i, be->patternsNb - 1))
+				HPdone = i - 1;
+		}
+		if(timeDone < 0)
+		{
+			if(be->getTimeout() > be->timeoutPerPattern[i])
+				timeDone = i - 1;
+		}
+		if(!(HPdone < 0 || timeDone < 0))
 			break;
 	}
-	return i - 1;
+	return !(HPdone < 0 || timeDone < 0) ? max(HPdone, timeDone) : i - 1;
 }
 
 // Works with every angle as the jointing point is not supposed to rotate at all
@@ -138,6 +149,7 @@ void boss1_ib1(BossEnemy *be)
 				be->setInternal(31, 0);
 				G_enemiesArray->add(itofix(20), itofix(-20), 100, image_LUT_boss1_enemy_ship_shadow, Pattern_1_boss, 0, SHADOW, true, 0, false);
 				G_enemiesArray->add(itofix(300), itofix(-20), 100, image_LUT_boss1_enemy_ship_shadow, Pattern_1_boss, 1, SHADOW, true, 0, false);
+				be->HP = getHPsum(be->HPperPattern, 0, be->patternsNb - 1);
 				be->readyToGo = true;
 			}
 		}
@@ -189,6 +201,7 @@ void boss1_ib2(BossEnemy *be)
 			G_enemiesArray->add(itofix(20), itofix(-20), 100, image_LUT_boss1_enemy_ship_light , Pattern_1_boss, 0, LIGHT, true, 0, false);
 			G_enemiesArray->add(itofix(300), itofix(-20), 100, be->currentPattern == 1 ? image_LUT_boss1_enemy_ship_light : image_LUT_boss1_enemy_ship_shadow,
 				Pattern_1_boss, 1, be->currentPattern == 1 ? LIGHT : SHADOW, true, 0, false);
+			be->HP = getHPsum(be->HPperPattern, be->currentPattern, be->patternsNb - 1);
 			be->readyToGo = true;
 		}
 		be->incInternal(31);
@@ -377,7 +390,7 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 // Collision CallBacks
 
 // Hitbox : sword
-int boss1_ccb1(BossEnemy *be, Bullet *b)
+int boss1_ccb1(BossEnemy *be, Bullet *b, int amount)
 {
 	Rect jointPos = getJointPoint(be, boss1_jointData, joint_leftarm_armed);
 	const unsigned short *img = bossImage_entries[bossImage_LUT_1_leftarm_armed];
@@ -389,13 +402,13 @@ int boss1_ccb1(BossEnemy *be, Bullet *b)
 		box.y <= fixtoi(b->y) && box.y + box.h >= fixtoi(b->y))
 	{
 		G_score += b->getPolarity() == SHADOW ? SCORE_HIT_OP : SCORE_HIT;
-		return (b->getPolarity() == SHADOW) + 1;
+		return ((b->getPolarity() == SHADOW) + 1) * amount;
 	}
 	return 0;
 }
 
 // Hitbox : shield
-int boss1_ccb2(BossEnemy *be, Bullet *b)
+int boss1_ccb2(BossEnemy *be, Bullet *b, int amount)
 {
 	Rect jointPos = getJointPoint(be, boss1_jointData, joint_rightarm_armed2);
 	const unsigned short *img = bossImage_entries[bossImage_LUT_1_rightarm_armed2];
@@ -407,13 +420,13 @@ int boss1_ccb2(BossEnemy *be, Bullet *b)
 		box.y <= fixtoi(b->y) && box.y + box.h >= fixtoi(b->y))
 	{
 		G_score += b->getPolarity() == LIGHT ? SCORE_HIT_OP : SCORE_HIT;
-		return (b->getPolarity() == LIGHT) + 1;
+		return ((b->getPolarity() == LIGHT) + 1) * amount;
 	}
 	return 0;
 }
 
 // Hitbox : body
-int boss1_ccb3(BossEnemy *be, Bullet *b)
+int boss1_ccb3(BossEnemy *be, Bullet *b, int amount)
 {
 	const unsigned short *img = bossImage_entries[bossImage_LUT_1_body];
 	
@@ -421,7 +434,7 @@ int boss1_ccb3(BossEnemy *be, Bullet *b)
 		be->y - itofix(img[1]) / 2 <= b->y && be->y + itofix(img[1]) / 2 >= b->y)
 	{
 		G_score += b->getPolarity() == SHADOW ? SCORE_HIT_OP : SCORE_HIT;
-		return (b->getPolarity() == SHADOW) + 1;
+		return ((b->getPolarity() == SHADOW) + 1) * amount;
 	}
 	return 0;
 }

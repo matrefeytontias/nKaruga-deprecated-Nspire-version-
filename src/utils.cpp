@@ -12,6 +12,14 @@ Fixed angleToEnemy(PowerFragment *pf, Enemy *e)
 	return (int)(atan2((double)(e->gety() - pf->y), (double)(e->getx() - pf->x)) * 128. / M_PI);
 }
 
+Fixed angleToBoss(PowerFragment *pf, BossEnemy *be)
+{
+	if(be->HP != 0)
+		return (int)(atan2((double)(be->y - pf->y), (double)(be->x - pf->x)) * 128. / M_PI);
+	else
+		return 192;
+}
+
 Fixed angleToPlayer(PowerFragment *pf, Player *p)
 {
 	static Fixed lastResult = 64;
@@ -70,6 +78,11 @@ Enemy* findNearestEnemy(Fixed x, Fixed y)
 		}
 		return nearest;
 	}
+}
+
+int distance(int x1, int y1, int x2, int y2)
+{
+	return sq(x1 - x2) + sq(y1 - y2);
 }
 
 KeyEvent getk(void)

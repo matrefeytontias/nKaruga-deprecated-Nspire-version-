@@ -8,7 +8,7 @@
 #define ENEMY_W(i) G_enemiesArray->data[i].img[0]
 #define ENEMY_H(i) G_enemiesArray->data[i].img[1]
 
-int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount, G_maxChain = 0; int G_score, G_power, G_bossBonus = 0;
+int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount, G_maxChain = 0; int G_score, G_power;
 bool G_displayBg = true, G_fireback = true, G_hardMode = false;
 bool G_hasFiredOnce;
 bool G_fightingBoss;
@@ -21,6 +21,7 @@ t_key G_fireKey, G_polarityKey, G_fragmentKey, G_pauseKey;
 DrawingCandidates *DC;
 
 EnemiesArray *G_enemiesArray;
+BossEnemy *G_bossEnemy;
 Particles *G_particles;
 
 void playGame();
@@ -115,6 +116,8 @@ int main(int argc, char **argv)
 	
 	DC = new DrawingCandidates;
 	DC->init();
+	
+	G_bossEnemy = new BossEnemy;
 	
 	buildGameLUTs();
 	
@@ -223,6 +226,8 @@ int main(int argc, char **argv)
 	
 	delete DC;
 	
+	delete G_bossEnemy;
+	
 	deinitExplosionEngine();
 	deinitBuffering();
 	
@@ -258,7 +263,6 @@ void playGame()
 	// Game phase
 	int gamePhase;
 	G_fightingBoss = false;
-	BossEnemy bossEnemy;
 	BossData bossData;
 	
 	// Variables for transition animation
@@ -378,7 +382,7 @@ void playGame()
 							// fight boss
 							levelCounter++;
 							bossData = createBossData(levelStream[levelCounter]);
-							bossEnemy.activate(&bossData);
+							G_bossEnemy->activate(&bossData);
 							levelCounter++;
 						}
 						else if(currentLevelByte == LVLSTR_BKPT)
@@ -457,10 +461,11 @@ void playGame()
 		}
 		else if(gamePhase == PHASE_BOSSFIGHT)
 		{
-			if(bossEnemy.handle(&ship, bArray))
+			if(G_bossEnemy->handle(&ship, bArray))
 			{
 				gamePhase = PHASE_BOSSEXPLODEINIT;
 				G_fightingBoss = false;
+				G_enemiesArray->destroyAllEnemies(&ship, bArray);
 			}
 		}
 		
@@ -492,7 +497,7 @@ void playGame()
 		
 		G_enemiesArray->handle(&ship, bArray);
 		
-		bArray->handle(&ship, &bossEnemy);
+		bArray->handle(&ship, G_bossEnemy);
 		
 		G_particles->handle();
 		
@@ -516,7 +521,7 @@ void playGame()
 			}
 			else
 			{
-				drawStringF(&statsRect.x, &statsRect.y, 0, 0xffff, 0, "Score : %d\nTime : %d", G_score, bossEnemy.getTimeout());
+				drawStringF(&statsRect.x, &statsRect.y, 0, 0xffff, 0, "Score : %d\nTime : %d", G_score, G_bossEnemy->getTimeout());
 			}
 			
 			// Draw explosions
@@ -560,11 +565,13 @@ void playGame()
 					drawString(&statsRect.x, &statsRect.y, (320 - stringWidth(string_results[1])) / 2, string_results[0], 0xffff, 0);
 					if(gpTimer > 128)
 					{
-						drawString(&statsRect.x, &statsRect.y, (320 - numberWidth(G_bossBonus)) / 2, string_results[1], 0xffff, 0);
-						drawDecimal(&statsRect.x, &statsRect.y, G_bossBonus, 0xffff, 0);
+						// Boss bonus
+						drawString(&statsRect.x, &statsRect.y, (320 - numberWidth(G_bossEnemy->getTimeout() * 10000)) / 2, string_results[1], 0xffff, 0);
+						drawDecimal(&statsRect.x, &statsRect.y, G_bossEnemy->getTimeout() * 10000, 0xffff, 0);
 					}
 					if(gpTimer > 256)
 					{
+						// Score
 						statsRect.x = (320 - stringWidth(string_results[2])) / 2;
 						statsRect.y += 16;
 						drawString(&statsRect.x, &statsRect.y, (320 - numberWidth(G_score)) / 2, string_results[2], 0xffff, 0);
@@ -574,7 +581,10 @@ void playGame()
 						drawString(&statsRect.x, &statsRect.y, 0, string_results[3], 0xffff, 0);
 						drawDecimal(&statsRect.x, &statsRect.y, G_maxChain, 0xffff, 0);
 						drawString(&statsRect.x, &statsRect.y, (320 - stringWidth(string_results[5])) / 2, string_results[4], 0xffff, 0);
-						// don't display grade for now as it doesn't exist yet
+						// Grade
+						drawString(&statsRect.x, &statsRect.y, (320 - stringWidth("Dot eater !")) / 2, string_results[5], 0xffff, 0);
+						if(!G_hasFiredOnce)
+							drawString(&statsRect.x, &statsRect.y, statsRect.x, "Dot eater !", 0xffff, 0);
 					}
 					if(gpTimer > 384 && KFIRE(kEv))
 					{
@@ -596,6 +606,7 @@ void playGame()
 			{
 				initExplosionEffect(160, 120, 500, 0);
 				gamePhase = PHASE_BOSSEXPLODE;
+				G_score += G_bossEnemy->getTimeout() * 10000;
 			}
 			else if(gamePhase == PHASE_BOSSEXPLODE)
 			{

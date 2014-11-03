@@ -76,10 +76,10 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 					}
 				}
 				
-				// and possibly bosses
+				// and possibly the boss
 				if(G_fightingBoss && be->isHurtable())
 				{
-					bossDamaged = (be->collisionCallbacks[be->currentPattern])(be, cb);
+					bossDamaged = (be->collisionCallbacks[be->currentPattern])(be, cb, 1);
 					if(bossDamaged)
 					{
 						destroyBullet = true;
@@ -148,6 +148,21 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 							G_score += cf->getPolarity() != cf->targetE->getPolarity() ? SCORE_HIT_OP : SCORE_HIT;
 							destroyBullet = true;
 						}
+					}
+				}
+				
+				// and boss, even
+				if(G_fightingBoss && be->isHurtable())
+				{
+					// Create a placeholder bullet to pass to the collision callback
+					Bullet temp;
+					temp.activate(cf->x, cf->y, 0, 0, 0, cf->getPolarity(), false);
+					bossDamaged = (be->collisionCallbacks[be->currentPattern])(be, &temp, 10);
+					temp.deactivate();
+					if(bossDamaged)
+					{
+						destroyBullet = true;
+						be->damage(bossDamaged);
 					}
 				}
 			}

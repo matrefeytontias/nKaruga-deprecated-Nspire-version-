@@ -80,7 +80,6 @@ inline void readFromConfig(FILE* in)
 
 int main(int argc, char **argv)
 {
-    printf("Test");
 	UNUSED(argc);
 	int x, y, blink = 0;
 	bool donePlaying = false, openedMenu = false;

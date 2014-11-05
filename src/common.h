@@ -1,8 +1,7 @@
 #ifndef INCLUDE_COMMON
 #define INCLUDE_COMMON
 
-#include <os.h>
-#include <math.h>
+#include <libndls.h>
 
 #include "n2DLib.h"
 

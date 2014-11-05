@@ -1,32 +1,40 @@
 DEBUG = FALSE
+
 GCC = nspire-gcc
-AS = nspire-as
-GXX=nspire-g++
-LD = nspire-ld-bflt
-GCCFLAGS = -Wall -W -marm -Ofast
+AS  = nspire-as
+GXX = nspire-g++
+LD  = nspire-ld
+GENZEHN = genzehn
+
+GCCFLAGS = -Wall -W -marm
+LDFLAGS =
+ZEHNFLAGS = --name "$(EXE)"
+ZEHNFLAGSEMU = --name "$(EXE_EMU)"
+
+# test
 HEADER_DEPENDS_DIR = .depends
 HEADER_DEPENDS_FLAG = -MM -MF $(HEADER_DEPENDS_DIR)/$<.d
 DEPEND_FILE_NAMES = $(patsubst %.cpp,%.cpp.d,$(wildcard *.cpp)) $(patsubst %.c,%.c.d,$(wildcard *.c))
 # Append the directory to depend files
 DEPEND_FILES = $(foreach file, $(DEPEND_FILE_NAMES), $(HEADER_DEPENDS_DIR)/$(file))
-LDFLAGS = 
+# test
+
 ifeq ($(DEBUG),FALSE)
 	GCCFLAGS += -Os
 else
 	GCCFLAGS += -O0 -g
-	LDFLAGS += --debug
 endif
-CPPOBJS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
-OBJS = $(patsubst %.c,%.o,$(wildcard *.c)) $(patsubst %.S,%.o,$(wildcard *.S)) $(CPPOBJS)
-ifneq ($(strip $(CPPOBJS)),)
-	LDFLAGS += --cpp
-endif
-EXE = nKaruga.tns
-EXE_EMU = nKaruga_emu.tns
+
+OBJS = $(patsubst %.c, %.o, $(shell find . -name \*.c))
+OBJS += $(patsubst %.cpp, %.o, $(shell find . -name \*.cpp))
+OBJS += $(patsubst %.S, %.o, $(shell find . -name \*.S))
+EXE = nKaruga
+EXE_EMU = nKaruga_emu
 DISTDIR = ../
 vpath %.tns $(DISTDIR)
+vpath %.elf $(DISTDIR)
 
-all: $(HEADER_DEPENDS_DIR) header_dependencies  $(EXE) $(EXE_EMU)
+all: $(HEADER_DEPENDS_DIR) header_dependencies $(EXE).prg.tns $(EXE_EMU).prg.tns
 
 $(HEADER_DEPENDS_DIR):
 	mkdir $(HEADER_DEPENDS_DIR)
@@ -42,27 +50,39 @@ $(HEADER_DEPENDS_DIR)/%.c.d : %.c
 	$(GCC) $(GCCFLAGS) -c $< $(HEADER_DEPENDS_FLAG)
 
 %.o: %.c
-	$(GCC) $(GCCFLAGS) -c $< -o $@
+	$(GCC) $(GCCFLAGS) -c $<
 
 %.o: %.cpp
-	$(GXX) $(GCCFLAGS) -c $< -o $@
+	$(GXX) $(GCCFLAGS) -c $<
+	
+%.o: %.S
+	$(AS) -c $<
 
-%.o: %.S $(AS) -c $<
-
-main_emu.o: GCCFLAGS+= -D DEBUG_NKARUGA
+main_emu.o: GCCFLAGS += -D DEBUG_NKARUGA
 main_emu.o: main.cpp
 	$(GXX) $(GCCFLAGS) -c $< -o $@
-$(EXE): $(OBJS)
 
-$(EXE_EMU): main_emu.o  $(filter-out main.o,$(OBJS))
-
-%.tns:
+$(EXE).elf: $(OBJS)
 	mkdir -p $(DISTDIR)
-	$(LD) $(filter-out header_dependencies,$^) -o $(DISTDIR)/$@ $(LDFLAGS)
-ifeq ($(DEBUG),FALSE)
-	@rm -f $(DISTDIR)/*.gdb
-endif
+	$(LD) $^ -o $(DISTDIR)/$@ $(LDFLAGS)
+
+$(EXE).tns: $(EXE).elf
+	$(GENZEHN) --input $(DISTDIR)/$^ --output $(DISTDIR)/$@ $(ZEHNFLAGS)
+
+$(EXE).prg.tns: $(EXE).tns
+	make-prg $(DISTDIR)/$^ $(DISTDIR)/$@
+	
+$(EXE_EMU).elf: main_emu.o $(filter-out ./main.o,$(OBJS))
+# $(warning Linking $(filter-out main.o,$(OBJS)) using $(LD))
+	mkdir -p $(DISTDIR)
+	$(LD) $^ -o $(DISTDIR)/$@ $(LDFLAGS)
+
+$(EXE_EMU).tns: $(EXE_EMU).elf
+	$(GENZEHN) --input $(DISTDIR)/$^ --output $(DISTDIR)/$@ $(ZEHNFLAGSEMU)
+
+$(EXE_EMU).prg.tns: $(EXE_EMU).tns
+	make-prg $(DISTDIR)/$^ $(DISTDIR)/$@
 
 clean:
-	rm -f *.o *.elf $(DISTDIR)/*.gdb $(DISTDIR)/$(EXE) $(DISTDIR)/$(EXE_EMU) $(HEADER_DEPENDS_DIR)/*.d
+	rm -f *.o $(DISTDIR)/$(EXE).tns $(DISTDIR)/$(EXE).elf $(DISTDIR)/$(EXE).prg.tns $(DISTDIR)/$(EXE_EMU).tns $(DISTDIR)/$(EXE_EMU).elf $(DISTDIR)/$(EXE_EMU).prg.tns $(HEADER_DEPENDS_DIR)/*.d
 	rm -rf .depends

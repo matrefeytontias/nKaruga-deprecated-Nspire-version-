@@ -112,7 +112,7 @@ void timer_init(unsigned timer)
 		- timers decreasing
 		- timers count to 0 and stop until a new value is loaded
 	*/
-	if (is_cx)
+	if (has_colors)
 	{
 		volatile unsigned *timer_ctl = (unsigned *) (TIMER + 0x08 + 0x20 * timer);
 		volatile unsigned *timer_load = (unsigned *) (TIMER + 0x20 * timer);
@@ -139,7 +139,7 @@ void timer_init(unsigned timer)
 
 void timer_restore(unsigned timer)
 {
-	if (is_cx)
+	if (has_colors)
 	{
 		volatile unsigned *timer_ctl = (unsigned *) (TIMER + 0x08 + 0x20 * timer);
 		volatile unsigned *timer_load = (unsigned *) (TIMER + 0x20 * timer);
@@ -161,7 +161,7 @@ void timer_restore(unsigned timer)
 
 void timer_load(unsigned timer, unsigned value)
 {
-	if (is_cx)
+	if (has_colors)
 	{
 		volatile unsigned *timer_load = (unsigned *) (TIMER + 0x20 * timer);
 		*timer_load = value;
@@ -175,7 +175,7 @@ void timer_load(unsigned timer, unsigned value)
 
 unsigned timer_read(unsigned timer)
 {
-	if (is_cx)
+	if (has_colors)
 	{
 		volatile unsigned *timer_value = (unsigned *) (TIMER + 0x04 + 0x20 * timer);
 		return *timer_value;
@@ -716,7 +716,7 @@ int get_key_pressed(t_key* report)
 	// Touchpad and clickpad keyboards have different keymapping
 	for(row = 0; row < 8; row++)
 	{
-		rowmap = is_cx ? KEY_DATA[row] : ~KEY_DATA[row];
+		rowmap = has_colors ? KEY_DATA[row] : ~KEY_DATA[row];
 		for(col = 1; col <= 0x400; col <<= 1)
 		{
 			if(rowmap & col)

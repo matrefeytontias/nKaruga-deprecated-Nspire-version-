@@ -1,7 +1,14 @@
 #ifndef INCLUDE_GRAFX
 #define INCLUDE_GRAFX
 
-#include <os.h>
+#include <libndls.h>
+#include <stdarg.h>
+
+// Add those functions for C++ compiler under Linux
+#if !defined(min) && !defined(max)
+#define max(a, b) (a > b)
+#define min(a, b) (a < b)
+#endif
 
 typedef int Fixed;
 typedef struct

@@ -6,8 +6,8 @@
 
 // Add those functions for C++ compiler under Linux
 #if !defined(min) && !defined(max)
-#define max(a, b) (a > b)
-#define min(a, b) (a < b)
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#define min(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
 typedef int Fixed;

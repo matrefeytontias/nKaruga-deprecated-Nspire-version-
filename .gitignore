@@ -5,3 +5,4 @@
 src/tags
 src/.depends*
 src/*.cppcheck
+screenshots/

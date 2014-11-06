@@ -1,7 +1,7 @@
 nKaruga
 =======
 
-A clone of Treasure's *Ikaruga* for TI-Nspire calculators. Of course, this is still in early beta stages.
+A clone of Treasure's *Ikaruga* for TI-Nspire calculators. Of course, this is still in beta stages. Source is available at https://github.com/matrefeytontias/nKaruga
 
 Building
 ========

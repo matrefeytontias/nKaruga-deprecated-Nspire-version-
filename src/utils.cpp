@@ -5,7 +5,8 @@ Fixed angleToPlayer(Enemy *e, Player *p)
 	static Fixed lastResult = 64;
 	if(!p->isDying())
 		lastResult = (int)(atan2((double)(p->y - e->gety()), (double)(p->x - e->getx())) * 128. / M_PI);
-	return lastResult; }
+	return lastResult;
+}
 
 Fixed angleToEnemy(PowerFragment *pf, Enemy *e)
 {

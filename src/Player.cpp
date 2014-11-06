@@ -15,7 +15,7 @@ Player::Player()
 	img[SHADOW + SWITCHING0] = image_entries[image_LUT_player_ship_polarityswitch_0_shadow];
 	img[LIGHT + SWITCHING1] = image_entries[image_LUT_player_ship_polarityswitch_1_light];
 	img[SHADOW + SWITCHING1] = image_entries[image_LUT_player_ship_polarityswitch_1_shadow];
-	
+	deathCounter = 0;
 	x = 0;
 	y = 0;
 }
@@ -92,7 +92,7 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 			{
 				G_hasFiredOnce = true;
 				for(int i = 0; i < G_power / 10; i++)
-					bArray->add_fragment(x, y, ((i % 6) - 3) * 8 + (i % 2 ? 128 : 0), this, polarity, false);
+					bArray->add_fragment(x, y, ((i % 6) - 3) * 8 + ((i % 2) ? 128 : 0), this, polarity, false);
 				G_power = 0;
 			}
 		}
@@ -114,8 +114,8 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 					// fire 1 bullet
 					bArray->add(x, y, 0, itofix(-3), image_LUT_player_bullet_light, polarity, false);
 					fireDelay = 24;
+					fireRepeat = true;
 				}
-				fireRepeat = true;
 			}
 			else
 				fireRepeat = false;

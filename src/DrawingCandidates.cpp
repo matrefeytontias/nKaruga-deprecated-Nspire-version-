@@ -2,7 +2,7 @@
 
 DrawingCandidates::DrawingCandidates()
 {
-	
+	candidatesCount = 0;
 }
 
 DrawingCandidates::~DrawingCandidates()
@@ -10,34 +10,29 @@ DrawingCandidates::~DrawingCandidates()
 	
 }
 
-void DrawingCandidates::init()
-{
-	data = (DrawingCandidate**)malloc(sizeof(DrawingCandidate*));
-	candidatesCount = 0;
-}
-
 void DrawingCandidates::add(unsigned short *img, Rect *pos)
 {
-	data[candidatesCount] = new DrawingCandidate(img, pos);
+	data[candidatesCount].activate(img, pos);
 	candidatesCount++;
-	data = (DrawingCandidate**)realloc(data, (candidatesCount + 1) * sizeof(DrawingCandidate*));
-	if(!data)
-	{
-		printf("Allocation failed\n");
-		exit(1);
-	}
+	// printf("Drawing candidate 0 : 0x%8X\n", (int)data[candidatesCount]);
+	// data = (DrawingCandidate**)realloc(data, (candidatesCount + 1) * sizeof(DrawingCandidate*));
+	// if(!data)
+	// {
+		// printf("Allocation failed\n");
+		// exit(1);
+	// }
 }
 
 void DrawingCandidates::add(unsigned short *img, Rect *pos, Rect *center, Fixed angle)
 {
-	data[candidatesCount] = new DrawingCandidate(img, pos, center, angle);
+	data[candidatesCount].activate(img, pos, center, angle);
 	candidatesCount++;
-	data = (DrawingCandidate**)realloc(data, (candidatesCount + 1) * sizeof(DrawingCandidate*));
-	if(!data)
-	{
-		printf("Allocation failed\n");
-		exit(1);
-	}
+	// data = (DrawingCandidate**)realloc(data, (candidatesCount + 1) * sizeof(DrawingCandidate*));
+	// if(!data)
+	// {
+		// printf("Allocation failed\n");
+		// exit(1);
+	// }
 }
 
 void DrawingCandidates::flush()
@@ -47,21 +42,17 @@ void DrawingCandidates::flush()
 		//~ printf("Drawing %d objects.\n", candidatesCount);
 		for(int i = 0; i < candidatesCount; i++)
 		{
-			data[i]->draw();
-			delete data[i];
+			data[i].draw();
+			data[i].deactivate();
 		}
 	}
 	else
 	{
 		for(int i = 0; i < candidatesCount - 1; i++)
-			delete data[i];
+			data[i].deactivate();
 	}
 	
-	free(data);
-	init();
-}
-
-void DrawingCandidates::release()
-{
-	free(data);
+	// free(data);
+	// data = (DrawingCandidate**)malloc(sizeof(DrawingCandidate*));
+	candidatesCount = 0;
 }

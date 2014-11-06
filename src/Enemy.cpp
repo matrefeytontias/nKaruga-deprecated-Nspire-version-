@@ -14,12 +14,12 @@ Enemy::Enemy()
 
 Enemy::~Enemy()
 {
+	printf("This is not supposed to happen\n");
 }
 
 void Enemy::handle(Player *p, BulletArray *bArray)
 {
 	Rect er;
-	Fixed angle;
 	
 	if(active)
 	{
@@ -30,6 +30,7 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 			// handle bullets and pattern first
 			switch(callback)
 			{
+				Fixed angle;
 				// Too many patterns, needs dedicated file
 				#include "patterns.h"
 			}
@@ -99,6 +100,7 @@ void Enemy::activate(int _x, int _y, int _HP, int shipImgID, int callbackID, int
 void Enemy::deactivate()
 {
 	active = false;
+	// delete this;
 }
 
 void Enemy::damage(Player *_p, bool _pol, int amount, BulletArray *bArray)

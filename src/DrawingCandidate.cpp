@@ -1,14 +1,25 @@
 #include "common.h"
 
-DrawingCandidate::DrawingCandidate(unsigned short *_img, Rect *_pos)
+DrawingCandidate::DrawingCandidate()
+{
+	
+}
+
+DrawingCandidate::~DrawingCandidate()
+{
+	
+}
+
+void DrawingCandidate::activate(unsigned short *_img, Rect *_pos)
 {
 	img = _img;
 	pos.x = _pos->x - img[0] / 2;
 	pos.y = _pos->y - img[1] / 2;
 	rotates = false;
+	active = true;
 }
 
-DrawingCandidate::DrawingCandidate(unsigned short *_img, Rect *_pos, Rect *_center, Fixed _angle)
+void DrawingCandidate::activate(unsigned short *_img, Rect *_pos, Rect *_center, Fixed _angle)
 {
 	img = _img;
 	angle = _angle;
@@ -23,17 +34,21 @@ DrawingCandidate::DrawingCandidate(unsigned short *_img, Rect *_pos, Rect *_cent
 	else
 		centered = true;
 	rotates = true;
+	active = true;
 }
 
-DrawingCandidate::~DrawingCandidate()
+void DrawingCandidate::deactivate()
 {
-	
+	active = false;
 }
 
 void DrawingCandidate::draw()
 {
-	if(rotates)
-		drawSpriteRotated(img, &pos, centered ? NULL : &center, angle);
-	else
-		drawSprite(img, pos.x, pos.y);
+	if(active)
+	{
+		if(rotates)
+			drawSpriteRotated(img, &pos, centered ? NULL : &center, angle);
+		else
+			drawSprite(img, pos.x, pos.y);
+	}
 }

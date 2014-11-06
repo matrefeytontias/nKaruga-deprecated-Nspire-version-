@@ -93,7 +93,7 @@ case Pattern_1_8:
 	}
 	break;
 case Pattern_1_9:
-	x += waveIndex % 2 ? 192 : -192;
+	x += (waveIndex % 2) ? 192 : -192;
 	y += 128;
 	
 	if(!(G_waveTimer % 8))
@@ -103,7 +103,7 @@ case Pattern_1_10:
 	if(!(G_waveTimer % 4))
 	{
 		int temp = fixsin(internal[0]) * 80;
-		x = (waveIndex % 2 ? -temp : temp) + itofix(160);
+		x = ((waveIndex % 2) ? -temp : temp) + itofix(160);
 		if(abs(temp) > itofix(70))
 		{
 			if(!(G_waveTimer % 8))
@@ -123,8 +123,8 @@ case Pattern_1_12:
 			y += itofix(2);
 		else if(internal[0] == 45)
 		{
-			internal[1] = waveIndex % 2 ? 0 : 128;
-			internal[2] = x + (waveIndex % 2 ? itofix(-20) : itofix(20));
+			internal[1] = (waveIndex % 2) ? 0 : 128;
+			internal[2] = x + ((waveIndex % 2) ? itofix(-20) : itofix(20));
 			internal[3] = y;
 		}
 		else if(internal[0] - 45 < 416)
@@ -257,8 +257,8 @@ case Pattern_1_14:
 		x += 64;
 	break;
 case Pattern_1_15:
-	x = fixcos(internal[0] + (waveIndex % 2 ? 128 : 0)) * 30;
-	y = fixsin(internal[0] + (waveIndex % 2 ? 128 : 0)) * 30;
+	x = fixcos(internal[0] + ((waveIndex % 2) ? 128 : 0)) * 30;
+	y = fixsin(internal[0] + ((waveIndex % 2) ? 128 : 0)) * 30;
 	if(!(G_waveTimer % 4))
 	{
 		if(!(internal[0] % 128))
@@ -371,7 +371,7 @@ case Pattern_1_19:
 	break;
 case Pattern_1_20:
 	if(!(G_waveTimer % 32))
-		bArray->add(getx(), gety(), waveIndex % 2 ? itofix(1) : itofix(-1), 0, image_LUT_enemy_bullet_2_light, polarity, true);
+		bArray->add(getx(), gety(), (waveIndex % 2) ? itofix(1) : itofix(-1), 0, image_LUT_enemy_bullet_2_light, polarity, true);
 	break;
 case Pattern_1_21:
 	if(!internal[0] && waveIndex % 2)

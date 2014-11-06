@@ -115,7 +115,6 @@ int main(int argc, char **argv)
 	G_particles = new Particles;
 	
 	DC = new DrawingCandidates;
-	DC->init();
 	
 	G_bossEnemy = new BossEnemy;
 	
@@ -219,14 +218,16 @@ int main(int argc, char **argv)
 	}
 	
 	delete G_enemiesArray;
+	// printf("Deleted enemies array\n");
 	
 	delete G_particles;
-	
-	DC->release();
+	// printf("Deleted particles\n");
 	
 	delete DC;
+	// printf("Deleted drawing candidates\n");
 	
 	delete G_bossEnemy;
+	// printf("Deleted boss enemy\n");
 	
 	deinitExplosionEngine();
 	deinitBuffering();

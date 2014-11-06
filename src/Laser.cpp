@@ -61,7 +61,6 @@ void Laser::draw()
 	int sx = (x1 < x2)?1:-1;
 	int sy = (y1 < y2)?1:-1;
 	int err = dx-dy;
-	int e2;
 	// Sprite drawing vars
 	Fixed sdx = fixsin(-angle);
 	Fixed sdy = fixcos(-angle);
@@ -80,7 +79,7 @@ void Laser::draw()
 			syp += sdy;
 		}
 		
-		e2 = 2*err;
+		int e2 = 2*err;
 		if (e2 > -dy)
 		{	
 			err = err - dy;

@@ -53,16 +53,20 @@ extern KeyEvent getk();
 #define LASER_SPEED 2
 #define LASER_THICKNESS 25
 
+#define MAX_DISPLAYABLE 1000
+
 class DrawingCandidate
 {
 public:
-	DrawingCandidate(unsigned short *img, Rect *pos);
-	DrawingCandidate(unsigned short *img, Rect *pos, Rect *center, Fixed angle);
+	DrawingCandidate();
 	~DrawingCandidate();
+	void activate(unsigned short *img, Rect *pos);
+	void activate(unsigned short *img, Rect *pos, Rect *center, Fixed angle);
+	void deactivate();
 	void draw();
 private:
 	Rect pos, center;
-	bool rotates, centered;
+	bool rotates, centered, active;
 	Fixed angle;
 	unsigned short *img;
 };
@@ -72,13 +76,11 @@ class DrawingCandidates
 public:
 	DrawingCandidates();
 	~DrawingCandidates();
-	void init();
 	void add(unsigned short *img, Rect *pos);
 	void add(unsigned short *img, Rect *pos, Rect *center, Fixed angle);
 	void flush();
-	void release();
 private:
-	DrawingCandidate **data;
+	DrawingCandidate data[MAX_DISPLAYABLE];
 	int candidatesCount;
 };
 

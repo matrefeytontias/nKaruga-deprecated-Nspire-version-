@@ -102,7 +102,7 @@ bool PowerFragment::handle()
 		speed += (speed < itofix(6)) * 32;
 		if(hurtPlayer)
 		{
-			if(!targetP->isDying())
+			if(targetP->isHurtable())
 				angle = angleToPlayer(this, targetP);
 		}
 		else

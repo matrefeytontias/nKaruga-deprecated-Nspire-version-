@@ -60,15 +60,23 @@ Scoring (a whole lot)
 
 nKaruga implements the same complex scoring system as the original Ikaruga, and thus scoring takes an important part in the gameplay.
 
-Each time one of your bullets hits an enemy, you earn 20 points, and each time you absorb a bullet of your polarity you get 100 points as well. Each time you kill an enemy, its polarity is remembered, and if you kill three enemies of the same polarity in a row, your _chain bonus_ doubles. Your _chain bonus_ is bonus points you get each time you complete a 3-kills streak of one polarity. It starts at 100 and doubles with each 3-kills streak you complete up to a maximum of 25 600.
-But beware ! If you kill an enemy of the opposite polarity in the middle of a chain without it being finished (for example when you kill two blue ships and then one red ship), your chain breaks, your chain bonus goes back to 100 and your chain count to 0, and everything is to be done again.
+Each time one of your bullets hits an enemy, you earn 20 points if it's of the same polarity and 40 if it's of opposite polarity, and each time you absorb a bullet of your polarity you get 100 points. Each time you kill an enemy, its polarity is "remembered", and if you kill three enemies of the same polarity in a row, your _chain bonus_ doubles. Your _chain bonus_ is bonus points you get each time you complete a 3-kills streak of one polarity. It starts at 100 and doubles with each 3-kills streak you complete, up to a maximum of 25 600.
+But beware ! If you kill an enemy of the wrong polarity in the middle of a chain without it being finished (for example when you kill two blue ships and then one red ship), your chain breaks, your chain bonus goes back to 100 and your chain count to 0, and everything is to be done again.
 
-One last thing, there is no other scoring during bosses than bullet hit and absorption.
+Boss battles
+============
+
+During boss battles, chaining is not taken into account. When you battle a boss, you have a limited amount of time to take it down. Bosses may or may not respect several patterns ; if you're too slow, the boss will move to the next pattern by itself. 
+
+Tips for boss battles :
+- watch for the time ! The faster you beat the boss, the bigger the bonus at the end !
+- try to figure out what polarity the boss is vulnerable to. It can change during the battle.
+- also try to figure out what the hitbox is. It's not always obvious.
 
 Credits
 =======
 
 Code : matrefeytontias
-Helping : geekboy
+Helping with debugging : geekboy
 
 GFX : Metaru, Hayleia, pierrotdu18, aeTIos, matrefeytontias

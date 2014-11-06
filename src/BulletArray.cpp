@@ -33,7 +33,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 		destroyBullet = false;
 		if(cb->isActive())
 		{
-			if(cb->hurtsPlayer() && !p->isDying())
+			if(cb->hurtsPlayer() && p->isHurtable())
 			{
 				// Check collisions with player if he's not dead already
 				if(cb->getPolarity() != p->getPolarity())
@@ -107,7 +107,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 		destroyBullet = false;
 		if(cf->isActive())
 		{
-			if(cf->hurtsPlayer() && !p->isDying())
+			if(cf->hurtsPlayer() && p->isHurtable())
 			{
 				// Check collisions with player
 				if(cf->getPolarity() != p->getPolarity())
@@ -186,7 +186,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 		destroyBullet = false;
 		if(ch->isActive())
 		{
-			if(!p->isDying())
+			if(p->isHurtable())
 			{
 				// Check collisions with player
 				if(ch->getPolarity() != p->getPolarity())
@@ -235,7 +235,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				r = cl->getVector();
 				cl->getSides(&r1, &r2);
 				
-				if(!p->isDying())
+				if(p->isHurtable())
 				{
 					// Uses cartesian hitbox for checking collision with player
 					// First, see if the player is not too far

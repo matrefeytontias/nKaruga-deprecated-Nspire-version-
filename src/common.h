@@ -245,6 +245,7 @@ public:
 	void hurt();
 	int getLives();
 	bool isDying();
+	bool isHurtable();
 	// x, y on-screen
 	Fixed x, y;
 	// Ship images, light and shadow
@@ -252,6 +253,7 @@ public:
 	// Other four are polarity transition animation frames (frame 0 light/shadow, frame 1 light/shadow)
 	// images have same dimensions
 	unsigned short *img[6];
+	int deathCounter;
 private:
 	int isSwitchingPolarity;
 	// keep firing at a reasonable rate
@@ -263,7 +265,6 @@ private:
 	bool polarityRepeat;
 	bool dying;
 	int lives;
-	int deathCounter;
 } ;
 
 // Enemy
@@ -527,6 +528,8 @@ enum
 	image_LUT_player_ship_polarityswitch_0_shadow,
 	image_LUT_player_ship_polarityswitch_1_light,
 	image_LUT_player_ship_polarityswitch_1_shadow,
+	image_LUT_player_ship_invincible_light,
+	image_LUT_player_ship_invincible_shadow,
 	image_LUT_player_bullet_light,
 	image_LUT_player_bullet_shadow,
 	image_LUT_player_homing_bullet_light_0,

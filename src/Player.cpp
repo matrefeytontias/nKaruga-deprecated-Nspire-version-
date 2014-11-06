@@ -34,11 +34,13 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 		r.x = fixtoi(x);
 		r.y = fixtoi(y);
 		
-		//~ if(!G_skipFrame) 
-		//~ {
-			//~ drawSprite(img[((isSwitchingPolarity / 8) * 2) + (polarity ? SHADOW : LIGHT)], r.x, r.y);
-			DC->add(img[((isSwitchingPolarity / 8) * 2) + (polarity ? SHADOW : LIGHT)], &r);
-		//~ }
+		DC->add(img[((isSwitchingPolarity / 8) * 2) + polarity], &r);
+		
+		if(deathCounter)
+		{
+			DC->add(image_entries[image_LUT_player_ship_invincible_light + polarity], &r);
+			deathCounter--;
+		}
 		
 		if(isSwitchingPolarity)
 		{
@@ -188,4 +190,9 @@ int Player::getLives()
 bool Player::isDying()
 {
 	return dying;
+}
+
+bool Player::isHurtable()
+{
+	return !dying && !deathCounter;
 }

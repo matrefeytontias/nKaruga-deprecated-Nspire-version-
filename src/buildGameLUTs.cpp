@@ -17,6 +17,8 @@ void buildGameLUTs()
 	image_entries[image_LUT_player_ship_polarityswitch_0_shadow] = image_player_ship_polarityswitch_0_shadow;
 	image_entries[image_LUT_player_ship_polarityswitch_1_light] = image_player_ship_polarityswitch_1_light;
 	image_entries[image_LUT_player_ship_polarityswitch_1_shadow] = image_player_ship_polarityswitch_1_shadow;
+	image_entries[image_LUT_player_ship_invincible_light] = image_player_ship_invincible_light;
+	image_entries[image_LUT_player_ship_invincible_shadow] = image_player_ship_invincible_shadow;
 	image_entries[image_LUT_player_homing_bullet_light_0] = image_player_homing_bullet_light_0;
 	image_entries[image_LUT_player_homing_bullet_light_1] = image_player_homing_bullet_light_1;
 	image_entries[image_LUT_player_homing_bullet_light_2] = image_player_homing_bullet_light_2;

@@ -44,7 +44,7 @@ int bossHPperPat[BOSS_NB][MAX_PATTERNS_PER_BOSS] = {
 };
 
 int bossTimeoutPerPat[BOSS_NB][MAX_PATTERNS_PER_BOSS] = {
-	{ 100, 80, 55 }
+	{ 150, 110, 70 }
 };
 
 /*

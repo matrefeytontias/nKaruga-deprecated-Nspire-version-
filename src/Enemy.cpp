@@ -59,7 +59,7 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 			if(!ghost)
 			{
 				// Check wether the player hit the enemy
-				if(!p->isDying() && (p->x >= getx() - (itofix(img[0]) / 2) && p->x < getx() + (itofix(img[0]) / 2)) && (p->y >= gety() - (itofix(img[0]) / 2) && p->y <= gety() + (itofix(img[1]) / 2)))
+				if(p->isHurtable() && (p->x >= getx() - (itofix(img[0]) / 2) && p->x < getx() + (itofix(img[0]) / 2)) && (p->y >= gety() - (itofix(img[0]) / 2) && p->y <= gety() + (itofix(img[1]) / 2)))
 				{
 					p->hurt();
 				}

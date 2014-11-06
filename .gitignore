@@ -4,3 +4,4 @@
 *.gdb
 src/tags
 src/.depends*
+src/*.cppcheck

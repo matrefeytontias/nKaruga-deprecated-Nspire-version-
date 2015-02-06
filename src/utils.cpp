@@ -47,10 +47,10 @@ Enemy* findNearestEnemy(Fixed x, Fixed y)
 	
 	for(int i = 0; i < MAX_ENEMY; i++)
 	{
-		if(G_enemiesArray->data[i].isActive() && !G_enemiesArray->data[i].isGhost())
+		if(G_enemiesArray.data[i].isActive() && !G_enemiesArray.data[i].isGhost())
 		{
 			hasLivingEnemy = true;
-			nearest = &G_enemiesArray->data[i];
+			nearest = &G_enemiesArray.data[i];
 			break;
 		}
 	}
@@ -66,9 +66,9 @@ Enemy* findNearestEnemy(Fixed x, Fixed y)
 		
 		for(int i = 0; i < MAX_ENEMY; i++)
 		{
-			if(G_enemiesArray->data[i].isActive() && !G_enemiesArray->data[i].isGhost())
+			if(G_enemiesArray.data[i].isActive() && !G_enemiesArray.data[i].isGhost())
 			{
-				ce = &G_enemiesArray->data[i];
+				ce = &G_enemiesArray.data[i];
 				concurrentDistance = sq(fixtoi(ce->getx() - x)) + sq(fixtoi(ce->gety() - y));
 				if(concurrentDistance < lastDistance)
 				{

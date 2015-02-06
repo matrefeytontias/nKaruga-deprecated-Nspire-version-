@@ -61,15 +61,15 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				// Check collisions with enemies (there are much more enemies than players)
 				for(int j = 0; j < MAX_ENEMY; j++)
 				{
-					if(G_enemiesArray->data[j].isActive() && !G_enemiesArray->data[j].isGhost())
+					if(G_enemiesArray.data[j].isActive() && !G_enemiesArray.data[j].isGhost())
 					{
-						if(cb->x - itofix(cb->img[0] / 2) <= G_enemiesArray->data[j].getx() + itofix(G_enemiesArray->data[j].img[0] / 2) &&
-						cb->x + itofix(cb->img[0] / 2) >= G_enemiesArray->data[j].getx() - itofix(G_enemiesArray->data[j].img[0] / 2) &&
-						cb->y - itofix(cb->img[1] / 2) <= G_enemiesArray->data[j].gety() + itofix(G_enemiesArray->data[j].img[1] / 2) &&
-						cb->y + itofix(cb->img[1] / 2) >= G_enemiesArray->data[j].gety() - itofix(G_enemiesArray->data[j].img[1] / 2))
+						if(cb->x - itofix(cb->img[0] / 2) <= G_enemiesArray.data[j].getx() + itofix(G_enemiesArray.data[j].img[0] / 2) &&
+						cb->x + itofix(cb->img[0] / 2) >= G_enemiesArray.data[j].getx() - itofix(G_enemiesArray.data[j].img[0] / 2) &&
+						cb->y - itofix(cb->img[1] / 2) <= G_enemiesArray.data[j].gety() + itofix(G_enemiesArray.data[j].img[1] / 2) &&
+						cb->y + itofix(cb->img[1] / 2) >= G_enemiesArray.data[j].gety() - itofix(G_enemiesArray.data[j].img[1] / 2))
 						{
-							G_enemiesArray->data[j].damage(p, cb->getPolarity(), 1, this);
-							G_score += cb->getPolarity() != G_enemiesArray->data[j].getPolarity() ? SCORE_HIT_OP : SCORE_HIT;
+							G_enemiesArray.data[j].damage(p, cb->getPolarity(), 1, this);
+							G_score += cb->getPolarity() != G_enemiesArray.data[j].getPolarity() ? SCORE_HIT_OP : SCORE_HIT;
 							destroyBullet = true;
 							// The same bullet can destroy several enemies if it hits them *during the same frame* !
 						}
@@ -320,7 +320,6 @@ void BulletArray::add_homing(Fixed _x, Fixed _y, Fixed angle, Player* target, bo
 {
 	if(homingCount < MAX_HOMING)
 	{
-		printf("%d\n", angle);
 		data_homing[homingCount].activate(_x, _y, angle, target, _p);
 		homingCount++;
 	}

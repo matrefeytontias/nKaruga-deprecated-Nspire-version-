@@ -659,7 +659,7 @@ extern t_key G_fireKey, G_polarityKey, G_fragmentKey, G_pauseKey;
 
 extern touchpad_info_t *G_tpinfo;
 extern touchpad_report_t G_tpstatus;
-extern EnemiesArray *G_enemiesArray;
+extern EnemiesArray G_enemiesArray;
 extern BossEnemy *G_bossEnemy;
 extern Particles *G_particles;
 

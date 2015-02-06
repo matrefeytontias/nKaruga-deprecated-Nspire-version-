@@ -5,8 +5,8 @@
 #include "../gfx/bossWarning.h"
 #include "misc_data.h"
 
-#define ENEMY_W(i) G_enemiesArray->data[i].img[0]
-#define ENEMY_H(i) G_enemiesArray->data[i].img[1]
+#define ENEMY_W(i) G_enemiesArray.data[i].img[0]
+#define ENEMY_H(i) G_enemiesArray.data[i].img[1]
 
 int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount, G_maxChain = 0; int G_score, G_power;
 bool G_displayBg = true, G_fireback = true, G_hardMode = false;
@@ -20,7 +20,7 @@ t_key G_fireKey, G_polarityKey, G_fragmentKey, G_pauseKey;
 
 DrawingCandidates *DC;
 
-EnemiesArray *G_enemiesArray;
+EnemiesArray G_enemiesArray;
 BossEnemy *G_bossEnemy;
 Particles *G_particles;
 
@@ -109,8 +109,6 @@ int main(int argc, char **argv)
 	
 	if(is_touchpad)
 		G_tpinfo = touchpad_getinfo();
-	
-	G_enemiesArray = new EnemiesArray;
 	
 	G_particles = new Particles;
 	
@@ -217,17 +215,11 @@ int main(int argc, char **argv)
 			donePlaying = true;
 	}
 	
-	delete G_enemiesArray;
-	// printf("Deleted enemies array\n");
-	
 	delete G_particles;
-	// printf("Deleted particles\n");
 	
 	delete DC;
-	// printf("Deleted drawing candidates\n");
 	
 	delete G_bossEnemy;
-	// printf("Deleted boss enemy\n");
 	
 	deinitExplosionEngine();
 	deinitBuffering();
@@ -243,7 +235,6 @@ int getBossPhase(int timer)
 		return PHASE_BOSSCINEMATIC;
 	else
 	{
-		//~ return PHASE_BOSSEXPLODEINIT;
 		return PHASE_BOSSFIGHT;
 	}
 }
@@ -294,7 +285,7 @@ void playGame()
 	
 	for(int i = 0; i < MAX_ENEMY; i++)
 	{
-		G_enemiesArray->data[i].deactivate();
+		G_enemiesArray.data[i].deactivate();
 		G_killedThisFrame[i] = 0;
 	}
 	
@@ -333,7 +324,7 @@ void playGame()
 							G_waveTimer = 0;
 							waveIndex = 0;
 							levelCounter++;
-							G_enemiesArray->resetEnemyCounter();
+							G_enemiesArray.resetEnemyCounter();
 						}
 						else if(currentLevelByte == LVLSTR_WAIT)
 						{
@@ -347,7 +338,7 @@ void playGame()
 							int levelCanProgress = 1;
 							for(int i = 0; i < MAX_ENEMY; i++)
 							{
-								if(G_enemiesArray->data[i].isActive())
+								if(G_enemiesArray.data[i].isActive())
 								{
 									levelCanProgress = 0;
 									break;
@@ -370,7 +361,7 @@ void playGame()
 						else if(currentLevelByte == LVLSTR_JOINT)
 						{
 							// Constrain an enemy to another
-							G_enemiesArray->data[levelStream[levelCounter + 1]].joint(levelStream[levelCounter + 2],
+							G_enemiesArray.data[levelStream[levelCounter + 1]].joint(levelStream[levelCounter + 2],
 											itofix(levelStream[levelCounter + 3]),
 											itofix(levelStream[levelCounter + 4]), levelStream[levelCounter + 5]);
 							levelCounter += 6;
@@ -394,8 +385,8 @@ void playGame()
 							G_waveTimer, gpTimer, waveIndex);
 							for(int i = 0; i < MAX_ENEMY; i++)
 							{
-								if(G_enemiesArray->data[i].isActive())
-									printf("Enemy %d :\nX,Y : %d, %d\n", i, fixtoi(G_enemiesArray->data[i].getx()), fixtoi(G_enemiesArray->data[i].gety()));
+								if(G_enemiesArray.data[i].isActive())
+									printf("Enemy %d :\nX,Y : %d, %d\n", i, fixtoi(G_enemiesArray.data[i].getx()), fixtoi(G_enemiesArray.data[i].gety()));
 							}
 							bkpt();
 							levelCounter++;
@@ -423,7 +414,7 @@ void playGame()
 					else
 					{
 						// Dunno what it is ? Then it's an enemy by default
-						G_enemiesArray->add(itofix(levelStream[levelCounter]), itofix(levelStream[levelCounter + 1]), levelStream[levelCounter + 2],
+						G_enemiesArray.add(itofix(levelStream[levelCounter]), itofix(levelStream[levelCounter + 1]), levelStream[levelCounter + 2],
 															levelStream[levelCounter + 3], levelStream[levelCounter + 4], waveIndex, levelStream[levelCounter + 5],
 															levelStream[levelCounter + 6], levelStream[levelCounter + 7], false);
 						levelCounter += 8;
@@ -467,7 +458,7 @@ void playGame()
 			{
 				gamePhase = PHASE_BOSSEXPLODEINIT;
 				G_fightingBoss = false;
-				G_enemiesArray->destroyAllEnemies(&ship, bArray);
+				G_enemiesArray.destroyAllEnemies(&ship, bArray);
 			}
 		}
 		
@@ -497,7 +488,7 @@ void playGame()
 		
 		ship.handle(kEv, bArray);
 		
-		G_enemiesArray->handle(&ship, bArray);
+		G_enemiesArray.handle(&ship, bArray);
 		
 		bArray->handle(&ship, G_bossEnemy);
 		
@@ -527,7 +518,7 @@ void playGame()
 			}
 			
 			// Draw explosions
-			G_enemiesArray->handleExplosions();
+			G_enemiesArray.handleExplosions();
 			
 			// Draw power
 			for(int i = MAX_FRAGMENT - 1; i >= 0; i--)
@@ -703,14 +694,14 @@ void playGame()
 						G_score += 100 * (1 << min(G_chainStatus, 8));
 						for(int j = 0; j < MAX_ENEMY; j++)
 						{
-							if(G_enemiesArray->deadEnemies.relevant[j])
+							if(G_enemiesArray.deadEnemies.relevant[j])
 							{
 								if(j == i)
 								{
-									chainNotifsArray[currentNotif].activate(G_enemiesArray->deadEnemies.x[j], G_enemiesArray->deadEnemies.y[j], 100 * (1 << min(G_chainStatus, 8)));
+									chainNotifsArray[currentNotif].activate(G_enemiesArray.deadEnemies.x[j], G_enemiesArray.deadEnemies.y[j], 100 * (1 << min(G_chainStatus, 8)));
 									currentNotif = (currentNotif + 1) % MAX_ENEMY;
 								}
-								G_enemiesArray->deadEnemies.relevant[j] = false;
+								G_enemiesArray.deadEnemies.relevant[j] = false;
 							}
 						}
 						G_chainStatus++;

@@ -13,7 +13,6 @@ EnemiesArray::~EnemiesArray()
 
 void EnemiesArray::add(int x, int y, int HP, int shipImgID, int callbackID, int waveIndex, bool polarity, bool hasRotation, int firebackAmount, bool ghost)
 {
-	printf("Enemy %d\n", currentEnemy);
 	data[currentEnemy].activate(x, y, HP, shipImgID, callbackID, waveIndex, polarity, hasRotation, firebackAmount, ghost);
 	currentEnemy++;
 	currentEnemy %= MAX_ENEMY;

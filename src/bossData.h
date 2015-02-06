@@ -147,8 +147,8 @@ void boss1_ib1(BossEnemy *be)
 				be->currentPattern = be->lastPattern = 0;
 				be->setInternal(30, 0);
 				be->setInternal(31, 0);
-				G_enemiesArray->add(itofix(20), itofix(-20), 100, image_LUT_boss1_enemy_ship_shadow, Pattern_1_boss, 0, SHADOW, true, 0, false);
-				G_enemiesArray->add(itofix(300), itofix(-20), 100, image_LUT_boss1_enemy_ship_shadow, Pattern_1_boss, 1, SHADOW, true, 0, false);
+				G_enemiesArray.add(itofix(20), itofix(-20), 100, image_LUT_boss1_enemy_ship_shadow, Pattern_1_boss, 0, SHADOW, true, 0, false);
+				G_enemiesArray.add(itofix(300), itofix(-20), 100, image_LUT_boss1_enemy_ship_shadow, Pattern_1_boss, 1, SHADOW, true, 0, false);
 				be->HP = getHPsum(be->HPperPattern, 0, be->patternsNb - 1);
 				be->readyToGo = true;
 			}
@@ -198,8 +198,8 @@ void boss1_ib2(BossEnemy *be)
 		{
 			be->setInternal(0, 0);
 			be->setInternal(31, 0);
-			G_enemiesArray->add(itofix(20), itofix(-20), 100, image_LUT_boss1_enemy_ship_light , Pattern_1_boss, 0, LIGHT, true, 0, false);
-			G_enemiesArray->add(itofix(300), itofix(-20), 100, be->currentPattern == 1 ? image_LUT_boss1_enemy_ship_light : image_LUT_boss1_enemy_ship_shadow,
+			G_enemiesArray.add(itofix(20), itofix(-20), 100, image_LUT_boss1_enemy_ship_light , Pattern_1_boss, 0, LIGHT, true, 0, false);
+			G_enemiesArray.add(itofix(300), itofix(-20), 100, be->currentPattern == 1 ? image_LUT_boss1_enemy_ship_light : image_LUT_boss1_enemy_ship_shadow,
 				Pattern_1_boss, 1, be->currentPattern == 1 ? LIGHT : SHADOW, true, 0, false);
 			be->HP = getHPsum(be->HPperPattern, be->currentPattern, be->patternsNb - 1);
 			be->readyToGo = true;
@@ -239,7 +239,7 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 		be->lastPattern = be->currentPattern;
 		be->initCallbackCalled = false;
 		be->readyToGo = false;
-		G_enemiesArray->destroyAllEnemies(p, bArray);
+		G_enemiesArray.destroyAllEnemies(p, bArray);
 		return;
 	}
 	
@@ -370,7 +370,7 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 				// TODO : animation
 				pos = getJointPoint(be, boss1_jointData, joint_leftarm_nonarmed);
 				for(int i = 0; i < 4; i++)
-					G_enemiesArray->add(itofix(pos.x), itofix(pos.y), 1, image_LUT_boss1_grenade_light + (fireStage % 2), Pattern_1_bossGrenade, i, fireStage % 2, true, 0, true);
+					G_enemiesArray.add(itofix(pos.x), itofix(pos.y), 1, image_LUT_boss1_grenade_light + (fireStage % 2), Pattern_1_bossGrenade, i, fireStage % 2, true, 0, true);
 			}
 			else if(fireStage > 6)
 			{

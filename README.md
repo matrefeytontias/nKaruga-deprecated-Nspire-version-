@@ -77,6 +77,6 @@ Credits
 =======
 
 Code : matrefeytontias
-Helping with debugging : geekboy
+With occasional help from : Choups314, geekboy
 
 GFX : Metaru, Hayleia, pierrotdu18, aeTIos, matrefeytontias

@@ -61,6 +61,10 @@ void buildGameLUTs()
 	image_entries[image_LUT_enemy_ship_4_shadow] = image_enemy_ship_4_shadow;
 	image_entries[image_LUT_enemy_ship_4_lightball] = image_enemy_ship_4_lightball;
 	image_entries[image_LUT_enemy_ship_4_shadowball] = image_enemy_ship_4_shadowball;
+	image_entries[image_LUT_enemy_ship_5_light] = image_enemy_ship_5_light;
+	image_entries[image_LUT_enemy_ship_5_shadow] = image_enemy_ship_5_shadow;
+	image_entries[image_LUT_enemy_ship_6_light] = image_enemy_ship_6_light;
+	image_entries[image_LUT_enemy_ship_6_shadow] = image_enemy_ship_6_shadow;
 	image_entries[image_LUT_boss1_enemy_ship_light] = image_boss1_enemy_ship_light;
 	image_entries[image_LUT_boss1_enemy_ship_shadow] = image_boss1_enemy_ship_shadow;
 	image_entries[image_LUT_boss1_grenade_light] = image_boss1_grenade_light;

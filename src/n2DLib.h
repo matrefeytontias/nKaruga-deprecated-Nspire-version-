@@ -1,11 +1,14 @@
 #ifndef INCLUDE_GRAFX
 #define INCLUDE_GRAFX
 
-#include <os.h>
+#include <libndls.h>
 #include <stdarg.h>
 
-#define min(a, b) ((a) < (b) ? (a) : (b))
+// Add those functions for C++ compiler under Linux
+#if !defined(min) && !defined(max)
 #define max(a, b) ((a) > (b) ? (a) : (b))
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#endif
 
 typedef int Fixed;
 typedef struct
@@ -18,6 +21,7 @@ typedef struct
 
 #define itofix(x) ((x) << 8)
 #define fixtoi(x) ((x) >> 8)
+#define fixmul(x, y) ((x)*  (y) >> 8)
 #define fixdiv(x, y) (((x) << 8) / (y))
 #define clamp(x, a, b) min(max(x, a), b)
 #define sign(x) ((x) < 0)
@@ -27,7 +31,6 @@ typedef struct
 extern "C" {
 #endif
 
-extern Fixed fixmul(Fixed x, Fixed y);
 extern Fixed fixcos(Fixed angle);
 extern void rotate(int x, int y, int cx, int cy, Fixed angle, Rect* out);
 extern void getBoundingBox(int x, int y, int w, int h, int cx, int cy, Fixed angle, Rect *out);

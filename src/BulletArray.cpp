@@ -2,18 +2,10 @@
 
 BulletArray::BulletArray()
 {
-	for(int i = 0; i < MAX_BULLET; i++)
-		data[i].deactivate();
-	for(int i = 0; i < MAX_FRAGMENT; i++)
-		data_fragment[i].deactivate();
-	for(int i = 0; i < MAX_HOMING; i++)
-		data_homing[i].deactivate();
+	clear();
+	// lasers too
 	for(int i = 0; i < MAX_LASER; i++)
 		data_laser[i].deactivate();
-	
-	bulletCount = 0;
-	fragmentCount = 0;
-	homingCount = 0;
 	laserCount = 0;
 }
 
@@ -268,7 +260,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 								// Hit, but doesn't hurt
 								cl->setAmplitude((int)sqrt(sq(fixtoi(p->x) - r->x) + sq(fixtoi(p->y) - r->y)));
 								// Using G_skipFrame as a delay
-								if(!G_skipFrame)
+								if(!(G_skipFrame % 4))
 								{
 									G_power += G_power < MAX_POWER;
 									G_score += SCORE_ABSORB;
@@ -365,4 +357,18 @@ void BulletArray::stop_laser(Enemy *e)
 			break;
 		}
 	}
+}
+
+// Destroy all bullets except for lasers
+void BulletArray::clear()
+{
+	for(int i = 0; i < MAX_BULLET; i++)
+		data[i].deactivate();
+	for(int i = 0; i < MAX_FRAGMENT; i++)
+		data_fragment[i].deactivate();
+	for(int i = 0; i < MAX_HOMING; i++)
+		data_homing[i].deactivate();
+	bulletCount = 0;
+	fragmentCount = 0;
+	homingCount = 0;
 }

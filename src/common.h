@@ -218,6 +218,7 @@ public:
 	void deactivate_fragment(int offset);
 	void deactivate_homing(int offset);
 	void stop_laser(Enemy *origin);
+	void clear();
 private:
 	Bullet data[MAX_BULLET];
 	PowerFragment data_fragment[MAX_FRAGMENT];
@@ -239,11 +240,13 @@ class Player
 public:
 	Player();
 	~Player();
+	void reset();
 	void handle(KeyEvent k, BulletArray *bArray);
 	bool getPolarity();
 	void switchPolarity();
 	void hurt();
 	int getLives();
+	void setLives(int);
 	bool isDying();
 	bool isHurtable();
 	// x, y on-screen
@@ -399,6 +402,7 @@ public:
 	DestroyedEnemies();
 	~DestroyedEnemies();
 	void activate(Enemy *origin, int offset);
+	void clear();
 	int x[MAX_ENEMY];
 	int y[MAX_ENEMY];
 	bool relevant[MAX_ENEMY];

@@ -2,13 +2,6 @@
 
 Player::Player()
 {
-	polarity = LIGHT;
-	fireRepeat = false;
-	polarityRepeat = false;
-	dying = false;
-	isSwitchingPolarity = 0;
-	fireDelay = 32;
-	lives = 5;
 	img[LIGHT] = image_entries[image_LUT_player_ship_light];
 	img[SHADOW] = image_entries[image_LUT_player_ship_shadow];
 	img[LIGHT + SWITCHING0] = image_entries[image_LUT_player_ship_polarityswitch_0_light];
@@ -16,8 +9,20 @@ Player::Player()
 	img[LIGHT + SWITCHING1] = image_entries[image_LUT_player_ship_polarityswitch_1_light];
 	img[SHADOW + SWITCHING1] = image_entries[image_LUT_player_ship_polarityswitch_1_shadow];
 	deathCounter = 0;
+	dying = false;
 	x = 0;
 	y = 0;
+	reset();
+}
+
+void Player::reset()
+{
+	polarity = LIGHT;
+	fireRepeat = false;
+	polarityRepeat = false;
+	isSwitchingPolarity = 0;
+	fireDelay = 32;
+	lives = 4;
 }
 
 Player::~Player()
@@ -129,15 +134,13 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 	{
 		if(deathCounter < 12)
 		{
+			r.x = fixtoi(x);
+			r.y = fixtoi(y);
+			DC->add(image_entries[image_LUT_player_explosion_0 + deathCounter], &r);
 			// Death animation
 			// Uses frameskipping as a counter
-			if(!G_skipFrame)
-			{
-				r.x = fixtoi(x);
-				r.y = fixtoi(y);
-				DC->add(image_entries[image_LUT_player_explosion_0 + deathCounter], &r);
+			if(!(G_skipFrame % 8))
 				deathCounter++;
-			}
 		}
 		else if(deathCounter == 12)
 		{
@@ -151,7 +154,6 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 		// get the player back in the game !
 		else if(y > itofix(180))
 		{
-			//~ drawSprite(image_entries[image_LUT_player_ship_light], fixtoi(x) - w, fixtoi(y) - h);
 			r.x = fixtoi(x);
 			r.y = fixtoi(y);
 			DC->add(image_entries[image_LUT_player_ship_light], &r);
@@ -185,6 +187,11 @@ void Player::hurt()
 int Player::getLives()
 {
 	return lives;
+}
+
+void Player::setLives(int l)
+{
+	lives = l;
 }
 
 bool Player::isDying()

@@ -24,7 +24,7 @@ void DrawingCandidates::add(unsigned short *img, Rect *pos, Rect *center, Fixed 
 
 void DrawingCandidates::flush()
 {
-	if(!G_skipFrame)
+	if(!(G_skipFrame % 4))
 	{
 		for(int i = 0; i < candidatesCount; i++)
 		{

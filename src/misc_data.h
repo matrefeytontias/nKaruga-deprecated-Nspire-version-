@@ -4,6 +4,8 @@ static const char string_nKaruga_config[] = "nKaruga.cfg.tns";
 
 static const char string_title[] = "Press Enter to start or Del to quit";
 
+static const char string_continue[] = "Continue ? (Enter/Del : yes/no)";
+
 #define TITLE_OPTIONS 5
 static const char *string_options[TITLE_OPTIONS] = {
 	"nPlay\n",
@@ -36,5 +38,5 @@ static const char *string_results[6] = {
 	"Grade\n\n"
 };
 
-int power_fill_offsets[] = { 1, 2, 1, 5, 1, 8, 1, 10, 1, 10, 1, 10, 1, 10, 3, 10, 6, 10, 9, 10 };
+static const int power_fill_offsets[] = { 1, 2, 1, 5, 1, 8, 1, 10, 1, 10, 1, 10, 1, 10, 3, 10, 6, 10, 9, 10 };
 #endif

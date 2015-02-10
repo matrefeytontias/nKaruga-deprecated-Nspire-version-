@@ -428,7 +428,7 @@ void playGame()
 		}
 		else if(gamePhase == PHASE_TRANSITION)
 		{
-			if(!G_skipFrame) fillRect(0, 0, currentW, 240, 0);
+			if(!(G_skipFrame % 4)) fillRect(0, 0, currentW, 240, 0);
 			if(currentW == 0)
 			{
 				#define TRANSLATE 240
@@ -442,7 +442,7 @@ void playGame()
 					currentW++;
 			}
 			else
-				if(!G_skipFrame)
+				if(!(G_skipFrame % 4))
 				{
 					levelRect.x = 10;
 					levelRect.y = 60;
@@ -494,14 +494,53 @@ void playGame()
 		
 		G_particles->handle();
 		
-		if(!ship.getLives())
-			levelEnded = 1;
-		
 		// Draw everything that has to be drawn
 		DC->flush();
 		
+		// Put that here and test G_skipFrame so that the game is fully drawn when the game over screen shows
+		// Wait for the ship's explosion and the small delay to complete
+		if(!ship.getLives() && ship.deathCounter > 12 && !(G_skipFrame % 4))
+		{
+			// #####################
+			// TODO : save highscore
+			// #####################
+			
+			bool hasPressed = false;
+			// Display "continue" screen
+			int x = (320 - stringWidth(string_continue)) / 2;
+			int y = 120;
+			drawString(&x, &y, x, string_continue, 0xffff, 0x0000);
+			updateScreen();
+			while(!hasPressed)
+			{
+				if(isKeyPressed(KEY_NSPIRE_ENTER))
+				{
+					hasPressed = true;
+					// - initialise a new ship
+					ship.reset();
+					// - score and power set to 0
+					G_score = 0; // ouch
+					G_power = 0;
+					// - chains to 0
+					G_chainStatus = 0;
+					G_frameChainOffset = 0;
+					G_inChainCount = 0;
+					G_maxChain = 0; // I know that this one hurts but it has to be done ;_;
+					// - DO NOT RESET DOT EATER ACHIEVEMENT
+					// - destroy all bullets and dead enemies data (no posthumous scoring)
+					bArray->clear();
+					G_enemiesArray.deadEnemies.clear();
+				}
+				else if(isKeyPressed(KEY_NSPIRE_DEL))
+				{
+					hasPressed = true;
+					levelEnded = 1;
+				}
+			}
+		}
+		
 		// Things drawn within this block MUST NOT be candidates
-		if(!G_skipFrame)
+		if(!(G_skipFrame % 4))
 		{
 			// Draw score and chains
 			statsRect.x = statsRect.y = 0;
@@ -666,7 +705,7 @@ void playGame()
 		#endif
 		
 		scrollOffset = (scrollOffset + 1) % 240;
-		G_skipFrame = (G_skipFrame + 1) % 4;
+		G_skipFrame++;
 		
 		// handle chaining
 		if(!G_fightingBoss)

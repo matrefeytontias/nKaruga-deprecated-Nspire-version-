@@ -378,7 +378,6 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 				pos = getJointPoint(be, boss1_jointData, joint_rightarm_nonarmed);
 				for(int i = 0; i < 5; i++)
 				{
-					printf("angle = %d, ", i * 32);
 					bArray->add_homing(itofix(pos.x), itofix(pos.y), i * 32, p, LIGHT);
 				}
 			}

@@ -1,6 +1,6 @@
 #include "common.h"
 
-Bullet::Bullet()
+Bullet::Bullet() : Entity()
 {
 	active = false;
 }
@@ -17,11 +17,6 @@ Rect* Bullet::makeRect()
 	return &r;
 }
 
-bool Bullet::isActive()
-{
-	return active;
-}
-
 void Bullet::activate(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, int imgID, bool _p, bool _h)
 {
 	active = true;
@@ -32,11 +27,6 @@ void Bullet::activate(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, int imgID, bool 
 	dx = _dx;
 	dy = _dy;
 	img = image_entries[imgID + (_p ? 1 : 0)];
-}
-
-void Bullet::deactivate()
-{
-	active = false;
 }
 
 bool Bullet::getPolarity()

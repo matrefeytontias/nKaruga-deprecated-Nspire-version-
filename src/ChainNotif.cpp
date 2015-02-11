@@ -1,6 +1,6 @@
 #include "common.h"
 
-ChainNotif::ChainNotif()
+ChainNotif::ChainNotif() : Entity()
 {
 	untilDeath = 0;
 }

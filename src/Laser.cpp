@@ -1,18 +1,14 @@
 #include "common.h"
 
-Laser::Laser()
+Laser::Laser() : Bullet()
 {
 	active = false;
+	hurtPlayer = true;
 }
 
 Laser::~Laser()
 {
 	
-}
-
-bool Laser::isActive()
-{
-	return active;
 }
 
 void Laser::activate(Enemy *e, bool _p)
@@ -21,11 +17,6 @@ void Laser::activate(Enemy *e, bool _p)
 	active = true;
 	polarity = _p;
 	amplitude = 0;
-}
-
-void Laser::deactivate()
-{
-	active = false;
 }
 
 void Laser::handle()
@@ -91,11 +82,6 @@ void Laser::draw()
 			y1 = y1 + sy;
 		}
 	}
-}
-
-bool Laser::getPolarity()
-{
-	return polarity;
 }
 
 Rect* Laser::getVector()

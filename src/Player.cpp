@@ -1,6 +1,6 @@
 #include "common.h"
 
-Player::Player()
+Player::Player() : Entity()
 {
 	img[LIGHT] = image_entries[image_LUT_player_ship_light];
 	img[SHADOW] = image_entries[image_LUT_player_ship_shadow];
@@ -9,7 +9,7 @@ Player::Player()
 	img[LIGHT + SWITCHING1] = image_entries[image_LUT_player_ship_polarityswitch_1_light];
 	img[SHADOW + SWITCHING1] = image_entries[image_LUT_player_ship_polarityswitch_1_shadow];
 	deathCounter = 0;
-	dying = false;
+	active = true;
 	x = 0;
 	y = 0;
 	reset();
@@ -33,7 +33,7 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 {
 	static Rect r, temp;
 	
-	if(!dying)
+	if(active)
 	{
 		// Display the player
 		r.x = fixtoi(x);
@@ -159,7 +159,7 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 			DC->add(image_entries[image_LUT_player_ship_light], &r);
 			y -= itofix(1);
 		}
-		else dying = false;
+		else active = true;
 	}
 }
 
@@ -176,7 +176,7 @@ void Player::switchPolarity()
 void Player::hurt()
 {
 	lives--;
-	dying = true;
+	active = false;
 	deathCounter = 0;
 	G_chainStatus = 0;
 	G_frameChainOffset = 0;
@@ -194,12 +194,7 @@ void Player::setLives(int l)
 	lives = l;
 }
 
-bool Player::isDying()
-{
-	return dying;
-}
-
 bool Player::isHurtable()
 {
-	return !dying && !deathCounter;
+	return active && !deathCounter;
 }

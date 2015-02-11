@@ -89,8 +89,8 @@ int getPatternID(BossEnemy *be)
 Rect getJointPoint(BossEnemy *be, int data[][4], int offset)
 {
 	Rect result;
-	result.x = fixtoi(be->x) - bossImage_entries[bossImage_LUT_1_body][0] / 2 + data[offset][2];
-	result.y = fixtoi(be->y) - bossImage_entries[bossImage_LUT_1_body][1] / 2 + data[offset][3];
+	result.x = fixtoi(be->getx()) - bossImage_entries[bossImage_LUT_1_body][0] / 2 + data[offset][2];
+	result.y = fixtoi(be->gety()) - bossImage_entries[bossImage_LUT_1_body][1] / 2 + data[offset][3];
 	result.w = data[offset][0];
 	result.h = data[offset][1];
 	
@@ -118,16 +118,16 @@ void boss1_ib1(BossEnemy *be)
 	const int h = bossImage_entries[bossImage_LUT_1_body][1];
 	if(!be->initCallbackCalled)
 	{
-		be->x = itofix(160);
-		be->y = -itofix(h) / 2;
+		be->setx(itofix(160));
+		be->sety(-itofix(h) / 2);
 		be->maxHP = be->HP = getHPsum(be->HPperPattern, 0, be->patternsNb - 1);
 		be->setInternal(1, -32);
 		be->angle = 0;
 		be->initCallbackCalled = true;
 		be->setInternal(31, 0);
 	}
-	if(be->y < itofix(h) / 2)
-		be->y += 64;
+	if(be->gety() < itofix(h) / 2)
+		be->sety(be->gety() + 64);
 	else
 	{
 		// [31] : pause timer
@@ -154,7 +154,7 @@ void boss1_ib1(BossEnemy *be)
 			}
 		}
 	}
-	Rect pos = { fixtoi(be->x), fixtoi(be->y), 0, 0 }, centerRot;
+	Rect pos = { fixtoi(be->getx()), fixtoi(be->gety()), 0, 0 }, centerRot;
 	DC->add(bossImage_entries[bossImage_LUT_1_body], &pos);
 	
 	pos = getJointPoint(be, boss1_jointData, joint_rightarm_armed1);
@@ -164,7 +164,7 @@ void boss1_ib1(BossEnemy *be)
 	
 	// [1]: angle of sword [-32, 0]
 	pos = getJointPoint(be, boss1_jointData, joint_leftarm_armed);
-	rotate(pos.x, pos.y, fixtoi(be->x), fixtoi(be->y), be->angle, &pos);
+	rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
 	centerRot.x = pos.w;
 	centerRot.y = pos.h;
 	DC->add(bossImage_entries[bossImage_LUT_1_leftarm_armed], &pos, &centerRot, be->getInternal(1) + be->angle);
@@ -177,8 +177,8 @@ void boss1_ib2(BossEnemy *be)
 	Rect pos, centerRot;
 	if(!be->initCallbackCalled)
 	{
-		dx = (itofix(160) - be->x) / 128;
-		dy = (itofix(h / 2) - be->y) / 128;
+		dx = (itofix(160) - be->getx()) / 128;
+		dy = (itofix(h / 2) - be->gety()) / 128;
 		pos = getJointPoint(be, boss1_jointData, be->currentPattern == 1 ? joint_leftarm_armed : joint_rightarm_armed2);
 		initExplosionEffect(pos.x, pos.y, 150, 0);
 		be->initCallbackCalled = true;
@@ -186,10 +186,10 @@ void boss1_ib2(BossEnemy *be)
 	}
 	updateExplosionEffect();
 	
-	if(fixtoi(be->x) != 160 || fixtoi(be->y) != h / 2)
+	if(fixtoi(be->getx()) != 160 || fixtoi(be->gety()) != h / 2)
 	{
-		be->x += dx;
-		be->y += dy;
+		be->setx(be->getx() + dx);
+		be->sety(be->gety() + dy);
 	}
 	else
 	{
@@ -207,8 +207,8 @@ void boss1_ib2(BossEnemy *be)
 		be->incInternal(31);
 	}
 		
-	pos.x = fixtoi(be->x);
-	pos.y = fixtoi(be->y);
+	pos.x = fixtoi(be->getx());
+	pos.y = fixtoi(be->gety());
 	DC->add(bossImage_entries[bossImage_LUT_1_body], &pos);
 	
 	pos = getJointPoint(be, boss1_jointData, be->currentPattern == 1 ? joint_rightarm_armed1 : joint_rightarm_nonarmed);
@@ -217,7 +217,7 @@ void boss1_ib2(BossEnemy *be)
 	DC->add(bossImage_entries[be->currentPattern == 1 ? bossImage_LUT_1_rightarm_armed1 : bossImage_LUT_1_rightarm_nonarmed], &pos, &centerRot, be->angle);
 	
 	pos = getJointPoint(be, boss1_jointData, joint_leftarm_nonarmed);
-	rotate(pos.x, pos.y, fixtoi(be->x), fixtoi(be->y), be->angle, &pos);
+	rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
 	centerRot.x = pos.w;
 	centerRot.y = pos.h;
 	DC->add(bossImage_entries[bossImage_LUT_1_leftarm_nonarmed], &pos, &centerRot, be->angle);
@@ -229,8 +229,8 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 {
 	Rect pos, centerRot;
 	
-	pos.x = fixtoi(be->x);
-	pos.y = fixtoi(be->y);
+	pos.x = fixtoi(be->getx());
+	pos.y = fixtoi(be->gety());
 	DC->add(bossImage_entries[bossImage_LUT_1_body], &pos, NULL, be->angle);
 	
 	be->currentPattern = getPatternID(be);
@@ -249,18 +249,18 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 	if(!be->currentPattern)
 	{
 		// Slowly move and rotate the boss to fire everywhere
-		be->x -= fixcos(be->getInternal(0) / 8) / 4;
+		be->setx(be->getx() - fixcos(be->getInternal(0) / 8) / 4);
 		be->angle = fixmul(12, fixsin(be->getInternal(0) / 8));
 		be->incInternal(0);
 		
 		pos = getJointPoint(be, boss1_jointData, joint_rightarm_armed1);
-		rotate(pos.x, pos.y, fixtoi(be->x), fixtoi(be->y), be->angle, &pos);
+		rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
 		centerRot.x = pos.w;
 		centerRot.y = pos.h;
 		DC->add(bossImage_entries[bossImage_LUT_1_rightarm_armed1], &pos, &centerRot, be->angle);
 		
 		pos = getJointPoint(be, boss1_jointData, joint_leftarm_armed);
-		rotate(pos.x, pos.y, fixtoi(be->x), fixtoi(be->y), be->angle, &pos);
+		rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
 		centerRot.x = pos.w;
 		centerRot.y = pos.h;
 		DC->add(bossImage_entries[bossImage_LUT_1_leftarm_armed], &pos, &centerRot, be->angle);
@@ -293,18 +293,18 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 	{
 		unsigned short *img = bossImage_entries[bossImage_LUT_1_rightarm_armed2];
 		// Display things the exact same way as in pattern 1
-		be->x -= fixcos(be->getInternal(0) / 8) / 4;
+		be->setx(be->getx() - fixcos(be->getInternal(0) / 8) / 4);
 		be->angle = fixmul(12, fixsin(be->getInternal(0) / 8));
 		be->incInternal(0);
 		
 		pos = getJointPoint(be, boss1_jointData, joint_leftarm_nonarmed);
-		rotate(pos.x, pos.y, fixtoi(be->x), fixtoi(be->y), be->angle, &pos);
+		rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
 		centerRot.x = pos.w;
 		centerRot.y = pos.h;
 		DC->add(bossImage_entries[bossImage_LUT_1_leftarm_nonarmed], &pos, &centerRot, be->angle);
 		
 		pos = getJointPoint(be, boss1_jointData, joint_rightarm_armed2);
-		rotate(pos.x, pos.y, fixtoi(be->x), fixtoi(be->y), be->angle, &pos);
+		rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
 		centerRot.x = pos.w;
 		centerRot.y = pos.h;
 		DC->add(bossImage_entries[bossImage_LUT_1_rightarm_armed2], &pos, &centerRot, be->angle);
@@ -349,7 +349,7 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 		DC->add(bossImage_entries[bossImage_LUT_1_leftarm_nonarmed], &pos, &centerRot, be->getInternal(2));
 		
 		pos = getJointPoint(be, boss1_jointData, joint_rightarm_nonarmed);
-		rotate(pos.x, pos.y, fixtoi(be->x), fixtoi(be->y), be->angle, &pos);
+		rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
 		centerRot.x = pos.w;
 		centerRot.y = pos.h;
 		DC->add(bossImage_entries[bossImage_LUT_1_rightarm_nonarmed], &pos, &centerRot, be->getInternal(3));
@@ -398,8 +398,8 @@ int boss1_ccb1(BossEnemy *be, Bullet *b, int amount)
 	
 	getBoundingBox(jointPos.x - jointPos.w, jointPos.y - jointPos.h, img[0], img[1], jointPos.x, jointPos.y, be->angle, &box);
 	
-	if(box.x <= fixtoi(b->x) && box.x + box.w >= fixtoi(b->x) &&
-		box.y <= fixtoi(b->y) && box.y + box.h >= fixtoi(b->y))
+	if(box.x <= fixtoi(b->getx()) && box.x + box.w >= fixtoi(b->getx()) &&
+		box.y <= fixtoi(b->gety()) && box.y + box.h >= fixtoi(b->gety()))
 	{
 		G_score += b->getPolarity() == SHADOW ? SCORE_HIT_OP : SCORE_HIT;
 		return ((b->getPolarity() == SHADOW) + 1) * amount;
@@ -416,8 +416,8 @@ int boss1_ccb2(BossEnemy *be, Bullet *b, int amount)
 	
 	getBoundingBox(jointPos.x - jointPos.w, jointPos.y - jointPos.h, img[0], img[1], jointPos.x, jointPos.y, be->angle, &box);
 	
-	if(box.x <= fixtoi(b->x) && box.x + box.w >= fixtoi(b->x) &&
-		box.y <= fixtoi(b->y) && box.y + box.h >= fixtoi(b->y))
+	if(box.x <= fixtoi(b->getx()) && box.x + box.w >= fixtoi(b->getx()) &&
+		box.y <= fixtoi(b->gety()) && box.y + box.h >= fixtoi(b->gety()))
 	{
 		G_score += b->getPolarity() == LIGHT ? SCORE_HIT_OP : SCORE_HIT;
 		return ((b->getPolarity() == LIGHT) + 1) * amount;
@@ -430,8 +430,8 @@ int boss1_ccb3(BossEnemy *be, Bullet *b, int amount)
 {
 	const unsigned short *img = bossImage_entries[bossImage_LUT_1_body];
 	
-	if(be->x - itofix(img[0]) / 2 <= b->x && be->x + itofix(img[0]) / 2 >= b->x &&
-		be->y - itofix(img[1]) / 2 <= b->y && be->y + itofix(img[1]) / 2 >= b->y)
+	if(be->getx() - itofix(img[0]) / 2 <= b->getx() && be->getx() + itofix(img[0]) / 2 >= b->getx() &&
+		be->gety() - itofix(img[1]) / 2 <= b->gety() && be->gety() + itofix(img[1]) / 2 >= b->gety())
 	{
 		G_score += b->getPolarity() == SHADOW ? SCORE_HIT_OP : SCORE_HIT;
 		return ((b->getPolarity() == SHADOW) + 1) * amount;

@@ -1,18 +1,14 @@
 #include "common.h"
 
-Homing::Homing()
+Homing::Homing() : Bullet()
 {
 	active = false;
+	hurtPlayer = true;
 }
 
 Homing::~Homing()
 {
 	
-}
-
-bool Homing::isActive()
-{
-	return active;
 }
 
 void Homing::activate(Fixed _x, Fixed _y, Fixed initialAngle, Player *_target, bool _p)
@@ -30,16 +26,6 @@ void Homing::activate(Fixed _x, Fixed _y, Fixed initialAngle, Player *_target, b
 		previousX[i] = x;
 		previousY[i] = y;
 	}
-}
-
-void Homing::deactivate()
-{
-	active = false;
-}
-
-bool Homing::getPolarity()
-{
-	return polarity;
 }
 
 #define HOMING_SPEED itofix(1)
@@ -61,7 +47,7 @@ bool Homing::handle()
 	{
 		if(aimTimer % 2)
 		{
-			if(((angle - angleToPlayer(this, target)) & 0xff) > 128)
+			if(((angle - angleToEntity(this, target)) & 0xff) > 128)
 				angle++;
 			else
 				angle--;

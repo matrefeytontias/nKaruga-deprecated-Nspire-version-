@@ -2,10 +2,10 @@
 
 inline Fixed angleToPlayer(Enemy *e, Player *p)
 {
-	return (int)(atan2((double)(p->y - e->gety()), (double)(p->x - e->getx())) * 128. / M_PI);
+	return (int)(atan2((double)(p->gety() - e->gety()), (double)(p->getx() - e->getx())) * 128. / M_PI);
 }
 
-Enemy::Enemy()
+Enemy::Enemy() : Entity()
 {
 	active = false;
 	diedThisFrame = false;
@@ -59,7 +59,7 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 			if(!ghost)
 			{
 				// Check wether the player hit the enemy
-				if(p->isHurtable() && (p->x >= getx() - (itofix(img[0]) / 2) && p->x < getx() + (itofix(img[0]) / 2)) && (p->y >= gety() - (itofix(img[0]) / 2) && p->y <= gety() + (itofix(img[1]) / 2)))
+				if(p->isHurtable() && (p->getx() >= getx() - (itofix(img[0]) / 2) && p->getx() < getx() + (itofix(img[0]) / 2)) && (p->gety() >= gety() - (itofix(img[0]) / 2) && p->gety() <= gety() + (itofix(img[1]) / 2)))
 				{
 					p->hurt();
 				}
@@ -71,11 +71,6 @@ void Enemy::handle(Player *p, BulletArray *bArray)
 		diedThisFrame = false;
 		isJointed = false;
 	}
-}
-
-bool Enemy::isActive()
-{
-	return active;
 }
 
 void Enemy::activate(int _x, int _y, int _HP, int shipImgID, int callbackID, int _waveIndex, bool _polarity, bool _hasRotation, int _f, bool _ghost)
@@ -95,12 +90,6 @@ void Enemy::activate(int _x, int _y, int _HP, int shipImgID, int callbackID, int
 		internal[i] = 0;
 	ghost = _ghost;
 	active = true;
-}
-
-void Enemy::deactivate()
-{
-	active = false;
-	// delete this;
 }
 
 void Enemy::damage(Player *_p, bool _pol, int amount, BulletArray *bArray)

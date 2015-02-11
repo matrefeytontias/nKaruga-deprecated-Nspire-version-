@@ -55,6 +55,23 @@ extern KeyEvent getk();
 
 #define MAX_DISPLAYABLE 1000
 
+class Entity
+{
+public:
+	Entity();
+	~Entity();
+	Fixed getx();
+	Fixed gety();
+	void setx(Fixed);
+	void sety(Fixed);
+	bool isActive();
+	void activate();
+	void deactivate();
+protected:
+	bool active;
+	Fixed x, y;
+};
+
 class DrawingCandidate
 {
 public:
@@ -85,26 +102,21 @@ private:
 };
 
 // Both enemies and player can fire them
-class Bullet
+class Bullet : public Entity
 {
 public:
 	Bullet();
 	~Bullet();
 	Rect* makeRect();
-	bool isActive();
 	void activate(Fixed x, Fixed y, Fixed dx, Fixed dy, int imageID, bool polarity, bool hurtsPlayer);
-	void deactivate();
 	bool getPolarity();
 	bool hurtsPlayer();
 	bool handle();
 	void draw();
-	// x, y on-screen
-	Fixed x, y;
 	// speed
 	Fixed dx, dy;
 	unsigned short *img;
-private:
-	bool active;
+protected:
 	bool polarity;
 	bool hurtPlayer;
 };
@@ -112,25 +124,19 @@ private:
 class Player;
 
 // Only enemies can fire them
-class Homing
+// So hurtPlayer is always true
+class Homing : public Bullet
 {
 public:
 	Homing();
 	~Homing();
-	bool isActive();
 	void activate(Fixed x, Fixed y, Fixed initialAngle, Player *target, bool polarity);
-	void deactivate();
-	bool getPolarity();
 	bool handle();
 	void draw();
-	Fixed x;
-	Fixed y;
 	Player* target;
 private:
-	bool polarity;
 	Fixed previousX[HOMING_TRAILING];
 	Fixed previousY[HOMING_TRAILING];
-	bool active;
 	Fixed angle;
 	int aimTimer;
 };
@@ -139,20 +145,14 @@ class Enemy;
 class BossEnemy;
 
 // Both enemies and player can fire them
-class PowerFragment
+class PowerFragment : public Bullet
 {
 public:
 	PowerFragment();
 	~PowerFragment();
-	bool isActive();
 	void activate(Fixed x, Fixed y, Fixed initialAngle, Player *target, bool polarity, bool hurtsPlayer);
-	void deactivate();
-	bool getPolarity();
-	bool hurtsPlayer();
 	bool handle();
 	void draw();
-	Fixed x;
-	Fixed y;
 	// Polar coordinates of speed
 	Fixed speed;
 	Fixed angle;
@@ -162,37 +162,27 @@ public:
 private:
 	Fixed previousX[FRAGMENT_TRAILING];
 	Fixed previousY[FRAGMENT_TRAILING];
-	bool polarity;
-	bool active;
-	bool hurtPlayer;
 	// Determine if the initial angle has been reached once already
 	bool hasReachedAngle;
 	int skipPositionRecord;
 };
 
 // Only enemies can fire them
-class Laser
+class Laser : public Bullet
 {
 public:
 	Laser();
 	~Laser();
-	bool isActive();
 	void activate(Enemy *origin, bool polarity);
-	void deactivate();
 	void handle();
 	void draw();
-	bool getPolarity();
 	Rect* getVector();
 	void getSides(Rect *side1, Rect *side2);
 	int getAmplitude();
 	void setAmplitude(int amp);
 	Fixed angle;
 	Enemy *origin;
-	int x;
-	int y;
 private:
-	bool active;
-	bool polarity;
 	// Lasers are not immediate, they grow
 	Fixed amplitude;
 };
@@ -235,7 +225,7 @@ private:
 };
 
 // Player
-class Player
+class Player : public Entity
 {
 public:
 	Player();
@@ -247,10 +237,7 @@ public:
 	void hurt();
 	int getLives();
 	void setLives(int);
-	bool isDying();
 	bool isHurtable();
-	// x, y on-screen
-	Fixed x, y;
 	// Ship images, light and shadow
 	// First two are "normal" ship
 	// Other four are polarity transition animation frames (frame 0 light/shadow, frame 1 light/shadow)
@@ -266,7 +253,6 @@ private:
 	// Key repeat handlers
 	bool fireRepeat;
 	bool polarityRepeat;
-	bool dying;
 	int lives;
 } ;
 
@@ -274,15 +260,13 @@ private:
 // For real this time
 #define MAX_ENEMY 46
 
-class Enemy
+class Enemy : public Entity
 {
 public:
 	Enemy();
 	~Enemy();
 	void handle(Player *player, BulletArray *bArray);
-	bool isActive();
 	void activate(int x, int y, int HP, int shipImgID, int callbackID, int waveIndex, bool polarity, bool hasRotation, int firebackAmount, bool ghost);
-	void deactivate();
 	void damage(Player *player, bool polarity, int amount, BulletArray *bArray);
 	void joint(int offset, Fixed x, Fixed y, bool diesWithJoint);
 	Fixed getRotation();
@@ -293,12 +277,10 @@ public:
 	Fixed getx();
 	Fixed gety();
 	// x, y on-screen
-	Fixed x, y;
 	// Enemy image
 	unsigned short *img;
 	bool diedThisFrame;
 private:
-	bool active;
 	// Ghost enemies have no interaction with anything
 	bool ghost;
 	int HP;
@@ -357,7 +339,7 @@ typedef struct
 } BossData;
 
 // The really big bad one
-class BossEnemy
+class BossEnemy : public Entity
 {
 public:
 	BossEnemy();
@@ -372,7 +354,6 @@ public:
 	void decInternal(int offset);
 	int getInternal(int offset);
 	int getTimeout();
-	Fixed x, y;
 	Fixed angle;
 	int HP;
 	int maxHP;
@@ -409,7 +390,7 @@ public:
 };
 
 // Explosion animations
-class ExplosionAnim
+class ExplosionAnim : public Entity
 {
 public:
 	ExplosionAnim();
@@ -417,8 +398,6 @@ public:
 	void activate(int, int, bool);
 	void handle();
 private:
-	int x;
-	int y;
 	int counter;
 	bool polarity;
 };
@@ -462,7 +441,7 @@ private:
 };
 
 // Text notifications of score-chaining
-class ChainNotif
+class ChainNotif : public Entity
 {
 public:
 	ChainNotif();
@@ -470,8 +449,7 @@ public:
 	void activate(int x, int y, int value);
 	void handle();
 private:
-	int x, backupX;
-	int y;
+	Fixed backupX;
 	// Number to display
 	int value;
 	bool maxChain;
@@ -672,11 +650,7 @@ extern BossEnemy *G_bossEnemy;
 extern Particles *G_particles;
 
 // Utils
-extern Fixed angleToPlayer(Enemy*, Player*);
-extern Fixed angleToEnemy(PowerFragment*, Enemy*);
-extern Fixed angleToBoss(PowerFragment*, BossEnemy*);
-extern Fixed angleToPlayer(PowerFragment*, Player*);
-extern Fixed angleToPlayer(Homing*, Player*);
+extern Fixed angleToEntity(Entity*, Entity*);
 extern Enemy* findNearestEnemy(Fixed x, Fixed y);
 extern int distance(int x1, int y1, int x2, int y2);
 extern BossData createBossData(int bossID);

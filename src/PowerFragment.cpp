@@ -1,6 +1,6 @@
 #include "common.h"
 
-PowerFragment::PowerFragment()
+PowerFragment::PowerFragment() : Bullet()
 {
 	active = false;
 	hasReachedAngle = false;
@@ -9,11 +9,6 @@ PowerFragment::PowerFragment()
 PowerFragment::~PowerFragment()
 {
 	
-}
-
-bool PowerFragment::isActive()
-{
-	return active;
 }
 
 void PowerFragment::activate(Fixed _x, Fixed _y, Fixed initialAngle, Player *_targetP, bool _p, bool _h)
@@ -39,21 +34,6 @@ void PowerFragment::activate(Fixed _x, Fixed _y, Fixed initialAngle, Player *_ta
 		previousX[i] = x;
 		previousY[i] = y;
 	}
-}
-
-void PowerFragment::deactivate()
-{
-	active = false;
-}
-
-bool PowerFragment::getPolarity()
-{
-	return polarity;
-}
-
-bool PowerFragment::hurtsPlayer()
-{
-	return hurtPlayer;
 }
 
 bool PowerFragment::handle()
@@ -103,7 +83,7 @@ bool PowerFragment::handle()
 		if(hurtPlayer)
 		{
 			if(targetP->isHurtable())
-				angle = angleToPlayer(this, targetP);
+				angle = angleToEntity(this, targetP);
 		}
 		else
 		{
@@ -111,11 +91,11 @@ bool PowerFragment::handle()
 			if(targetE)
 			{
 				if(!G_fightingBoss)
-					angle = angleToEnemy(this, targetE);
-				else if(distance(fixtoi(x), fixtoi(y), fixtoi(targetB->x), fixtoi(targetB->y)) < distance(fixtoi(x), fixtoi(y), fixtoi(targetE->x), fixtoi(targetE->y)))
-					angle = angleToBoss(this, targetB);
+					angle = angleToEntity(this, targetE);
+				else if(distance(fixtoi(x), fixtoi(y), fixtoi(targetB->getx()), fixtoi(targetB->gety())) < distance(fixtoi(x), fixtoi(y), fixtoi(targetE->getx()), fixtoi(targetE->gety())))
+					angle = angleToEntity(this, targetB);
 				else
-					angle = angleToEnemy(this, targetE);
+					angle = angleToEntity(this, targetE);
 			}
 		}
 	}

@@ -14,7 +14,7 @@ BossData createBossData(int bossID)
 	return result;
 }
 
-BossEnemy::BossEnemy()
+BossEnemy::BossEnemy() : Entity()
 {
 	HP = 0;
 }

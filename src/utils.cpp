@@ -1,9 +1,9 @@
 #include "common.h"
 
-Fixed angleToPlayer(Enemy *e, Player *p)
+/*Fixed angleToPlayer(Enemy *e, Player *p)
 {
 	static Fixed lastResult = 64;
-	if(!p->isDying())
+	if(p->isActive())
 		lastResult = (int)(atan2((double)(p->y - e->gety()), (double)(p->x - e->getx())) * 128. / M_PI);
 	return lastResult;
 }
@@ -24,7 +24,7 @@ Fixed angleToBoss(PowerFragment *pf, BossEnemy *be)
 Fixed angleToPlayer(PowerFragment *pf, Player *p)
 {
 	static Fixed lastResult = 64;
-	if(!p->isDying())
+	if(p->isActive())
 		lastResult = (int)(atan2((double)(p->y - pf->y), (double)(p->x - pf->x)) * 128. / M_PI);
 	return lastResult;
 }
@@ -32,8 +32,16 @@ Fixed angleToPlayer(PowerFragment *pf, Player *p)
 Fixed angleToPlayer(Homing *h, Player *p)
 {
 	static Fixed lastResult = 64;
-	if(!p->isDying())
+	if(p->isActive())
 		lastResult = (int)(atan2((double)(p->y - h->y), (double)(p->x - h->x)) * 128. / M_PI);
+	return lastResult;
+}*/
+
+Fixed angleToEntity(Entity *e1, Entity *e2)
+{
+	static Fixed lastResult = 64;
+	if(e2->isActive())
+		lastResult = (int)(atan2((double)(e2->gety() - e1->gety()), (double)(e2->getx() - e1->getx())) * 128. / M_PI);
 	return lastResult;
 }
 

@@ -4,7 +4,7 @@
 #define EXPLOSION_W image_entries[image_LUT_explosion_light_0][0]
 #define EXPLOSION_H image_entries[image_LUT_explosion_light_0][1]
 
-ExplosionAnim::ExplosionAnim()
+ExplosionAnim::ExplosionAnim() : Entity()
 {
 	counter = 0;
 }

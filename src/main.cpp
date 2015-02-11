@@ -272,8 +272,8 @@ void playGame()
 	ChainNotif chainNotifsArray[MAX_ENEMY];
 	int currentNotif;
 	
-	ship.x = itofix(160);
-	ship.y = itofix(180);
+	ship.setx(itofix(160));
+	ship.sety(itofix(180));
 	
 	levelCounter = 0;
 	levelTimer = 0;
@@ -432,8 +432,8 @@ void playGame()
 			if(currentW == 0)
 			{
 				#define TRANSLATE 240
-				dX = (itofix(220) - ship.x) / TRANSLATE;
-				dY = (itofix(180) - ship.y) / TRANSLATE;
+				dX = (itofix(220) - ship.getx()) / TRANSLATE;
+				dY = (itofix(180) - ship.gety()) / TRANSLATE;
 				currentW++;
 			}
 			else if(currentW < 120)
@@ -480,8 +480,8 @@ void playGame()
 			G_tpstatus.y = G_tpinfo->height / 2;
 			if(gpTimer < TRANSLATE)
 			{
-				ship.x += dX;
-				ship.y += dY;
+				ship.setx(ship.getx() + dX);
+				ship.sety(ship.gety() + dY);
 			}
 			sleep(5);
 		}

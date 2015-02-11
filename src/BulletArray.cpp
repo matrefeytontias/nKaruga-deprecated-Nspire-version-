@@ -31,8 +31,8 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				if(cb->getPolarity() != p->getPolarity())
 				{
 					// the player has a 1px hitbox (for now) (but that actually seems to be enough)
-					if(p->x >= cb->x - itofix(cb->img[0] / 2) && p->x < cb->x + itofix(cb->img[0] / 2)
-					&& p->y >= cb->y - itofix(cb->img[1] / 2) && p->y < cb->y + itofix(cb->img[1] / 2))
+					if(p->getx() >= cb->getx() - itofix(cb->img[0] / 2) && p->getx() < cb->getx() + itofix(cb->img[0] / 2)
+					&& p->gety() >= cb->gety() - itofix(cb->img[1] / 2) && p->gety() < cb->gety() + itofix(cb->img[1] / 2))
 					{
 						p->hurt();
 						destroyBullet = true;
@@ -40,7 +40,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				}
 				else
 				{
-					if(sq(fixtoi(cb->x - p->x)) + sq(fixtoi(cb->y - p->y)) < sq(19)) // sqrt(player.w/2 ^2 + player.h/2 ^2)
+					if(sq(fixtoi(cb->getx() - p->getx())) + sq(fixtoi(cb->gety() - p->gety())) < sq(19)) // sqrt(player.w/2 ^2 + player.h/2 ^2)
 					{
 						destroyBullet = true;
 						G_score += SCORE_ABSORB;
@@ -55,10 +55,10 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				{
 					if(G_enemiesArray.data[j].isActive() && !G_enemiesArray.data[j].isGhost())
 					{
-						if(cb->x - itofix(cb->img[0] / 2) <= G_enemiesArray.data[j].getx() + itofix(G_enemiesArray.data[j].img[0] / 2) &&
-						cb->x + itofix(cb->img[0] / 2) >= G_enemiesArray.data[j].getx() - itofix(G_enemiesArray.data[j].img[0] / 2) &&
-						cb->y - itofix(cb->img[1] / 2) <= G_enemiesArray.data[j].gety() + itofix(G_enemiesArray.data[j].img[1] / 2) &&
-						cb->y + itofix(cb->img[1] / 2) >= G_enemiesArray.data[j].gety() - itofix(G_enemiesArray.data[j].img[1] / 2))
+						if(cb->getx() - itofix(cb->img[0] / 2) <= G_enemiesArray.data[j].getx() + itofix(G_enemiesArray.data[j].img[0] / 2) &&
+						cb->getx() + itofix(cb->img[0] / 2) >= G_enemiesArray.data[j].getx() - itofix(G_enemiesArray.data[j].img[0] / 2) &&
+						cb->gety() - itofix(cb->img[1] / 2) <= G_enemiesArray.data[j].gety() + itofix(G_enemiesArray.data[j].img[1] / 2) &&
+						cb->gety() + itofix(cb->img[1] / 2) >= G_enemiesArray.data[j].gety() - itofix(G_enemiesArray.data[j].img[1] / 2))
 						{
 							G_enemiesArray.data[j].damage(p, cb->getPolarity(), 1, this);
 							G_score += cb->getPolarity() != G_enemiesArray.data[j].getPolarity() ? SCORE_HIT_OP : SCORE_HIT;
@@ -106,8 +106,8 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				{
 					// the player has a 1px hitbox (for now) (but that actually seems to be enough)
 					// power fragments have a 8*8 hitbox
-					if(p->x >= cf->x - itofix(4) && p->x < cf->x + itofix(4)
-					&& p->y >= cf->y - itofix(4) && p->y < cf->y + itofix(4))
+					if(p->getx() >= cf->getx() - itofix(4) && p->getx() < cf->getx() + itofix(4)
+					&& p->gety() >= cf->gety() - itofix(4) && p->gety() < cf->gety() + itofix(4))
 					{
 						p->hurt();
 						destroyBullet = true;
@@ -115,7 +115,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				}
 				else
 				{
-					if(sq(fixtoi(cf->x - p->x)) + sq(fixtoi(cf->y - p->y)) < sq(p->img[0][0] / 2))
+					if(sq(fixtoi(cf->getx() - p->getx())) + sq(fixtoi(cf->gety() - p->gety())) < sq(p->img[0][0] / 2))
 					{
 						destroyBullet = true;
 						G_score += SCORE_ABSORB * 10;
@@ -131,10 +131,10 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				{
 					if(cf->targetE->isActive())
 					{
-						if(cf->x - itofix(4) <= cf->targetE->getx() + itofix(cf->targetE->img[0] / 2) &&
-						cf->x + itofix(4) >= cf->targetE->getx() - itofix(cf->targetE->img[0] / 2) &&
-						cf->y - itofix(4) <= cf->targetE->gety() + itofix(cf->targetE->img[1] / 2) &&
-						cf->y + itofix(4) >= cf->targetE->gety() - itofix(cf->targetE->img[1] / 2))
+						if(cf->getx() - itofix(4) <= cf->targetE->getx() + itofix(cf->targetE->img[0] / 2) &&
+						cf->getx() + itofix(4) >= cf->targetE->getx() - itofix(cf->targetE->img[0] / 2) &&
+						cf->gety() - itofix(4) <= cf->targetE->gety() + itofix(cf->targetE->img[1] / 2) &&
+						cf->gety() + itofix(4) >= cf->targetE->gety() - itofix(cf->targetE->img[1] / 2))
 						{
 							cf->targetE->damage(p, cf->getPolarity(), 10, this);
 							G_score += cf->getPolarity() != cf->targetE->getPolarity() ? SCORE_HIT_OP : SCORE_HIT;
@@ -148,7 +148,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				{
 					// Create a placeholder bullet to pass to the collision callback
 					Bullet temp;
-					temp.activate(cf->x, cf->y, 0, 0, 0, cf->getPolarity(), false);
+					temp.activate(cf->getx(), cf->gety(), 0, 0, 0, cf->getPolarity(), false);
 					bossDamaged = (be->collisionCallbacks[be->currentPattern])(be, &temp, 10);
 					temp.deactivate();
 					if(bossDamaged)
@@ -185,8 +185,8 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				{
 					// the player has a 1px hitbox (for now) (but that actually seems to be enough)
 					// homings have a 16*16 hitbox
-					if(p->x >= ch->x - itofix(8) && p->x < ch->x + itofix(8)
-					&& p->y >= ch->y - itofix(8) && p->y < ch->y + itofix(8))
+					if(p->getx() >= ch->getx() - itofix(8) && p->getx() < ch->getx() + itofix(8)
+					&& p->gety() >= ch->gety() - itofix(8) && p->gety() < ch->gety() + itofix(8))
 					{
 						p->hurt();
 						destroyBullet = true;
@@ -194,7 +194,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				}
 				else
 				{
-					if(sq(fixtoi(ch->x - p->x)) + sq(fixtoi(ch->y - p->y)) < sq(p->img[0][0] / 2))
+					if(sq(fixtoi(ch->getx() - p->getx())) + sq(fixtoi(ch->gety() - p->gety())) < sq(p->img[0][0] / 2))
 					{
 						destroyBullet = true;
 						G_score += SCORE_ABSORB * 5;
@@ -231,7 +231,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				{
 					// Uses cartesian hitbox for checking collision with player
 					// First, see if the player is not too far
-					if(sq(fixtoi(p->x) - r->x) + sq(fixtoi(p->y) - r->y) <= sq(cl->getAmplitude()))
+					if(sq(fixtoi(p->getx()) - r->x) + sq(fixtoi(p->gety()) - r->y) <= sq(cl->getAmplitude()))
 					{
 						// if we're not too far, carry on collision checking
 						// calculate the laser's cartesian equation and apply it to each of its sides
@@ -244,7 +244,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 						
 						if(p->getPolarity() != cl->getPolarity())
 						{
-							int temp = a * fixtoi(p->x) + b * fixtoi(p->y);
+							int temp = a * fixtoi(p->getx()) + b * fixtoi(p->gety());
 							// Work the player's 1 px hitbox
 							if(sign(temp + c1) != sign(temp + c2))
 								// Hit !
@@ -252,13 +252,13 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 						}
 						else
 						{
-							int temp1 = a * (fixtoi(p->x) - p->img[0][0] / 2) + b * fixtoi(p->y);
-							int temp2 = a * (fixtoi(p->x) + p->img[0][0] / 2) + b * fixtoi(p->y);
+							int temp1 = a * (fixtoi(p->getx()) - p->img[0][0] / 2) + b * fixtoi(p->gety());
+							int temp2 = a * (fixtoi(p->getx()) + p->img[0][0] / 2) + b * fixtoi(p->gety());
 							
 							if(sign(temp1 + c1) != sign(temp1 + c2) || sign(temp2 + c1) != sign(temp2 + c2))
 							{
 								// Hit, but doesn't hurt
-								cl->setAmplitude((int)sqrt(sq(fixtoi(p->x) - r->x) + sq(fixtoi(p->y) - r->y)));
+								cl->setAmplitude((int)sqrt(sq(fixtoi(p->getx()) - r->x) + sq(fixtoi(p->gety()) - r->y)));
 								// Using G_skipFrame as a delay
 								if(!(G_skipFrame % 4))
 								{
@@ -266,15 +266,15 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 									G_score += SCORE_ABSORB;
 								}
 								// Lasers are powerful, so they push the player
-								p->x += fixcos(cl->angle) / 2;
-								p->y += fixsin(cl->angle) / 2;
+								p->setx(p->getx() + fixcos(cl->angle) / 2);
+								p->sety(p->gety() + fixsin(cl->angle) / 2);
 								
 								// Add particles ! Yeeee !
 								int k = (rand() % 4) + 1;
 								for(int j = 0; j < k; j++)
 								{
 									Fixed a = cl->angle + 128 + (rand() % 64) - 32;
-									G_particles->add(p->x, p->y, fixcos(a) / 2, fixsin(a) / 2, cl->getPolarity());
+									G_particles->add(p->getx(), p->gety(), fixcos(a) / 2, fixsin(a) / 2, cl->getPolarity());
 								}
 							}
 						}

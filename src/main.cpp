@@ -243,7 +243,7 @@ void playGame()
 {
 	KeyEvent kEv = 0;
 	int levelCounter, levelTimer, waveIndex, scrollOffset = 0, pxScrollStart, pxScrollEnd, pauseTimer;
-	bool levelEnded = false, parsedEnemy = true;
+	bool gameEnded = false, parsedEnemy = true;
 	int readKeys = 0, gpTimer = 0;
 	int x, y;
 	
@@ -301,7 +301,7 @@ void playGame()
 	currentNotif = 0;
 	gpTimer = 0;
 	
-	while(!KQUIT(kEv) && !levelEnded)
+	while(!KQUIT(kEv) && !gameEnded)
 	{
 		gpTimer++;
 		G_waveTimer++;
@@ -408,8 +408,8 @@ void playGame()
 					}
 					else if(currentLevelByte == LVLSTR_END)
 					{
-						// End of the level
-						levelEnded = true;
+						// End of the game
+						gameEnded = true; 
 					}
 					else
 					{
@@ -534,7 +534,7 @@ void playGame()
 				else if(isKeyPressed(KEY_NSPIRE_DEL))
 				{
 					hasPressed = true;
-					levelEnded = 1;
+					gameEnded = 1;
 				}
 			}
 		}

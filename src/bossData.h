@@ -20,10 +20,11 @@ enum
 	NB_JOINT_BOSS1
 };
 
-/*
- * ####
+/* ####################
+ * 
  * DATA
- * ####
+ *
+ * ####################
  */
 
 // source(x, y) , destination(x, y)
@@ -47,10 +48,11 @@ int bossTimeoutPerPat[BOSS_NB][MAX_PATTERNS_PER_BOSS] = {
 	{ 150, 110, 70 }
 };
 
-/*
- * #####
+/* ####################
+ * 
  * UTILS
- * #####
+ *
+ * ####################
  */
 
 int getHPsum(int *a, int start, int end)
@@ -97,10 +99,11 @@ Rect getJointPoint(BossEnemy *be, int data[][4], int offset)
 	return result;
 }
 
-/*
- * ##############
- * AI PROGRAMMING
- * ##############
+/* ####################
+ * 
+ * BOSS PROGRAMMING
+ *
+ * ####################
  */
 
 // [x]: usage
@@ -112,8 +115,13 @@ Rect getJointPoint(BossEnemy *be, int data[][4], int offset)
  * ######
  */
 
-// Initialization callbacks
-void boss1_ib1(BossEnemy *be)
+/*
+ * ########################
+ * Initialization callbacks
+ * ########################
+ */
+ 
+void boss1_icb1(BossEnemy *be)
 {
 	const int h = bossImage_entries[bossImage_LUT_1_body][1];
 	if(!be->initCallbackCalled)
@@ -170,7 +178,7 @@ void boss1_ib1(BossEnemy *be)
 	DC->add(bossImage_entries[bossImage_LUT_1_leftarm_armed], &pos, &centerRot, be->getInternal(1) + be->angle);
 }
 
-void boss1_ib2(BossEnemy *be)
+void boss1_icb2(BossEnemy *be)
 {
 	const int h = bossImage_entries[bossImage_LUT_1_body][1];
 	static Fixed dx = 0, dy = 0;
@@ -223,7 +231,11 @@ void boss1_ib2(BossEnemy *be)
 	DC->add(bossImage_entries[bossImage_LUT_1_leftarm_nonarmed], &pos, &centerRot, be->angle);
 }
 
-// Behavior callbacks
+/*
+ * ###################
+ * Behaviour callbacks
+ * ###################
+ */
 
 void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 {
@@ -240,6 +252,7 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 		be->initCallbackCalled = false;
 		be->readyToGo = false;
 		G_enemiesArray.destroyAllEnemies(p, bArray);
+		bArray->clear();
 		return;
 	}
 	
@@ -386,7 +399,11 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 	}
 }
 
-// Collision CallBacks
+/*
+ * ###################
+ * Collision callbacks
+ * ###################
+ */
 
 // Hitbox : sword
 int boss1_ccb1(BossEnemy *be, Bullet *b, int amount)
@@ -438,12 +455,92 @@ int boss1_ccb3(BossEnemy *be, Bullet *b, int amount)
 	return 0;
 }
 
-boss_ib bossIBdata[BOSS_NB][MAX_PATTERNS_PER_BOSS] = {
-	{ boss1_ib1, boss1_ib2, boss1_ib2 }
+/*
+ * ##################
+ * Distance callbacks
+ * ##################
+ */
+
+// Target point : center of sword
+Fixed boss1_dcb1(BossEnemy *be, PowerFragment *pf)
+{
+	Rect pos = getJointPoint(be, boss1_jointData, joint_leftarm_armed);
+	rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
+	rotate(pos.x, pos.y + bossImage_entries[bossImage_LUT_1_leftarm_armed][1] / 2, pos.x, pos.y, be->angle, &pos);
+	return distance(pos.x, pos.y, fixtoi(pf->getx()), fixtoi(pf->gety()));
+}
+
+// Target point : center of shield
+Fixed boss1_dcb2(BossEnemy *be, PowerFragment *pf)
+{
+	Rect pos = getJointPoint(be, boss1_jointData, joint_rightarm_armed2);
+	rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
+	return distance(pos.x, pos.y, fixtoi(pf->getx()), fixtoi(pf->gety()));
+}
+
+// Target point : center of body
+Fixed boss1_dcb3(BossEnemy *be, PowerFragment *pf)
+{
+	return distance(fixtoi(be->getx()), fixtoi(be->gety()), fixtoi(pf->getx()), fixtoi(pf->gety()));
+}
+
+/*
+ * ###############
+ * Angle callbacks
+ * ###############
+ *
+ * Same target points as the distance callbacks
+ */
+
+Fixed boss1_acb1(BossEnemy *be, PowerFragment *pf)
+{
+	Entity temp;
+	Rect pos = getJointPoint(be, boss1_jointData, joint_leftarm_armed);
+	rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
+	rotate(pos.x, pos.y + bossImage_entries[bossImage_LUT_1_leftarm_armed][1] / 2, pos.x, pos.y, be->angle, &pos);
+	temp.activate();
+	temp.setx(itofix(pos.x));
+	temp.sety(itofix(pos.y));
+	return angleToEntity(pf, &temp);
+}
+
+Fixed boss1_acb2(BossEnemy *be, PowerFragment *pf)
+{
+	Entity temp;
+	Rect pos = getJointPoint(be, boss1_jointData, joint_rightarm_armed2);
+	rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
+	temp.activate();
+	temp.setx(itofix(pos.x));
+	temp.sety(itofix(pos.y));
+	return angleToEntity(pf, &temp);
+}
+
+Fixed boss1_acb3(BossEnemy *be, PowerFragment *pf)
+{
+	return angleToEntity(pf, be);
+}
+
+/* ####################
+ * 
+ * ADDITIONAL DATA
+ *
+ * ####################
+ */
+
+boss_icb bossICBdata[BOSS_NB][MAX_PATTERNS_PER_BOSS] = {
+	{ boss1_icb1, boss1_icb2, boss1_icb2 }
 };
 
 boss_cb bossCBdata[BOSS_NB] = { boss1_cb };
 
 boss_ccb bossCCBdata[BOSS_NB][MAX_PATTERNS_PER_BOSS] = {
 	{ boss1_ccb1, boss1_ccb2, boss1_ccb3 }
+};
+
+boss_dcb bossDCBdata[BOSS_NB][MAX_PATTERNS_PER_BOSS] = {
+	{ boss1_dcb1, boss1_dcb2, boss1_dcb3 }
+};
+
+boss_acb bossACBdata[BOSS_NB][MAX_PATTERNS_PER_BOSS] = {
+	{ boss1_acb1, boss1_acb2, boss1_acb3 }
 };

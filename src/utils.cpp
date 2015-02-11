@@ -2,10 +2,15 @@
 
 Fixed angleToEntity(Entity *e1, Entity *e2)
 {
-	static Fixed lastResult = 64;
+	static Fixed lastResult = 192;
 	if(e2->isActive())
 		lastResult = (int)(atan2((double)(e2->gety() - e1->gety()), (double)(e2->getx() - e1->getx())) * 128. / M_PI);
 	return lastResult;
+}
+
+int distance(int x1, int y1, int x2, int y2)
+{
+	return sq(x1 - x2) + sq(y1 - y2);
 }
 
 Enemy* findNearestEnemy(Fixed x, Fixed y)
@@ -32,7 +37,7 @@ Enemy* findNearestEnemy(Fixed x, Fixed y)
 	else
 	{
 		// If yes, find the actual nearest enemy
-		int lastDistance = sq(fixtoi(nearest->getx() - x)) + sq(fixtoi(nearest->gety() - y));
+		int lastDistance = distance(fixtoi(nearest->getx()), fixtoi(nearest->gety()), fixtoi(x), fixtoi(y));
 		int concurrentDistance;
 		
 		for(int i = 0; i < MAX_ENEMY; i++)
@@ -40,7 +45,7 @@ Enemy* findNearestEnemy(Fixed x, Fixed y)
 			if(G_enemiesArray.data[i].isActive() && !G_enemiesArray.data[i].isGhost())
 			{
 				ce = &G_enemiesArray.data[i];
-				concurrentDistance = sq(fixtoi(ce->getx() - x)) + sq(fixtoi(ce->gety() - y));
+				concurrentDistance = distance(fixtoi(ce->getx()), fixtoi(ce->gety()), fixtoi(x), fixtoi(y));
 				if(concurrentDistance < lastDistance)
 				{
 					nearest = ce;
@@ -50,11 +55,6 @@ Enemy* findNearestEnemy(Fixed x, Fixed y)
 		}
 		return nearest;
 	}
-}
-
-int distance(int x1, int y1, int x2, int y2)
-{
-	return sq(x1 - x2) + sq(y1 - y2);
 }
 
 KeyEvent getk(void)

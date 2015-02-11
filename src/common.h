@@ -69,6 +69,7 @@ public:
 	void deactivate();
 protected:
 	bool active;
+	bool isEnemy;
 	Fixed x, y;
 };
 
@@ -316,12 +317,36 @@ private:
  * Exceptionally, drawing should be taken care of in the callback using drawing candidates since bosses have complex graphical behaviors.
  */
 
-// Init callback (initialization hook)
-typedef void (*boss_ib)(BossEnemy*);
-// Behavior callback (handle behavior)
+// Initialization callback, handling pre-battle cinematics and such
+// Inputs :
+// - boss enemy to initialize
+// Output : none
+typedef void (*boss_icb)(BossEnemy*);
+// Behaviour callback, handling the boss's patterns during battle
+// Inputs :
+// - boss enemy to handle
+// - player object for aiming
+// - bullet array for firing bullets
+// Output : none
 typedef void (*boss_cb)(BossEnemy*, Player*, BulletArray*);
-// Collision callback (handle collision)
+// Collision callback, handling whether or not the boss is being hit by a bullet
+// Inputs :
+// - boss enemy to test
+// - bullet object
+// - amount of damage to deal if the boss is hit
 typedef int (*boss_ccb)(BossEnemy*, Bullet*, int);
+// Distance callback, handling distance calcualtion for when the boss is being aimed by power fragments
+// Inputs :
+// - boss enemy to test
+// - power fragment object
+// Output : distance to boss
+typedef Fixed (*boss_dcb)(BossEnemy*, PowerFragment*);
+// Angle callback, handling angle calculation for when the boss is being aimed by power fragments
+// Inputs :
+// - boss enemy to test
+// - power fragment object
+// Output : angle to boss
+typedef Fixed (*boss_acb)(BossEnemy*, PowerFragment*);
 
 typedef struct
 {
@@ -332,10 +357,10 @@ typedef struct
 	// Self-explanatory
 	int *HPperPattern;
 	int *timeoutPerPattern;
-	// Initialization callbacks, handling pre-battle cinematics and such
-	boss_ib *initCallbacks;
-	// Collision callbacks, handling collisions between the boss and bullets
+	boss_icb *initCallbacks;
 	boss_ccb *collisionCallbacks;
+	boss_dcb *distanceCallbacks;
+	boss_acb *angleCallbacks;
 } BossData;
 
 // The really big bad one
@@ -354,6 +379,8 @@ public:
 	void decInternal(int offset);
 	int getInternal(int offset);
 	int getTimeout();
+	Fixed getDistance(PowerFragment*);
+	Fixed getAngle(PowerFragment*);
 	Fixed angle;
 	int HP;
 	int maxHP;
@@ -364,14 +391,14 @@ public:
 	int patternsNb;
 	bool readyToGo;
 	bool initCallbackCalled;
-	// Initialization callbacks, handling pre-battle cinematics and such
-	boss_ib *initCallbacks;
+	boss_icb *initCallbacks;
 	boss_cb callback;
-	// Collision callbacks, handling collisions between the boss and bullets
 	boss_ccb *collisionCallbacks;
+	boss_dcb *distanceCallbacks;
+	boss_acb *angleCallbacks;
 private:
 	int remainingTime;
-	bool hurtable;
+	bool *hurtable;
 	// LOTS of internal registers
 	int internal[32];
 };

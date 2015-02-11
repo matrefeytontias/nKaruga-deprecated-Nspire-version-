@@ -19,7 +19,8 @@ void PowerFragment::activate(Fixed _x, Fixed _y, Fixed initialAngle, Player *_ta
 	targetP = _targetP;
 	polarity = _p;
 	hasReachedAngle = false;
-	if(!(hurtPlayer = _h))
+	hurtPlayer = _h;
+	if(!hurtPlayer)
 	{
 		targetE = findNearestEnemy(x, y);
 		if(G_fightingBoss)
@@ -91,11 +92,21 @@ bool PowerFragment::handle()
 			if(targetE)
 			{
 				if(!G_fightingBoss)
+				{
 					angle = angleToEntity(this, targetE);
-				else if(distance(fixtoi(x), fixtoi(y), fixtoi(targetB->getx()), fixtoi(targetB->gety())) < distance(fixtoi(x), fixtoi(y), fixtoi(targetE->getx()), fixtoi(targetE->gety())))
-					angle = angleToEntity(this, targetB);
+				}
+				else if(targetB->getDistance(this) < distance(fixtoi(x), fixtoi(y), fixtoi(targetE->getx()), fixtoi(targetE->gety())))
+				{
+					angle = targetB->getAngle(this);
+				}
 				else
+				{
 					angle = angleToEntity(this, targetE);
+				}
+			}
+			else if(G_fightingBoss)
+			{
+				angle = angleToEntity(this, targetB);
 			}
 		}
 	}

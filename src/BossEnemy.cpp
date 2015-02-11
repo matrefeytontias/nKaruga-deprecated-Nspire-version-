@@ -7,16 +7,19 @@ BossData createBossData(int bossID)
 	result.patternsNb = bossPatternsNb[bossID];
 	result.HPperPattern = bossHPperPat[bossID];
 	result.timeoutPerPattern = bossTimeoutPerPat[bossID];
-	result.initCallbacks = bossIBdata[bossID];
+	result.initCallbacks = bossICBdata[bossID];
 	result.callback = bossCBdata[bossID];
 	result.collisionCallbacks = bossCCBdata[bossID];
-	
+	result.distanceCallbacks = bossDCBdata[bossID];
+	result.angleCallbacks = bossACBdata[bossID];
 	return result;
 }
 
 BossEnemy::BossEnemy() : Entity()
 {
 	HP = 0;
+	// Bind "hurtable" to "active"
+	hurtable = &active;
 }
 
 BossEnemy::~BossEnemy()
@@ -34,11 +37,13 @@ void BossEnemy::activate(BossData *d)
 	initCallbacks = d->initCallbacks;
 	callback = d->callback;
 	collisionCallbacks = d->collisionCallbacks;
+	distanceCallbacks = d->distanceCallbacks;
+	angleCallbacks = d->angleCallbacks;
 	currentPattern = 0;
 	// Mark for initialization callback execution
 	readyToGo = false;
 	initCallbackCalled = false;
-	hurtable = false;
+	*hurtable = false;
 	remainingTime = timeoutPerPattern[0];
 }
 
@@ -54,7 +59,7 @@ int BossEnemy::handle(Player *p, BulletArray *bArray)
 		fillRect(316, 0, 4, limit, color_HPbars[color - 1]);
 		fillRect(316, limit, 4, 239 - limit, color_HPbars[color]);
 		
-		hurtable = true;
+		*hurtable = true;
 		(callback)(this, p, bArray);
 		// Timer 1 counts the second
 		if(!timer_read(1))
@@ -67,7 +72,7 @@ int BossEnemy::handle(Player *p, BulletArray *bArray)
 	}
 	else
 	{
-		hurtable = false;
+		*hurtable = false;
 		(initCallbacks[currentPattern])(this);
 	}
 	
@@ -79,14 +84,15 @@ void BossEnemy::damage(int amount)
 	HP -= amount;
 }
 
+// Equivalent to BossEnemy::isActive()
 bool BossEnemy::isHurtable()
 {
-	return hurtable;
+	return *hurtable;
 }
 
 void BossEnemy::makeHurtable()
 {
-	hurtable = true;
+	*hurtable = true;
 }
 
 void BossEnemy::setInternal(int offset, int value)
@@ -112,4 +118,14 @@ int BossEnemy::getInternal(int offset)
 int BossEnemy::getTimeout()
 {
 	return remainingTime;
+}
+
+Fixed BossEnemy::getDistance(PowerFragment *pf)
+{
+	return (distanceCallbacks[currentPattern])(this, pf);
+}
+
+Fixed BossEnemy::getAngle(PowerFragment *pf)
+{
+	return (angleCallbacks[currentPattern])(this, pf);
 }

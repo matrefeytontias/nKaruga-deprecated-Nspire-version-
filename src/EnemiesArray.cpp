@@ -52,5 +52,5 @@ void EnemiesArray::destroyAllEnemies(Player *p, BulletArray *bArray)
 {
 	for(int i = 0; i < MAX_ENEMY; i++)
 		if(data[i].isActive())
-			data[i].damage(p, data[i].getPolarity(), 5000, bArray);
+			data[i].damage(p, data[i].getPolarity(), 9999, bArray);
 }

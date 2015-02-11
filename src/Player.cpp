@@ -99,7 +99,7 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 			{
 				G_hasFiredOnce = true;
 				for(int i = 0; i < G_power / 10; i++)
-					bArray->add_fragment(x, y, ((i % 6) - 3) * 8 + ((i % 2) ? 128 : 0), this, polarity, false);
+					bArray->add_fragment(x, y, ((i % 2) ? -33 + (i / 2) * 11 : 161 - (i / 2) * 11), this, polarity, false);
 				G_power = 0;
 			}
 		}

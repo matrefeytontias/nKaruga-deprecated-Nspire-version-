@@ -65,6 +65,24 @@ void buildGameLUTs()
 	image_entries[image_LUT_enemy_ship_5_shadow] = image_enemy_ship_5_shadow;
 	image_entries[image_LUT_enemy_ship_6_light] = image_enemy_ship_6_light;
 	image_entries[image_LUT_enemy_ship_6_shadow] = image_enemy_ship_6_shadow;
+	image_entries[image_LUT_box_light_1] = image_box_light_1;
+	image_entries[image_LUT_box_light_2] = image_box_light_2;
+	image_entries[image_LUT_box_light_3] = image_box_light_3;
+	image_entries[image_LUT_box_light_4] = image_box_light_4;
+	image_entries[image_LUT_box_light_5] = image_box_light_5;
+	image_entries[image_LUT_box_light_6] = image_box_light_6;
+	image_entries[image_LUT_box_shadow_1] = image_box_shadow_1;
+	image_entries[image_LUT_box_shadow_2] = image_box_shadow_2;
+	image_entries[image_LUT_box_shadow_3] = image_box_shadow_3;
+	image_entries[image_LUT_box_shadow_4] = image_box_shadow_4;
+	image_entries[image_LUT_box_shadow_5] = image_box_shadow_5;
+	image_entries[image_LUT_box_shadow_6] = image_box_shadow_6;
+	image_entries[image_LUT_box_solid_1] = image_box_solid_1;
+	image_entries[image_LUT_box_solid_2] = image_box_solid_2;
+	image_entries[image_LUT_box_solid_3] = image_box_solid_3;
+	image_entries[image_LUT_box_solid_4] = image_box_solid_4;
+	image_entries[image_LUT_box_solid_5] = image_box_solid_5;
+	image_entries[image_LUT_box_solid_6] = image_box_solid_6;
 	image_entries[image_LUT_boss1_enemy_ship_light] = image_boss1_enemy_ship_light;
 	image_entries[image_LUT_boss1_enemy_ship_shadow] = image_boss1_enemy_ship_shadow;
 	image_entries[image_LUT_boss1_grenade_light] = image_boss1_grenade_light;
@@ -87,7 +105,7 @@ void buildGameLUTs()
 	image_entries[image_LUT_particle_shadow] = image_particle_shadow;
 	image_entries[image_LUT_powerslot] = image_powerslot;
 	image_entries[image_LUT_lives] = image_lives;
-	image_entries[image_LUT_background] = image_bg;
+	image_entries[image_LUT_background0] = image_bg0;
 	image_entries[image_LUT_titleScreen] = image_titleScreen;
 	
 	// Boss images

@@ -498,7 +498,7 @@ enum
 	PHASE_BOSSFIGHT,
 	PHASE_BOSSEXPLODEINIT,
 	PHASE_BOSSEXPLODE,
-	PHASE_RESULTS
+	PHASE_RESULTS,
 };
 
 // Special values
@@ -512,6 +512,7 @@ enum
 	LVLSTR_NEWWAVE,
 	LVLSTR_WAIT,
 	LVLSTR_KILLED,
+	LVLSTR_REINIT,
 	LVLSTR_CHAPTER,
 	LVLSTR_JOINT,
 	LVLSTR_BOSS,
@@ -521,6 +522,7 @@ enum
 #define cmd_newWave LVLSTR_CMD, LVLSTR_NEWWAVE
 #define cmd_wait(x) LVLSTR_CMD, LVLSTR_WAIT, x
 #define cmd_killed LVLSTR_CMD, LVLSTR_KILLED
+#define cmd_newChapter(n) LVLSTR_CMD, LVLSTR_REINIT, n
 #define cmd_startChapter(n) LVLSTR_CMD, LVLSTR_CHAPTER, n
 #define cmd_joint(which, to, x, y, jointDependant) LVLSTR_CMD, LVLSTR_JOINT, which, to, x, y, jointDependant
 #define cmd_bkpt LVLSTR_CMD, LVLSTR_BKPT
@@ -585,6 +587,24 @@ enum
 	image_LUT_enemy_ship_5_shadow,
 	image_LUT_enemy_ship_6_light,
 	image_LUT_enemy_ship_6_shadow,
+	image_LUT_box_light_1,
+	image_LUT_box_light_2,
+	image_LUT_box_light_3,
+	image_LUT_box_light_4,
+	image_LUT_box_light_5,
+	image_LUT_box_light_6,
+	image_LUT_box_shadow_1,
+	image_LUT_box_shadow_2,
+	image_LUT_box_shadow_3,
+	image_LUT_box_shadow_4,
+	image_LUT_box_shadow_5,
+	image_LUT_box_shadow_6,
+	image_LUT_box_solid_1,
+	image_LUT_box_solid_2,
+	image_LUT_box_solid_3,
+	image_LUT_box_solid_4,
+	image_LUT_box_solid_5,
+	image_LUT_box_solid_6,
 	image_LUT_chain_hit_light,
 	image_LUT_chain_hit_shadow,
 	image_LUT_explosion_light_0,
@@ -603,7 +623,7 @@ enum
 	image_LUT_particle_shadow,
 	image_LUT_powerslot,
 	image_LUT_lives,
-	image_LUT_background,
+	image_LUT_background0,
 	image_LUT_titleScreen,
 	image_LUT_boss1_enemy_ship_light,
 	image_LUT_boss1_enemy_ship_shadow,

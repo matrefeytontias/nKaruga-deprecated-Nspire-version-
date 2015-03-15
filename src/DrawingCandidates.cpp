@@ -7,13 +7,11 @@ void cthIntro1(Camera *cam)
 {
 	// None needed in level 1
 	UNUSED(cam);
-	cam->absX = cam->relX = 100;
 }
 
 void cthChap1(Camera *cam)
 {
 	UNUSED(cam);
-	cam->absX = cam->absY = cam->relX = cam->relY = 0;
 }
 
 void cthIntro2(Camera *cam)

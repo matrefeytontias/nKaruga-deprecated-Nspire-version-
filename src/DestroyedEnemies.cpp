@@ -11,8 +11,8 @@ DestroyedEnemies::~DestroyedEnemies()
 
 void DestroyedEnemies::activate(Enemy *e, int c)
 {
-	x[c] = fixtoi(e->getx());
-	y[c] = fixtoi(e->gety());
+	x[c] = iToScreenX(fixtoi(e->getx()), e->getCamRel());
+	y[c] = iToScreenY(fixtoi(e->gety()), e->getCamRel());
 	relevant[c] = true;
 }
 

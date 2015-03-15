@@ -155,27 +155,27 @@ void boss1_icb1(BossEnemy *be)
 				be->currentPattern = be->lastPattern = 0;
 				be->setInternal(30, 0);
 				be->setInternal(31, 0);
-				G_enemiesArray.add(itofix(20), itofix(-20), 100, image_LUT_boss1_enemy_ship_shadow, Pattern_1_boss, 0, SHADOW, true, 0, false);
-				G_enemiesArray.add(itofix(300), itofix(-20), 100, image_LUT_boss1_enemy_ship_shadow, Pattern_1_boss, 1, SHADOW, true, 0, false);
+				G_enemiesArray.add(itofix(20), itofix(-20), 100, image_LUT_boss1_enemy_ship_shadow, Pattern_1_boss, 0, SHADOW, true, 0, false, false);
+				G_enemiesArray.add(itofix(300), itofix(-20), 100, image_LUT_boss1_enemy_ship_shadow, Pattern_1_boss, 1, SHADOW, true, 0, false, false);
 				be->HP = getHPsum(be->HPperPattern, 0, be->patternsNb - 1);
 				be->readyToGo = true;
 			}
 		}
 	}
 	Rect pos = { fixtoi(be->getx()), fixtoi(be->gety()), 0, 0 }, centerRot;
-	DC->add(bossImage_entries[bossImage_LUT_1_body], &pos);
+	DC->add(bossImage_entries[bossImage_LUT_1_body], &pos, CAMREL_RELATIVE);
 	
 	pos = getJointPoint(be, boss1_jointData, joint_rightarm_armed1);
 	centerRot.x = pos.w;
 	centerRot.y = pos.h;
-	DC->add(bossImage_entries[bossImage_LUT_1_rightarm_armed1], &pos, &centerRot, be->angle);
+	DC->add(bossImage_entries[bossImage_LUT_1_rightarm_armed1], &pos, &centerRot, be->angle, CAMREL_RELATIVE);
 	
 	// [1]: angle of sword [-32, 0]
 	pos = getJointPoint(be, boss1_jointData, joint_leftarm_armed);
 	rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
 	centerRot.x = pos.w;
 	centerRot.y = pos.h;
-	DC->add(bossImage_entries[bossImage_LUT_1_leftarm_armed], &pos, &centerRot, be->getInternal(1) + be->angle);
+	DC->add(bossImage_entries[bossImage_LUT_1_leftarm_armed], &pos, &centerRot, be->getInternal(1) + be->angle, CAMREL_RELATIVE);
 }
 
 void boss1_icb2(BossEnemy *be)
@@ -206,9 +206,9 @@ void boss1_icb2(BossEnemy *be)
 		{
 			be->setInternal(0, 0);
 			be->setInternal(31, 0);
-			G_enemiesArray.add(itofix(20), itofix(-20), 100, image_LUT_boss1_enemy_ship_light , Pattern_1_boss, 0, LIGHT, true, 0, false);
+			G_enemiesArray.add(itofix(20), itofix(-20), 100, image_LUT_boss1_enemy_ship_light , Pattern_1_boss, 0, LIGHT, true, 0, false, false);
 			G_enemiesArray.add(itofix(300), itofix(-20), 100, be->currentPattern == 1 ? image_LUT_boss1_enemy_ship_light : image_LUT_boss1_enemy_ship_shadow,
-				Pattern_1_boss, 1, be->currentPattern == 1 ? LIGHT : SHADOW, true, 0, false);
+				Pattern_1_boss, 1, be->currentPattern == 1 ? LIGHT : SHADOW, true, 0, false, false);
 			be->HP = getHPsum(be->HPperPattern, be->currentPattern, be->patternsNb - 1);
 			be->readyToGo = true;
 		}
@@ -217,18 +217,18 @@ void boss1_icb2(BossEnemy *be)
 		
 	pos.x = fixtoi(be->getx());
 	pos.y = fixtoi(be->gety());
-	DC->add(bossImage_entries[bossImage_LUT_1_body], &pos);
+	DC->add(bossImage_entries[bossImage_LUT_1_body], &pos, CAMREL_RELATIVE);
 	
 	pos = getJointPoint(be, boss1_jointData, be->currentPattern == 1 ? joint_rightarm_armed1 : joint_rightarm_nonarmed);
 	centerRot.x = pos.w;
 	centerRot.y = pos.h;
-	DC->add(bossImage_entries[be->currentPattern == 1 ? bossImage_LUT_1_rightarm_armed1 : bossImage_LUT_1_rightarm_nonarmed], &pos, &centerRot, be->angle);
+	DC->add(bossImage_entries[be->currentPattern == 1 ? bossImage_LUT_1_rightarm_armed1 : bossImage_LUT_1_rightarm_nonarmed], &pos, &centerRot, be->angle, CAMREL_RELATIVE);
 	
 	pos = getJointPoint(be, boss1_jointData, joint_leftarm_nonarmed);
 	rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
 	centerRot.x = pos.w;
 	centerRot.y = pos.h;
-	DC->add(bossImage_entries[bossImage_LUT_1_leftarm_nonarmed], &pos, &centerRot, be->angle);
+	DC->add(bossImage_entries[bossImage_LUT_1_leftarm_nonarmed], &pos, &centerRot, be->angle, CAMREL_RELATIVE);
 }
 
 /*
@@ -243,7 +243,7 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 	
 	pos.x = fixtoi(be->getx());
 	pos.y = fixtoi(be->gety());
-	DC->add(bossImage_entries[bossImage_LUT_1_body], &pos, NULL, be->angle);
+	DC->add(bossImage_entries[bossImage_LUT_1_body], &pos, NULL, be->angle, CAMREL_RELATIVE);
 	
 	be->currentPattern = getPatternID(be);
 	if(be->currentPattern != be->lastPattern)
@@ -270,13 +270,13 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 		rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
 		centerRot.x = pos.w;
 		centerRot.y = pos.h;
-		DC->add(bossImage_entries[bossImage_LUT_1_rightarm_armed1], &pos, &centerRot, be->angle);
+		DC->add(bossImage_entries[bossImage_LUT_1_rightarm_armed1], &pos, &centerRot, be->angle, CAMREL_RELATIVE);
 		
 		pos = getJointPoint(be, boss1_jointData, joint_leftarm_armed);
 		rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
 		centerRot.x = pos.w;
 		centerRot.y = pos.h;
-		DC->add(bossImage_entries[bossImage_LUT_1_leftarm_armed], &pos, &centerRot, be->angle);
+		DC->add(bossImage_entries[bossImage_LUT_1_leftarm_armed], &pos, &centerRot, be->angle, CAMREL_RELATIVE);
 		
 		int timer = be->getInternal(0);
 		
@@ -288,7 +288,7 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 				for(int i = 0; i < 3; i++)
 				{
 					Fixed angle = 64 - be->angle - (i - 1) * 32;
-					bArray->add(itofix(pos.x), itofix(pos.y), fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_1_light, LIGHT, true);
+					bArray->add(itofix(pos.x), itofix(pos.y), fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_1_light, LIGHT, true, CAMREL_NONE);
 				}
 			}
 			else
@@ -296,7 +296,7 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 				for(int i = 0; i < 2; i++)
 				{
 					Fixed angle = 64 - be->angle - (i * 32 - 16);
-					bArray->add(itofix(pos.x), itofix(pos.y), fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_1_light, LIGHT, true);
+					bArray->add(itofix(pos.x), itofix(pos.y), fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_1_light, LIGHT, true, CAMREL_NONE);
 				}
 			}
 		}
@@ -314,13 +314,13 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 		rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
 		centerRot.x = pos.w;
 		centerRot.y = pos.h;
-		DC->add(bossImage_entries[bossImage_LUT_1_leftarm_nonarmed], &pos, &centerRot, be->angle);
+		DC->add(bossImage_entries[bossImage_LUT_1_leftarm_nonarmed], &pos, &centerRot, be->angle, CAMREL_RELATIVE);
 		
 		pos = getJointPoint(be, boss1_jointData, joint_rightarm_armed2);
 		rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
 		centerRot.x = pos.w;
 		centerRot.y = pos.h;
-		DC->add(bossImage_entries[bossImage_LUT_1_rightarm_armed2], &pos, &centerRot, be->angle);
+		DC->add(bossImage_entries[bossImage_LUT_1_rightarm_armed2], &pos, &centerRot, be->angle, CAMREL_RELATIVE);
 		
 		int timer = be->getInternal(0);
 		
@@ -336,7 +336,7 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 					Fixed angle = j * 6 + 16 - be->angle;
 					for(int i = 0; i < 4; i++)
 					{
-						bArray->add(itofix(pos.x), itofix(pos.y), fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_1_light, SHADOW, true);
+						bArray->add(itofix(pos.x), itofix(pos.y), fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_1_light, SHADOW, true, CAMREL_NONE);
 						angle += 21;
 					}
 					bulletFired[j]++;
@@ -359,13 +359,13 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 		pos = getJointPoint(be, boss1_jointData, joint_leftarm_nonarmed);
 		centerRot.x = pos.w;
 		centerRot.y = pos.h;
-		DC->add(bossImage_entries[bossImage_LUT_1_leftarm_nonarmed], &pos, &centerRot, be->getInternal(2));
+		DC->add(bossImage_entries[bossImage_LUT_1_leftarm_nonarmed], &pos, &centerRot, be->getInternal(2), CAMREL_RELATIVE);
 		
 		pos = getJointPoint(be, boss1_jointData, joint_rightarm_nonarmed);
 		rotate(pos.x, pos.y, fixtoi(be->getx()), fixtoi(be->gety()), be->angle, &pos);
 		centerRot.x = pos.w;
 		centerRot.y = pos.h;
-		DC->add(bossImage_entries[bossImage_LUT_1_rightarm_nonarmed], &pos, &centerRot, be->getInternal(3));
+		DC->add(bossImage_entries[bossImage_LUT_1_rightarm_nonarmed], &pos, &centerRot, be->getInternal(3), CAMREL_RELATIVE);
 		
 		be->incInternal(0);
 		
@@ -383,7 +383,7 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 				// TODO : animation
 				pos = getJointPoint(be, boss1_jointData, joint_leftarm_nonarmed);
 				for(int i = 0; i < 4; i++)
-					G_enemiesArray.add(itofix(pos.x), itofix(pos.y), 1, image_LUT_boss1_grenade_light + (fireStage % 2), Pattern_1_bossGrenade, i, fireStage % 2, true, 0, true);
+					G_enemiesArray.add(itofix(pos.x), itofix(pos.y), 1, image_LUT_boss1_grenade_light + (fireStage % 2), Pattern_1_bossGrenade, i, fireStage % 2, true, 0, true, false);
 			}
 			else if(fireStage > 6)
 			{

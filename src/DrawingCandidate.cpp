@@ -10,16 +10,17 @@ DrawingCandidate::~DrawingCandidate()
 	
 }
 
-void DrawingCandidate::activate(unsigned short *_img, Rect *_pos)
+void DrawingCandidate::activate(unsigned short *_img, Rect *_pos, int _camRel)
 {
 	img = _img;
 	pos.x = _pos->x - img[0] / 2;
 	pos.y = _pos->y - img[1] / 2;
+	camRel = _camRel;
 	rotates = false;
 	active = true;
 }
 
-void DrawingCandidate::activate(unsigned short *_img, Rect *_pos, Rect *_center, Fixed _angle)
+void DrawingCandidate::activate(unsigned short *_img, Rect *_pos, Rect *_center, Fixed _angle, int _camRel)
 {
 	img = _img;
 	angle = _angle;
@@ -33,6 +34,7 @@ void DrawingCandidate::activate(unsigned short *_img, Rect *_pos, Rect *_center,
 	}
 	else
 		centered = true;
+	camRel = _camRel;
 	rotates = true;
 	active = true;
 }
@@ -42,12 +44,21 @@ void DrawingCandidate::deactivate()
 	active = false;
 }
 
-void DrawingCandidate::draw()
+void DrawingCandidate::draw(Camera *cam)
 {
 	if(active)
 	{
+		pos.x = iToScreenX(pos.x, camRel);
+		pos.y = iToScreenY(pos.y, camRel);
 		if(rotates)
+		{
+			if(centered)
+			{
+				center.x = iToScreenX(center.x, camRel);
+				center.y = iToScreenY(center.y, camRel);
+			}
 			drawSpriteRotated(img, &pos, centered ? NULL : &center, angle);
+		}
 		else
 			drawSprite(img, pos.x, pos.y);
 	}

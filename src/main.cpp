@@ -250,7 +250,8 @@ void playGame()
 	Rect statsRect, levelRect;
 	int chainColor[3] = { 0 };
 	
-	unsigned int* bg;
+	// Load first background right away
+	unsigned int* bg = (unsigned int*)image_entries[image_LUT_background0];
 	
 	// Game phase
 	int gamePhase;
@@ -263,8 +264,6 @@ void playGame()
 	bool drawPowerSlot = true;
 	static const char *levelStrs[5] = { "Chapter 1\nIdeal", "Chapter 2\nTrial", "Chapter 3\nFaith", "Chapter 4\nReality", "Chapter 5\nMetempsychosis" };
 	static unsigned short *levelKanjis[1] = { image_kanji_1 };
-	
-	bg = (unsigned int*)image_entries[image_LUT_background];
 	
 	BulletArray* bArray = new BulletArray;
 	Player ship;
@@ -326,6 +325,12 @@ void playGame()
 							levelCounter++;
 							G_enemiesArray.resetEnemyCounter();
 						}
+						else if(currentLevelByte == LVLSTR_NEWCAMERA)
+						{
+							// Follow a new camera path
+							DC->loadCameraPath(levelStream[++levelCounter]);
+							levelCounter++;
+						}
 						else if(currentLevelByte == LVLSTR_WAIT)
 						{
 							// Wait some frames
@@ -346,6 +351,23 @@ void playGame()
 							}
 							if(levelCanProgress) levelCounter++;
 							else levelCounter--;
+						}
+						else if(currentLevelByte == LVLSTR_REINIT)
+						{
+							// Prepare for a new chapter
+							int nextChapter = levelStream[++levelCounter];
+							G_enemiesArray.destroyAllEnemies(&ship, bArray);
+							bArray->clear();
+							// Reset everything chains-related max chains
+							G_chainStatus = 0;
+							G_frameChainOffset = 0;
+							G_inChainCount = 0;
+							bg = (unsigned int*)image_entries[image_LUT_background0 + nextChapter];
+							clearBufferB();
+							updateScreen();
+							sleep(1000);
+							levelCounter++;
+							// And here we go for a new chapter
 						}
 						else if(currentLevelByte == LVLSTR_CHAPTER)
 						{
@@ -415,9 +437,9 @@ void playGame()
 					{
 						// Dunno what it is ? Then it's an enemy by default
 						G_enemiesArray.add(itofix(levelStream[levelCounter]), itofix(levelStream[levelCounter + 1]), levelStream[levelCounter + 2],
-															levelStream[levelCounter + 3], levelStream[levelCounter + 4], waveIndex, levelStream[levelCounter + 5],
-															levelStream[levelCounter + 6], levelStream[levelCounter + 7], false);
-						levelCounter += 8;
+											levelStream[levelCounter + 3], levelStream[levelCounter + 4], waveIndex, levelStream[levelCounter + 5],
+											levelStream[levelCounter + 6], levelStream[levelCounter + 7], false, levelStream[levelCounter + 8]);
+						levelCounter += 9;
 						waveIndex++;
 						parsedEnemy = true;
 					}

@@ -17,13 +17,13 @@ Rect* Bullet::makeRect()
 	return &r;
 }
 
-void Bullet::activate(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, int imgID, bool _p, bool _h)
+void Bullet::activate(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, int imgID, bool _p, bool _h, int camRel)
 {
 	active = true;
 	polarity = _p;
 	hurtPlayer = _h;
-	x = _x;
-	y = _y;
+	x = fToScreenX(_x, camRel);
+	y = fToScreenY(_y, camRel);
 	dx = _dx;
 	dy = _dy;
 	img = image_entries[imgID + (_p ? 1 : 0)];
@@ -54,5 +54,5 @@ void Bullet::draw()
 	br.x = fixtoi(x);
 	br.y = fixtoi(y);
 	//~ drawSprite(img, br.x, br.y);
-	DC->add(img, &br);
+	DC->add(img, &br, CAMREL_NONE);
 }

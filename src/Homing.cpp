@@ -67,7 +67,7 @@ void Homing::draw()
 	r.x = fixtoi(x);
 	r.y = fixtoi(y);
 	
-	DC->add(image_entries[polarity ? image_LUT_enemy_homing_bullet_shadow : image_LUT_enemy_homing_bullet_light], &r);
+	DC->add(image_entries[polarity ? image_LUT_enemy_homing_bullet_shadow : image_LUT_enemy_homing_bullet_light], &r, CAMREL_NONE);
 	
 	for(int i = 0; i < FRAGMENT_TRAILING; i++)
 	{

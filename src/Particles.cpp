@@ -35,7 +35,7 @@ void Particles::handle()
 			
 			Rect r = { fixtoi(x[i]), fixtoi(y[i]), 0, 0 };
 			//~ drawSprite(image_entries[polarity[i] ? image_LUT_particle_shadow : image_LUT_particle_light], fixtoi(x[i]), fixtoi(y[i]));
-			DC->add(image_entries[polarity[i] ? image_LUT_particle_shadow : image_LUT_particle_light], &r);
+			DC->add(image_entries[polarity[i] ? image_LUT_particle_shadow : image_LUT_particle_light], &r, CAMREL_NONE);
 		}
 	}
 }

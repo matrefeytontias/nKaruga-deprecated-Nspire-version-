@@ -1,8 +1,37 @@
 #include "common.h"
 
+//
+// Camera travelling handlers
+//
+void cthIntro1(Camera *cam)
+{
+	// None needed in level 1
+	UNUSED(cam);
+	cam->absX = cam->relX = 100;
+}
+
+void cthChap1(Camera *cam)
+{
+	UNUSED(cam);
+	cam->absX = cam->absY = cam->relX = cam->relY = 0;
+}
+
+void cthIntro2(Camera *cam)
+{
+	UNUSED(cam);
+}
+
+cameraTravelling camTrav[] = { cthIntro1, cthChap1, cthIntro2 };
+
+// 
+// DrawingCandidates class
+// 
+
 DrawingCandidates::DrawingCandidates()
 {
 	candidatesCount = 0;
+	cam.absX = cam.absY = cam.relX = cam.relY = 0;
+	cameraPath = camTrav[0];
 }
 
 DrawingCandidates::~DrawingCandidates()
@@ -10,15 +39,15 @@ DrawingCandidates::~DrawingCandidates()
 	
 }
 
-void DrawingCandidates::add(unsigned short *img, Rect *pos)
+void DrawingCandidates::add(unsigned short *img, Rect *pos, int camRel)
 {
-	data[candidatesCount].activate(img, pos);
+	data[candidatesCount].activate(img, pos, camRel);
 	candidatesCount++;
 }
 
-void DrawingCandidates::add(unsigned short *img, Rect *pos, Rect *center, Fixed angle)
+void DrawingCandidates::add(unsigned short *img, Rect *pos, Rect *center, Fixed angle, int camRel)
 {
-	data[candidatesCount].activate(img, pos, center, angle);
+	data[candidatesCount].activate(img, pos, center, angle, camRel);
 	candidatesCount++;
 }
 
@@ -28,7 +57,7 @@ void DrawingCandidates::flush()
 	{
 		for(int i = 0; i < candidatesCount; i++)
 		{
-			data[i].draw();
+			data[i].draw(&cam);
 			data[i].deactivate();
 		}
 	}
@@ -39,4 +68,10 @@ void DrawingCandidates::flush()
 	}
 	
 	candidatesCount = 0;
+	(cameraPath)(&cam);
+}
+
+void DrawingCandidates::loadCameraPath(int id)
+{
+	cameraPath = camTrav[id];
 }

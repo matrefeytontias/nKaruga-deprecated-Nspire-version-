@@ -39,11 +39,11 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 		r.x = fixtoi(x);
 		r.y = fixtoi(y);
 		
-		DC->add(img[((isSwitchingPolarity / 8) * 2) + polarity], &r);
+		DC->add(img[((isSwitchingPolarity / 8) * 2) + polarity], &r, CAMREL_NONE);
 		
 		if(deathCounter)
 		{
-			DC->add(image_entries[image_LUT_player_ship_invincible_light + polarity], &r);
+			DC->add(image_entries[image_LUT_player_ship_invincible_light + polarity], &r, CAMREL_NONE);
 			deathCounter--;
 		}
 		
@@ -112,14 +112,14 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 				if(fireRepeat)
 				{
 					// fire 2 bullets if the key is being held
-					bArray->add(x - itofix(img[0][0]) / 3, y, 0, itofix(-3), image_LUT_player_bullet_light, polarity, false);
-					bArray->add(x + itofix(img[0][0]) / 3, y, 0, itofix(-3), image_LUT_player_bullet_light, polarity, false);
+					bArray->add(x - itofix(img[0][0]) / 3, y, 0, itofix(-3), image_LUT_player_bullet_light, polarity, false, CAMREL_NONE);
+					bArray->add(x + itofix(img[0][0]) / 3, y, 0, itofix(-3), image_LUT_player_bullet_light, polarity, false, CAMREL_NONE);
 					fireDelay = 16;
 				}
 				else
 				{
 					// fire 1 bullet
-					bArray->add(x, y, 0, itofix(-3), image_LUT_player_bullet_light, polarity, false);
+					bArray->add(x, y, 0, itofix(-3), image_LUT_player_bullet_light, polarity, false, CAMREL_NONE);
 					fireDelay = 24;
 					fireRepeat = true;
 				}
@@ -136,7 +136,7 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 		{
 			r.x = fixtoi(x);
 			r.y = fixtoi(y);
-			DC->add(image_entries[image_LUT_player_explosion_0 + deathCounter], &r);
+			DC->add(image_entries[image_LUT_player_explosion_0 + deathCounter], &r, CAMREL_NONE);
 			// Death animation
 			// Uses frameskipping as a counter
 			if(!(G_skipFrame % 8))
@@ -156,7 +156,7 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 		{
 			r.x = fixtoi(x);
 			r.y = fixtoi(y);
-			DC->add(image_entries[image_LUT_player_ship_light], &r);
+			DC->add(image_entries[image_LUT_player_ship_light], &r, CAMREL_NONE);
 			y -= itofix(1);
 		}
 		else active = true;

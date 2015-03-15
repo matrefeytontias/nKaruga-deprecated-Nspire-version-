@@ -73,18 +73,29 @@ protected:
 	Fixed x, y;
 };
 
+typedef struct
+{
+	int absX, absY;
+	int relX, relY;
+} Camera;
+
+typedef void (*cameraTravelling)(Camera*);
+
 class DrawingCandidate
 {
 public:
 	DrawingCandidate();
 	~DrawingCandidate();
-	void activate(unsigned short *img, Rect *pos);
-	void activate(unsigned short *img, Rect *pos, Rect *center, Fixed angle);
+	void activate(unsigned short *img, Rect *pos, int camRelation);
+	void activate(unsigned short *img, Rect *pos, Rect *center, Fixed angle, int camRelation);
 	void deactivate();
-	void draw();
+	void draw(Camera*);
 private:
 	Rect pos, center;
 	bool rotates, centered, active;
+	// How the camera affects the object's display
+	// See the enum lower in the file
+	int camRel;
 	Fixed angle;
 	unsigned short *img;
 };
@@ -94,12 +105,15 @@ class DrawingCandidates
 public:
 	DrawingCandidates();
 	~DrawingCandidates();
-	void add(unsigned short *img, Rect *pos);
-	void add(unsigned short *img, Rect *pos, Rect *center, Fixed angle);
+	void add(unsigned short *img, Rect *pos, int camRelation);
+	void add(unsigned short *img, Rect *pos, Rect *center, Fixed angle, int camRelation);
 	void flush();
+	void loadCameraPath(int id);
+	Camera cam;
 private:
 	DrawingCandidate data[MAX_DISPLAYABLE];
 	int candidatesCount;
+	cameraTravelling cameraPath;
 };
 
 // Both enemies and player can fire them
@@ -109,7 +123,7 @@ public:
 	Bullet();
 	~Bullet();
 	Rect* makeRect();
-	void activate(Fixed x, Fixed y, Fixed dx, Fixed dy, int imageID, bool polarity, bool hurtsPlayer);
+	void activate(Fixed x, Fixed y, Fixed dx, Fixed dy, int imageID, bool polarity, bool hurtsPlayer, int camRel);
 	bool getPolarity();
 	bool hurtsPlayer();
 	bool handle();
@@ -201,7 +215,7 @@ public:
 	BulletArray();
 	~BulletArray();
 	void handle(Player *player, BossEnemy *be);
-	void add(Fixed x, Fixed y, Fixed dx, Fixed dy, int imageID, bool polarity, bool hurtsPlayer);
+	void add(Fixed x, Fixed y, Fixed dx, Fixed dy, int imageID, bool polarity, bool hurtsPlayer, int camRel);
 	void add_fragment(Fixed x, Fixed y, Fixed initialAngle, Player *target, bool polarity, bool hurtsPlayer);
 	void add_homing(Fixed x, Fixed y, Fixed initialAngle, Player *target, bool polarity);
 	void fire_laser(Enemy *origin, bool polarity);
@@ -267,7 +281,7 @@ public:
 	Enemy();
 	~Enemy();
 	void handle(Player *player, BulletArray *bArray);
-	void activate(int x, int y, int HP, int shipImgID, int callbackID, int waveIndex, bool polarity, bool hasRotation, int firebackAmount, bool ghost);
+	void activate(int x, int y, int HP, int shipImgID, int callbackID, int waveIndex, bool polarity, bool hasRotation, int firebackAmount, bool ghost, bool prop);
 	void damage(Player *player, bool polarity, int amount, BulletArray *bArray);
 	void joint(int offset, Fixed x, Fixed y, bool diesWithJoint);
 	Fixed getRotation();
@@ -277,6 +291,7 @@ public:
 	bool isGhost();
 	Fixed getx();
 	Fixed gety();
+	int getCamRel();
 	// x, y on-screen
 	// Enemy image
 	unsigned short *img;
@@ -284,6 +299,8 @@ public:
 private:
 	// Ghost enemies have no interaction with anything
 	bool ghost;
+	// Props have special properties, like being unkillable
+	bool prop;
 	int HP;
 	// Does the enemy use rotation (achieved in the pattern)
 	bool hasRotation;
@@ -434,7 +451,7 @@ class EnemiesArray
 public:
 	EnemiesArray();
 	~EnemiesArray();
-	void add(int x, int y, int HP, int shipImgID, int callbackID, int waveIndex, bool polarity, bool hasRotation, int firebackAmount, bool ghost);
+	void add(int x, int y, int HP, int shipImgID, int callbackID, int waveIndex, bool polarity, bool hasRotation, int firebackAmount, bool ghost, bool prop);
 	void handle(Player *p, BulletArray *bArray);
 	void handleExplosions();
 	void resetEnemyCounter();
@@ -486,8 +503,8 @@ private:
 };
 
 // Level streams
-// x, y, HP, image ID, callback ID, polarity, has rotation ?, fireback amount
-#define enemy(x, y, HP, iID, cbID, p, hR, f) x, y, HP, iID, cbID, p, hR, f
+// x, y, HP, image ID, callback ID, polarity, has rotation ?, fireback amount, follows absolute camera ?
+#define enemy(x, y, HP, iID, cbID, p, hR, f, absCam) x, y, HP, iID, cbID, p, hR, f, absCam
 
 // Game phases
 enum
@@ -510,6 +527,7 @@ enum
 enum
 {
 	LVLSTR_NEWWAVE,
+	LVLSTR_NEWCAMERA,
 	LVLSTR_WAIT,
 	LVLSTR_KILLED,
 	LVLSTR_REINIT,
@@ -520,6 +538,7 @@ enum
 };
 
 #define cmd_newWave LVLSTR_CMD, LVLSTR_NEWWAVE
+#define cmd_newCameraPath(n) LVLSTR_CMD, LVLSTR_NEWCAMERA, n
 #define cmd_wait(x) LVLSTR_CMD, LVLSTR_WAIT, x
 #define cmd_killed LVLSTR_CMD, LVLSTR_KILLED
 #define cmd_newChapter(n) LVLSTR_CMD, LVLSTR_REINIT, n
@@ -673,6 +692,22 @@ enum
 	NB_CALLBACKS
 };
 
+// Camera travelling handlers
+enum
+{
+	CameraPath_i1,
+	CameraPath_c1,
+	CameraPath_i2
+};
+
+// Camera relations
+enum
+{
+	CAMREL_NONE,
+	CAMREL_ABSOLUTE,
+	CAMREL_RELATIVE
+};
+
 extern unsigned short *image_entries[NB_IMAGES];
 extern unsigned short *bossImage_entries[NB_BOSS_IMAGES];
 
@@ -700,6 +735,10 @@ extern Particles *G_particles;
 extern Fixed angleToEntity(Entity*, Entity*);
 extern Enemy* findNearestEnemy(Fixed x, Fixed y);
 extern int distance(int x1, int y1, int x2, int y2);
+extern int iToScreenX(int x, int camRel);
+extern int iToScreenY(int y, int camRel);
+extern Fixed fToScreenX(Fixed x, int camRel);
+extern Fixed fToScreenY(Fixed y, int camRel);
 extern BossData createBossData(int bossID);
 
 #endif

@@ -11,9 +11,9 @@ EnemiesArray::~EnemiesArray()
 	
 }
 
-void EnemiesArray::add(int x, int y, int HP, int shipImgID, int callbackID, int waveIndex, bool polarity, bool hasRotation, int firebackAmount, bool ghost)
+void EnemiesArray::add(int x, int y, int HP, int shipImgID, int callbackID, int waveIndex, bool polarity, bool hasRotation, int firebackAmount, bool ghost, bool prop)
 {
-	data[currentEnemy].activate(x, y, HP, shipImgID, callbackID, waveIndex, polarity, hasRotation, firebackAmount, ghost);
+	data[currentEnemy].activate(x, y, HP, shipImgID, callbackID, waveIndex, polarity, hasRotation, firebackAmount, ghost, prop);
 	currentEnemy++;
 	currentEnemy %= MAX_ENEMY;
 }
@@ -27,8 +27,8 @@ void EnemiesArray::handle(Player *p, BulletArray *bArray)
 		{
 			G_killedThisFrame[i] = data[i].getPolarity();
 			deadEnemies.activate(&data[i], i);
-			explosionsAnims[currentExplosion].activate(fixtoi(data[i].getx()),
-													   fixtoi(data[i].gety()),
+			explosionsAnims[currentExplosion].activate(iToScreenX(fixtoi(data[i].getx()), CAMREL_RELATIVE),
+													   iToScreenY(fixtoi(data[i].gety()), CAMREL_RELATIVE),
 													   data[i].getPolarity());
 			currentExplosion++;
 			currentExplosion %= MAX_ENEMY;

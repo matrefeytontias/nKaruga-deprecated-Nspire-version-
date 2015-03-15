@@ -69,3 +69,20 @@ KeyEvent getk(void)
 	k |= (((((isKeyPressed(KEY_NSPIRE_UP) << 1) + isKeyPressed(KEY_NSPIRE_RIGHT)) << 1) + isKeyPressed(KEY_NSPIRE_LEFT)) << 1) + isKeyPressed(KEY_NSPIRE_DOWN);
 	return k;
 }
+
+int iToScreenX(int x, int camRel)
+{
+	return (camRel == CAMREL_ABSOLUTE ? x - DC->cam.absX : (camRel == CAMREL_RELATIVE ? x - DC->cam.relX : x));
+}
+int iToScreenY(int y, int camRel)
+{
+	return (camRel == CAMREL_ABSOLUTE ? y - DC->cam.absY : (camRel == CAMREL_RELATIVE ? y - DC->cam.relY : y));
+}
+Fixed fToScreenX(Fixed x, int camRel)
+{
+	return (camRel == CAMREL_ABSOLUTE ? x - itofix(DC->cam.absX) : (camRel == CAMREL_RELATIVE ? x - itofix(DC->cam.relX) : x));
+}
+Fixed fToScreenY(Fixed y, int camRel)
+{
+	return (camRel == CAMREL_ABSOLUTE ? y - itofix(DC->cam.absY) : (camRel == CAMREL_RELATIVE ? y - itofix(DC->cam.relY) : y));
+}

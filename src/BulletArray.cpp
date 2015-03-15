@@ -53,15 +53,16 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				// Check collisions with enemies (there are much more enemies than players)
 				for(int j = 0; j < MAX_ENEMY; j++)
 				{
-					if(G_enemiesArray.data[j].isActive() && !G_enemiesArray.data[j].isGhost())
+					Enemy *ce = &G_enemiesArray.data[j];
+					if(ce->isActive() && !ce->isGhost())
 					{
-						if(cb->getx() - itofix(cb->img[0] / 2) <= G_enemiesArray.data[j].getx() + itofix(G_enemiesArray.data[j].img[0] / 2) &&
-						cb->getx() + itofix(cb->img[0] / 2) >= G_enemiesArray.data[j].getx() - itofix(G_enemiesArray.data[j].img[0] / 2) &&
-						cb->gety() - itofix(cb->img[1] / 2) <= G_enemiesArray.data[j].gety() + itofix(G_enemiesArray.data[j].img[1] / 2) &&
-						cb->gety() + itofix(cb->img[1] / 2) >= G_enemiesArray.data[j].gety() - itofix(G_enemiesArray.data[j].img[1] / 2))
+						if(cb->getx() - itofix(cb->img[0] / 2) <= fToScreenX(ce->getx(), ce->getCamRel()) + itofix(ce->img[0] / 2) &&
+						cb->getx() + itofix(cb->img[0] / 2) >= fToScreenX(ce->getx(), ce->getCamRel()) - itofix(ce->img[0] / 2) &&
+						cb->gety() - itofix(cb->img[1] / 2) <= fToScreenY(ce->gety(), ce->getCamRel()) + itofix(ce->img[1] / 2) &&
+						cb->gety() + itofix(cb->img[1] / 2) >= fToScreenY(ce->gety(), ce->getCamRel()) - itofix(ce->img[1] / 2))
 						{
-							G_enemiesArray.data[j].damage(p, cb->getPolarity(), 1, this);
-							G_score += cb->getPolarity() != G_enemiesArray.data[j].getPolarity() ? SCORE_HIT_OP : SCORE_HIT;
+							ce->damage(p, cb->getPolarity(), 1, this);
+							G_score += cb->getPolarity() != ce->getPolarity() ? SCORE_HIT_OP : SCORE_HIT;
 							destroyBullet = true;
 							// The same bullet can destroy several enemies if it hits them *during the same frame* !
 						}
@@ -129,15 +130,16 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				// A power fragment can only hit its registered target
 				if(cf->targetE)
 				{
-					if(cf->targetE->isActive())
+					Enemy *ce = cf->targetE;
+					if(ce->isActive())
 					{
-						if(cf->getx() - itofix(4) <= cf->targetE->getx() + itofix(cf->targetE->img[0] / 2) &&
-						cf->getx() + itofix(4) >= cf->targetE->getx() - itofix(cf->targetE->img[0] / 2) &&
-						cf->gety() - itofix(4) <= cf->targetE->gety() + itofix(cf->targetE->img[1] / 2) &&
-						cf->gety() + itofix(4) >= cf->targetE->gety() - itofix(cf->targetE->img[1] / 2))
+						if(cf->getx() - itofix(4) <= fToScreenX(ce->getx(), ce->getCamRel()) + itofix(ce->img[0] / 2) &&
+						cf->getx() + itofix(4) >= fToScreenX(ce->getx(), ce->getCamRel()) - itofix(ce->img[0] / 2) &&
+						cf->gety() - itofix(4) <= fToScreenY(ce->gety(), ce->getCamRel()) + itofix(ce->img[1] / 2) &&
+						cf->gety() + itofix(4) >= fToScreenY(ce->gety(), ce->getCamRel()) - itofix(ce->img[1] / 2))
 						{
-							cf->targetE->damage(p, cf->getPolarity(), 10, this);
-							G_score += cf->getPolarity() != cf->targetE->getPolarity() ? SCORE_HIT_OP : SCORE_HIT;
+							ce->damage(p, cf->getPolarity(), 10, this);
+							G_score += cf->getPolarity() != ce->getPolarity() ? SCORE_HIT_OP : SCORE_HIT;
 							destroyBullet = true;
 						}
 					}
@@ -148,7 +150,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				{
 					// Create a placeholder bullet to pass to the collision callback
 					Bullet temp;
-					temp.activate(cf->getx(), cf->gety(), 0, 0, 0, cf->getPolarity(), false);
+					temp.activate(cf->getx(), cf->gety(), 0, 0, 0, cf->getPolarity(), false, CAMREL_NONE);
 					bossDamaged = (be->collisionCallbacks[be->currentPattern])(be, &temp, 10);
 					temp.deactivate();
 					if(bossDamaged)
@@ -290,11 +292,11 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 	}
 }
 
-void BulletArray::add(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, int imgID, bool _p, bool _h)
+void BulletArray::add(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, int imgID, bool _p, bool _h, int camRel)
 {
 	if(bulletCount < MAX_BULLET)
 	{
-		data[bulletCount].activate(_x, _y, _dx, _dy, imgID, _p, _h);
+		data[bulletCount].activate(_x, _y, _dx, _dy, imgID, _p, _h, camRel);
 		bulletCount++;
 	}
 }

@@ -44,7 +44,7 @@ void DrawingCandidate::deactivate()
 	active = false;
 }
 
-void DrawingCandidate::draw(Camera *cam)
+void DrawingCandidate::draw()
 {
 	if(active)
 	{

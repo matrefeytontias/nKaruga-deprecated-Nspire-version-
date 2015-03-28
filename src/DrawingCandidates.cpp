@@ -55,7 +55,7 @@ void DrawingCandidates::flush()
 	{
 		for(int i = 0; i < candidatesCount; i++)
 		{
-			data[i].draw(&cam);
+			data[i].draw();
 			data[i].deactivate();
 		}
 	}
@@ -66,6 +66,7 @@ void DrawingCandidates::flush()
 	}
 	
 	candidatesCount = 0;
+	// Update camera
 	(cameraPath)(&cam);
 }
 

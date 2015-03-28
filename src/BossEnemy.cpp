@@ -20,6 +20,7 @@ BossEnemy::BossEnemy() : Entity()
 	HP = 0;
 	// Bind "hurtable" to "active"
 	hurtable = &active;
+	remainingTime = 0;
 }
 
 BossEnemy::~BossEnemy()

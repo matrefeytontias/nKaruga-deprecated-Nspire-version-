@@ -2,7 +2,6 @@
 #include "ExplosionEffect.h"
 #include "levels.h" 
 #include "../gfx/kanji.h"
-#include "../gfx/bossWarning.h"
 #include "misc_data.h"
 
 #define ENEMY_W(i) G_enemiesArray.data[i].img[0]
@@ -359,6 +358,7 @@ void playGame()
 						{
 							// Prepare for a new chapter
 							int nextChapter = levelStream[++levelCounter];
+							UNUSED(nextChapter);
 							G_enemiesArray.destroyAllEnemies(&ship, bArray);
 							bArray->clear();
 							// Reset everything chains-related
@@ -667,7 +667,7 @@ void playGame()
 				}
 			}
 			else if(gamePhase == PHASE_BOSSCINEMATIC)
-				drawSprite(image_bossWarning, 0, 72);
+				drawSprite(image_entries[image_LUT_bossWarning], 0, 72);
 			else if(gamePhase == PHASE_BOSSEXPLODEINIT)
 			{
 				initExplosionEffect(160, 120, 500, 0);

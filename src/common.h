@@ -644,6 +644,7 @@ enum
 	image_LUT_lives,
 	image_LUT_background0,
 	image_LUT_titleScreen,
+	image_LUT_bossWarning,
 	image_LUT_boss1_enemy_ship_light,
 	image_LUT_boss1_enemy_ship_shadow,
 	image_LUT_boss1_grenade_light,

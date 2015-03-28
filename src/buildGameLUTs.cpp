@@ -4,6 +4,7 @@
 #include "../gfx/bg.h"
 #include "../gfx/gfx.h"
 #include "../gfx/bossgfx.h"
+#include "../gfx/bossWarning.h"
 
 unsigned short *image_entries[NB_IMAGES];
 unsigned short *bossImage_entries[NB_BOSS_IMAGES];
@@ -105,6 +106,7 @@ void buildGameLUTs()
 	image_entries[image_LUT_particle_shadow] = image_particle_shadow;
 	image_entries[image_LUT_powerslot] = image_powerslot;
 	image_entries[image_LUT_lives] = image_lives;
+	image_entries[image_LUT_bossWarning] = image_bossWarning;
 	image_entries[image_LUT_background0] = image_bg0;
 	image_entries[image_LUT_titleScreen] = image_titleScreen;
 	

@@ -1,10 +1,5 @@
 #include "common.h"
 
-inline Fixed angleToPlayer(Enemy *e, Player *p)
-{
-	return (int)(atan2((double)(p->gety() - e->gety()), (double)(p->getx() - e->getx())) * 128. / M_PI);
-}
-
 Enemy::Enemy() : Entity()
 {
 	active = false;
@@ -112,7 +107,7 @@ void Enemy::damage(Player *_p, bool _pol, int amount, BulletArray *bArray)
 		{
 			if(_pol == polarity || G_hardMode)
 			{
-				Fixed angle = angleToPlayer(this, _p);
+				Fixed angle = angleToEntity(this, _p);
 				int famount = _pol != polarity ? fireback / 2 : fireback;
 				for(int i = 0; i < famount; i++)
 					bArray->add(getx(), gety(), fixcos(angle + (rand() % 16) - 8) << 1, fixsin(angle + (rand() % 16) - 8) + (rand() % 256), image_LUT_enemy_bullet_0_light, polarity, true, getCamRel());

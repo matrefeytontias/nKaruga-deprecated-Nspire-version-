@@ -53,7 +53,7 @@ case Pattern_1_5:
 	}
 	break;
 case Pattern_1_6:
-	angle = angleToPlayer(this, p);
+	angle = angleToEntity(this, p);
 	if(!(internal[0] % 25))
 	{
 		bArray->add(x, y, fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_1_light, polarity, true, getCamRel());
@@ -78,7 +78,7 @@ case Pattern_1_7:
 case Pattern_1_8:
 	if(!(G_waveTimer % 4))
 	{
-		angle = angleToPlayer(this, p);
+		angle = angleToEntity(this, p);
 		if(internal[0] < 35)
 			y += itofix(2);
 		else
@@ -140,7 +140,7 @@ case Pattern_1_12:
 			{
 				if(!(internal[1] % 256))
 				{
-					angle = angleToPlayer(this, p);
+					angle = angleToEntity(this, p);
 					bArray->add(x, y, fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_0_light, polarity, true, getCamRel());
 				}
 				internal[1] += 4;
@@ -267,7 +267,7 @@ case Pattern_1_15:
 	{
 		if(!(internal[0] % 128))
 		{
-			angle = angleToPlayer(this, p);
+			angle = angleToEntity(this, p);
 			bArray->add(getx(), gety(), fixcos(angle) / 2, fixsin(angle) / 2, image_LUT_enemy_bullet_0_light, polarity, true, getCamRel());
 		}
 		internal[0]++;
@@ -392,7 +392,7 @@ case Pattern_1_boss:
 		rotationAngle++;
 		if(!(G_waveTimer % 96))
 		{
-			angle = angleToPlayer(this, p);
+			angle = angleToEntity(this, p);
 			bArray->add(getx(), gety(), fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_1_light, polarity, true, getCamRel());
 		}
 	}
@@ -438,3 +438,98 @@ case Pattern_1_bossGrenade:
 // #######
 // Intro 2
 // #######
+case Pattern_2_1:
+	if(!internal[0])
+	{
+		if(fixtoi(x) != 160)
+		{
+			internal[3] = (fixtoi(x) < 160) * 2 - 1;
+			x += itofix((x < itofix(160)) * 2 - 1);
+			if(abs(fixtoi(x) - 160) == 80)
+			{
+				Fixed angle = angleToEntity(this, p);
+				bArray->add(getx(), gety(), fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_0_light, polarity, true, getCamRel());
+			}
+		}
+		else
+		{
+			internal[0] = 1;
+			internal[1] = 192;
+			internal[2] = itofix(120) - y;
+		}
+	}
+	else
+	{
+		x = fixmul(fixcos(internal[1]), internal[2]) + itofix(160);
+		y = fixmul(fixsin(internal[1]), internal[2]) + itofix(120);
+		if(G_waveTimer % 2) internal[1] += internal[3];
+		internal[2] += 32;
+	}
+	rotationAngle += internal[3];
+	break;
+case Pattern_2_2:
+	// x = 60 or 260
+	if(!internal[0])
+	{
+		if(fixtoi(y) != 120)
+		{
+			internal[3] = fixtoi(x) > 160;
+			y += itofix(1);
+		}
+		else
+		{
+			internal[0] = 1;
+			internal[1] = internal[3] ? 0 : 128;
+			internal[2] = abs(itofix(160) - x);
+		}
+		if(fixtoi(x) == fixtoi(y) || 320 - fixtoi(x) == fixtoi(y))
+		{
+			Fixed angle = angleToEntity(this, p);
+			bArray->add(getx(), gety(), fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_0_light, polarity, true, getCamRel());
+		}
+	}
+	else if((internal[1] & 0xff) != (internal[3] ? 224 : 160))
+	{
+		x = fixmul(fixcos(internal[1]), internal[2]) + itofix(160);
+		y = fixmul(fixsin(internal[1]), internal[2]) + itofix(120);
+		if(G_waveTimer % 2) internal[1] += internal[3] * 2 - 1;
+		rotationAngle = -internal[1] + !internal[3] * 128;
+	}
+	else
+	{
+		y += itofix(1);
+		x += itofix(internal[3] * 2 - 1);
+	}
+	break;
+case Pattern_2_3:
+	// y = 60
+	if(!internal[0])
+	{
+		if(fixtoi(x) != 160)
+		{
+			internal[3] = fixtoi(x) < 160;
+			x += itofix(internal[3] * 2 - 1);
+			rotationAngle = 64 * (internal[3] * 2 - 1);
+		}
+		else
+		{
+			internal[0] = 1;
+			internal[1] = 192 + internal[3] * 2 - 1;
+			internal[2] = abs(itofix(120) - y);
+		}
+		if(fixtoi(x) == fixtoi(y) || 320 - fixtoi(x) == fixtoi(y))
+		{
+			Fixed angle = angleToEntity(this, p);
+			bArray->add(getx(), gety(), fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_0_light, polarity, true, getCamRel());
+		}
+	}
+	else
+	{
+		x = fixmul(fixcos(internal[1]), internal[2]) + itofix(160);
+		y = fixmul(fixsin(internal[1]), internal[2]) + itofix(120);
+		if(G_waveTimer % 2) internal[1] += internal[3] * 2 - 1;
+		rotationAngle = -internal[1] + !internal[3] * 128;
+		if((internal[1] & 0xff) == 192) internal[4] = 1;
+		internal[2] += internal[4] * 128;
+	}
+	break;

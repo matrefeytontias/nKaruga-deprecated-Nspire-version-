@@ -89,7 +89,7 @@ public:
 	void activate(unsigned short *img, Rect *pos, int camRelation);
 	void activate(unsigned short *img, Rect *pos, Rect *center, Fixed angle, int camRelation);
 	void deactivate();
-	void draw(Camera*);
+	void draw();
 private:
 	Rect pos, center;
 	bool rotates, centered, active;
@@ -689,6 +689,9 @@ enum
 	Pattern_1_21,
 	Pattern_1_boss,
 	Pattern_1_bossGrenade,
+	Pattern_2_1,
+	Pattern_2_2,
+	Pattern_2_3,
 	NB_CALLBACKS
 };
 

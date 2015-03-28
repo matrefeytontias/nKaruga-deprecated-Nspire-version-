@@ -8,12 +8,13 @@
 #define ENEMY_W(i) G_enemiesArray.data[i].img[0]
 #define ENEMY_H(i) G_enemiesArray.data[i].img[1]
 
-int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount, G_maxChain = 0; int G_score, G_power;
+int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY] = { 0 }, G_frameChainOffset = 0, G_chainStatus = 0, G_inChainCount = 0, G_maxChain = 0;
+int G_score = 0, G_power = 0;
 bool G_displayBg = true, G_fireback = true, G_hardMode = false;
-bool G_hasFiredOnce;
-bool G_fightingBoss;
+bool G_hasFiredOnce = false;
+bool G_fightingBoss = false;
 int G_difficulty = 1;
-bool G_usingTouchpad;
+bool G_usingTouchpad = false;
 touchpad_info_t *G_tpinfo;
 touchpad_report_t G_tpstatus;
 t_key G_fireKey, G_polarityKey, G_fragmentKey, G_pauseKey;
@@ -242,10 +243,10 @@ int getBossPhase(int timer)
 void playGame()
 {
 	KeyEvent kEv = 0;
-	int levelCounter, levelTimer, waveIndex, scrollOffset = 0, pxScrollStart, pxScrollEnd, pauseTimer;
+	int levelCounter = 0, levelTimer = 0, waveIndex = 0, scrollOffset = 0, pxScrollStart = 0, pxScrollEnd = 0, pauseTimer = 0;
 	bool gameEnded = false, parsedEnemy = true;
 	int readKeys = 0, gpTimer = 0;
-	int x, y;
+	int x = 0, y = 0;
 	
 	Rect statsRect, levelRect;
 	int chainColor[3] = { 0 };
@@ -254,7 +255,7 @@ void playGame()
 	unsigned int* bg = (unsigned int*)image_entries[image_LUT_background0];
 	
 	// Game phase
-	int gamePhase;
+	int gamePhase = PHASE_GAME;
 	G_fightingBoss = false;
 	BossData bossData;
 	int bossBonus = 0;
@@ -324,6 +325,8 @@ void playGame()
 							waveIndex = 0;
 							levelCounter++;
 							G_enemiesArray.resetEnemyCounter();
+							// Reset relative camera
+							DC->cam.relX = DC->cam.relY = 0;
 						}
 						else if(currentLevelByte == LVLSTR_NEWCAMERA)
 						{
@@ -358,15 +361,18 @@ void playGame()
 							int nextChapter = levelStream[++levelCounter];
 							G_enemiesArray.destroyAllEnemies(&ship, bArray);
 							bArray->clear();
-							// Reset everything chains-related max chains
+							// Reset everything chains-related
 							G_chainStatus = 0;
 							G_frameChainOffset = 0;
 							G_inChainCount = 0;
-							bg = (unsigned int*)image_entries[image_LUT_background0 + nextChapter];
+							// bg = (unsigned int*)image_entries[image_LUT_background0 + nextChapter];
+							G_power = 0;
 							clearBufferB();
 							updateScreen();
 							sleep(1000);
 							levelCounter++;
+							// Reset all camera position
+							DC->cam.absX = DC->cam.absY = DC->cam.relX = DC->cam.relY = 0;
 							// And here we go for a new chapter
 						}
 						else if(currentLevelByte == LVLSTR_CHAPTER)
@@ -472,7 +478,11 @@ void playGame()
 					drawSprite(levelKanjis[chapterNum], 10, 80);
 				}
 			if(gpTimer > 768)
+			{
+				// Reset all camera position
+				DC->cam.absX = DC->cam.absY = DC->cam.relX = DC->cam.relY = 0;
 				gamePhase = PHASE_GAME;
+			}
 		}
 		else if(gamePhase == PHASE_BOSSFIGHT)
 		{

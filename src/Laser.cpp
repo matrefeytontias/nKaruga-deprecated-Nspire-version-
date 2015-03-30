@@ -11,17 +11,18 @@ Laser::~Laser()
 	
 }
 
-void Laser::activate(Enemy *e, bool _p)
+void Laser::activate(Enemy *e, bool _p, Fixed _a)
 {
 	origin = e;
 	active = true;
 	polarity = _p;
 	amplitude = 0;
+	angleOffset = _a;
 }
 
 void Laser::handle()
 {
-	angle = ~origin->getRotation() + 64;
+	angle = -origin->getRotation() + angleOffset;
 	x = fixtoi(origin->getx()) + fixtoi(fixcos(angle) * origin->img[0] / 2);
 	y = fixtoi(origin->gety()) + fixtoi(fixsin(angle) * origin->img[1] / 2);
 	amplitude += (amplitude < 320) * LASER_SPEED;
@@ -37,49 +38,63 @@ void Laser::draw()
 	int j = (rand() % 4) + 1;
 	for(int i = 0; i < j; i++)
 	{
-		Fixed a = angle + (rand() % 64) - 48;
-		G_particles->add(itofix(x), itofix(y), fixcos(a) / 2, fixsin(a) / 2, polarity);
+		Fixed a = angle + (rand() % 64) - 32;
+		G_particles->add(itofix(x), itofix(y), a, polarity, 32);
 	}
 	
-	// n2DLib's drawLine algorithm, but drawing rotated laser sprites instead of pixels
+	// A laser has an up-to 8-pixels core radius with an up-to 12-pixels aura radius (ie a laser is 24 pixels thick)
+	// I use n2DLib's drawLine algorithm, but drawing rotated laser slices instead of pixels
 	// Algorithm by pierrotdu18
 	int x1 = x;
 	int y1 = y;
 	int x2 = fixtoi(fixcos(angle) * amplitude) + x1;
 	int y2 = fixtoi(fixsin(angle) * amplitude) + y1;
-	int dx = abs(x2-x1);
-	int dy = abs(y2-y1);
-	int sx = (x1 < x2)?1:-1;
-	int sy = (y1 < y2)?1:-1;
-	int err = dx-dy;
-	// Sprite drawing vars
+	int dx = abs(x2 - x1);
+	int dy = abs(y2 - y1);
+	int sx = (x1 < x2) ? 1 : -1;
+	int sy = (y1 < y2) ? 1 : -1;
+	int err = dx - dy;
+	// Slice drawing vars
 	Fixed sdx = fixsin(-angle);
 	Fixed sdy = fixcos(-angle);
-	unsigned short *laserSlice = image_entries[polarity ? image_LUT_enemy_laser_shadow : image_LUT_enemy_laser_light] + 3; // skip header
-	
+	Fixed phase = -G_gpTimer * 24;
 	while (!(x1 == x2 && y1 == y2))
 	{
+		phase += 5; // a period is 50 pixels
+		Fixed coreR = fixcos(phase) * 2 + itofix(6); // the core radius oscillates between 4 and 8 pixels
+		Fixed auraR = fixsin(phase) * 3 + itofix(9); // the aura radius oscillates between 6 and 12 pixels
+		
 		// Draws a rotated laser "slice"
-		// Optimizes the sprite drawing since it's always the same 1*25 image
 		Fixed sxp = itofix(x1) - sdx * 12;
 		Fixed syp = itofix(y1) - sdy * 12;
 		for(int i = 0; i < 25; i++)
 		{
-			setPixel(fixtoi(sxp), fixtoi(syp), laserSlice[i]);
+			if(abs(i - 12) <= fixtoi(coreR)) // Core pixel
+			{
+				setPixel(fixtoi(sxp), fixtoi(syp), polarity ? 0 : 0xffff);
+				setPixel(fixtoi(sxp) + 1, fixtoi(syp), polarity ? 0 : 0xffff);
+				setPixel(fixtoi(sxp), fixtoi(syp) + 1, polarity ? 0 : 0xffff);
+				setPixel(fixtoi(sxp) + 1, fixtoi(syp) + 1, polarity ? 0 : 0xffff);
+			}
+			else if(abs(i - 12) <= fixtoi(auraR)) // Aura pixel
+				setPixel(fixtoi(sxp), fixtoi(syp),
+					polarity ?
+						0xf800
+						: r5g6b5(abs(fixtoi(auraR) - abs(i - 12)) * 256 / fixtoi(auraR), abs(fixtoi(auraR) - abs(i - 12)) * 128 / fixtoi(auraR) + 128, 255));
 			sxp += sdx;
 			syp += sdy;
 		}
 		
-		int e2 = 2*err;
+		int e2 = err * 2;
 		if (e2 > -dy)
 		{	
-			err = err - dy;
-			x1 = x1 + sx;
+			err -= dy;
+			x1 += + sx;
 		}
 		if (e2 < dx)
 		{	
-			err = err + dx;
-			y1 = y1 + sy;
+			err += dx;
+			y1 += sy;
 		}
 	}
 }

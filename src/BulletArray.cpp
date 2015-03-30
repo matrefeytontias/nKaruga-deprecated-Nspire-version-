@@ -276,7 +276,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 								for(int j = 0; j < k; j++)
 								{
 									Fixed a = cl->angle + 128 + (rand() % 64) - 32;
-									G_particles->add(p->getx(), p->gety(), fixcos(a) / 2, fixsin(a) / 2, cl->getPolarity());
+									G_particles->add(p->getx(), p->gety(), a, cl->getPolarity(), 32);
 								}
 							}
 						}
@@ -284,7 +284,8 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 				}
 				
 				cl->handle();
-				cl->draw();
+				// Lasers are very complicated to draw ; only do it if necessary
+				if(!(G_skipFrame % 4)) cl->draw();
 			}
 			else
 				cl->deactivate();
@@ -319,9 +320,9 @@ void BulletArray::add_homing(Fixed _x, Fixed _y, Fixed angle, Player* target, bo
 	}
 }
 
-void BulletArray::fire_laser(Enemy *e, bool _p)
+void BulletArray::fire_laser(Enemy *e, bool _p, Fixed _a)
 {
-	data_laser[laserCount].activate(e, _p);
+	data_laser[laserCount].activate(e, _p, _a);
 	laserCount = (laserCount + 1) % MAX_LASER;
 }
 

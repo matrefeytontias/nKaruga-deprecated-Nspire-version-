@@ -50,7 +50,7 @@ extern KeyEvent getk();
 // 12*10
 #define MAX_POWER 120
 
-#define LASER_SPEED 2
+#define LASER_SPEED 3
 #define LASER_THICKNESS 25
 
 #define MAX_DISPLAYABLE 1000
@@ -188,7 +188,7 @@ class Laser : public Bullet
 public:
 	Laser();
 	~Laser();
-	void activate(Enemy *origin, bool polarity);
+	void activate(Enemy *origin, bool polarity, Fixed angOffset);
 	void handle();
 	void draw();
 	Rect* getVector();
@@ -200,6 +200,7 @@ public:
 private:
 	// Lasers are not immediate, they grow
 	Fixed amplitude;
+	Fixed angleOffset;
 };
 
 class BossEnemy;
@@ -218,7 +219,7 @@ public:
 	void add(Fixed x, Fixed y, Fixed dx, Fixed dy, int imageID, bool polarity, bool hurtsPlayer, int camRel);
 	void add_fragment(Fixed x, Fixed y, Fixed initialAngle, Player *target, bool polarity, bool hurtsPlayer);
 	void add_homing(Fixed x, Fixed y, Fixed initialAngle, Player *target, bool polarity);
-	void fire_laser(Enemy *origin, bool polarity);
+	void fire_laser(Enemy *origin, bool polarity, Fixed angleOffset);
 	void deactivate(int offset);
 	void deactivate_fragment(int offset);
 	void deactivate_homing(int offset);
@@ -467,12 +468,13 @@ private:
 // Particles
 // Because they are pretty *_*
 #define MAX_PARTICLE 256
+#define PARTICLE_RADIUS 4
 class Particles
 {
 public:
 	Particles();
 	~Particles();
-	void add(Fixed x, Fixed y, Fixed dx, Fixed dy, bool polarity);
+	void add(Fixed x, Fixed y, Fixed angle, bool polarity, int lifetime);
 	void handle();
 private:
 	Fixed x[MAX_PARTICLE];
@@ -480,6 +482,7 @@ private:
 	Fixed dx[MAX_PARTICLE];
 	Fixed dy[MAX_PARTICLE];
 	int time[MAX_PARTICLE];
+	int dt[MAX_PARTICLE];
 	bool polarity[MAX_PARTICLE];
 	int counter;
 };
@@ -638,8 +641,6 @@ enum
 	image_LUT_explosion_shadow_3,
 	image_LUT_explosion_shadow_4,
 	image_LUT_explosion_shadow_5,
-	image_LUT_particle_light,
-	image_LUT_particle_shadow,
 	image_LUT_powerslot,
 	image_LUT_lives,
 	image_LUT_background0,
@@ -693,6 +694,7 @@ enum
 	Pattern_2_1,
 	Pattern_2_2,
 	Pattern_2_3,
+	Pattern_2_4,
 	NB_CALLBACKS
 };
 
@@ -720,6 +722,7 @@ extern void freeGameLUTs();
 
 extern DrawingCandidates *DC;
 // Global vars
+extern int G_gpTimer;
 extern int G_skipFrame, G_waveTimer, G_killedThisFrame[MAX_ENEMY], G_frameChainOffset, G_chainStatus, G_inChainCount, G_maxChain;
 extern int G_score, G_power;
 extern bool G_fightingBoss;

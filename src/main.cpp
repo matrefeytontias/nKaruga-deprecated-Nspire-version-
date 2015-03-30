@@ -7,6 +7,7 @@
 #define ENEMY_W(i) G_enemiesArray.data[i].img[0]
 #define ENEMY_H(i) G_enemiesArray.data[i].img[1]
 
+int G_gpTimer;
 int G_skipFrame = 0, G_waveTimer = 0, G_killedThisFrame[MAX_ENEMY] = { 0 }, G_frameChainOffset = 0, G_chainStatus = 0, G_inChainCount = 0, G_maxChain = 0;
 int G_score = 0, G_power = 0;
 bool G_displayBg = true, G_fireback = true, G_hardMode = false;
@@ -244,7 +245,7 @@ void playGame()
 	KeyEvent kEv = 0;
 	int levelCounter = 0, levelTimer = 0, waveIndex = 0, scrollOffset = 0, pxScrollStart = 0, pxScrollEnd = 0, pauseTimer = 0;
 	bool gameEnded = false, parsedEnemy = true;
-	int readKeys = 0, gpTimer = 0;
+	int readKeys = 0;
 	int x = 0, y = 0;
 	
 	Rect statsRect, levelRect;
@@ -298,11 +299,11 @@ void playGame()
 	
 	G_inChainCount = 0;
 	currentNotif = 0;
-	gpTimer = 0;
+	G_gpTimer = 0;
 	
 	while(!KQUIT(kEv) && !gameEnded)
 	{
-		gpTimer++;
+		G_gpTimer++;
 		G_waveTimer++;
 		if(gamePhase == PHASE_GAME)
 		{
@@ -381,7 +382,7 @@ void playGame()
 							// Set up transition
 							gamePhase = PHASE_TRANSITION;
 							currentW = 0;
-							gpTimer = 0;
+							G_gpTimer = 0;
 							levelCounter++;
 							chapterNum = levelStream[levelCounter];
 							levelCounter++;
@@ -399,7 +400,7 @@ void playGame()
 							// Cinematic
 							G_fightingBoss = true;
 							gamePhase = PHASE_BOSSCINEMATIC;
-							gpTimer = 0;
+							G_gpTimer = 0;
 							// fight boss
 							levelCounter++;
 							bossData = createBossData(levelStream[levelCounter]);
@@ -410,7 +411,7 @@ void playGame()
 						{
 							// Debug stuff
 							printf("Current wave timer : %d\nGlobal timer : %d\nCurrent wave index : %d\n",
-							G_waveTimer, gpTimer, waveIndex);
+							G_waveTimer, G_gpTimer, waveIndex);
 							for(int i = 0; i < MAX_ENEMY; i++)
 							{
 								if(G_enemiesArray.data[i].isActive())
@@ -431,7 +432,7 @@ void playGame()
 						gamePhase = PHASE_RESULTS;
 						currentW = 0;
 						currentH = 0;
-						gpTimer = 0;
+						G_gpTimer = 0;
 						levelCounter++;
 					}
 					else if(currentLevelByte == LVLSTR_END)
@@ -466,7 +467,7 @@ void playGame()
 			}
 			else if(currentW < 120)
 			{
-				if(!(gpTimer % 2))
+				if(!(G_gpTimer % 2))
 					currentW++;
 			}
 			else
@@ -477,7 +478,7 @@ void playGame()
 					drawString(&levelRect.x, &levelRect.y, levelRect.x, levelStrs[chapterNum], 0xffff, 0);
 					drawSprite(levelKanjis[chapterNum], 10, 80);
 				}
-			if(gpTimer > 768)
+			if(G_gpTimer > 768)
 			{
 				// Reset all camera position
 				DC->cam.absX = DC->cam.absY = DC->cam.relX = DC->cam.relY = 0;
@@ -495,7 +496,7 @@ void playGame()
 		}
 		
 		if(G_fightingBoss)
-			gamePhase = getBossPhase(gpTimer);
+			gamePhase = getBossPhase(G_gpTimer);
 		
 		if(!(readKeys % 4))
 		{
@@ -510,7 +511,7 @@ void playGame()
 			kEv = 0;
 			G_tpstatus.x = G_tpinfo->width / 2;
 			G_tpstatus.y = G_tpinfo->height / 2;
-			if(gpTimer < TRANSLATE)
+			if(G_gpTimer < TRANSLATE)
 			{
 				ship.setx(ship.getx() + dX);
 				ship.sety(ship.gety() + dY);
@@ -627,13 +628,13 @@ void playGame()
 					statsRect.x = (320 - stringWidth(string_results[0])) / 2;
 					statsRect.y = 16;
 					drawString(&statsRect.x, &statsRect.y, (320 - stringWidth(string_results[1])) / 2, string_results[0], 0xffff, 0);
-					if(gpTimer > 128)
+					if(G_gpTimer > 128)
 					{
 						// Boss bonus
 						drawString(&statsRect.x, &statsRect.y, (320 - numberWidth(G_bossEnemy->getTimeout() * 10000)) / 2, string_results[1], 0xffff, 0);
 						drawDecimal(&statsRect.x, &statsRect.y, G_bossEnemy->getTimeout() * 10000, 0xffff, 0);
 					}
-					if(gpTimer > 256)
+					if(G_gpTimer > 256)
 					{
 						G_score += bossBonus;
 						bossBonus = 0;
@@ -652,7 +653,7 @@ void playGame()
 						if(!G_hasFiredOnce)
 							drawString(&statsRect.x, &statsRect.y, statsRect.x, "Dot eater !", 0xffff, 0);
 					}
-					if(gpTimer > 384 && KFIRE(kEv))
+					if(G_gpTimer > 384 && KFIRE(kEv))
 					{
 						gamePhase = PHASE_GAME;
 					}
@@ -663,7 +664,7 @@ void playGame()
 					else if(currentW < 160) currentW += 2;
 						
 					fillRect(160 - currentW, 120 - currentH, currentW * 2 + 1, currentH * 2, 0);
-					gpTimer = 0;
+					G_gpTimer = 0;
 				}
 			}
 			else if(gamePhase == PHASE_BOSSCINEMATIC)

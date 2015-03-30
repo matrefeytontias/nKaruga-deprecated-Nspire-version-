@@ -302,7 +302,7 @@ case Pattern_1_17:
 		else if(y == itofix(46) && !internal[0])
 		{
 			// FIRE DA L4Z000000000000000R
-			bArray->fire_laser(this, polarity);
+			bArray->fire_laser(this, polarity, 64);
 			rotationAngle++;
 			internal[0] = 1;
 			internal[1] = rotationAngle * 2;
@@ -531,5 +531,36 @@ case Pattern_2_3:
 		rotationAngle = -internal[1] + !internal[3] * 128;
 		if((internal[1] & 0xff) == 192) internal[4] = 1;
 		internal[2] += internal[4] * 128;
+	}
+	break;
+case Pattern_2_4:
+	if(x < itofix(100))
+	{
+		x += 128;
+	}
+	else if(x > itofix(220))
+	{
+		x -= 128;
+	}
+	else if(fixtoi(x) == 100 || fixtoi(x) == 220)
+	{
+		if(!internal[0])
+		{
+			bArray->fire_laser(this, polarity, 64);
+			internal[0] = 1;
+		}
+		else if(internal[1] < 1024)
+		{
+			internal[1]++;
+		}
+		else if(internal[1] == 1024)
+		{
+			bArray->stop_laser(this);
+			internal[1]++;
+		}
+		else
+		{
+			y -= 128;
+		}
 	}
 	break;

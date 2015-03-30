@@ -5,6 +5,7 @@ Enemy::Enemy() : Entity()
 	active = false;
 	diedThisFrame = false;
 	isJointed = false;
+	rotationAngle = 0;
 }
 
 Enemy::~Enemy()

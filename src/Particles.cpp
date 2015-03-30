@@ -12,14 +12,16 @@ Particles::~Particles()
 	
 }
 
-void Particles::add(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, bool _p)
+void Particles::add(Fixed _x, Fixed _y, Fixed _a, bool _p, int lifetime)
 {
+	int ratio = rand() % 256;
 	x[counter] = _x;
 	y[counter] = _y;
-	dx[counter] = _dx;
-	dy[counter] = _dy;
+	dx[counter] = fixmul(fixcos(_a), ratio);
+	dy[counter] = fixmul(fixsin(_a), ratio);
 	polarity[counter] = _p;
-	time[counter] = (rand() % 64) + 32;
+	time[counter] = lifetime;
+	dt[counter] = lifetime / PARTICLE_RADIUS;
 	counter = (counter + 1) % MAX_PARTICLE;
 }
 
@@ -33,9 +35,10 @@ void Particles::handle()
 			x[i] += dx[i];
 			y[i] += dy[i];
 			
-			Rect r = { fixtoi(x[i]), fixtoi(y[i]), 0, 0 };
-			//~ drawSprite(image_entries[polarity[i] ? image_LUT_particle_shadow : image_LUT_particle_light], fixtoi(x[i]), fixtoi(y[i]));
-			DC->add(image_entries[polarity[i] ? image_LUT_particle_shadow : image_LUT_particle_light], &r, CAMREL_NONE);
+			// Rect r = { fixtoi(x[i]), fixtoi(y[i]), 0, 0 };
+			// DC->add(image_entries[polarity[i] ? image_LUT_particle_shadow : image_LUT_particle_light], &r, CAMREL_NONE);
+			fillCircle(fixtoi(x[i]), fixtoi(y[i]), time[i] / dt[i], polarity[i] ? 0 : 0xffff);
+			
 		}
 	}
 }

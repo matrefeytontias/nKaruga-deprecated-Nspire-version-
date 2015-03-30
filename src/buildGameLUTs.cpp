@@ -102,8 +102,6 @@ void buildGameLUTs()
 	image_entries[image_LUT_explosion_shadow_3] = image_explosion_shadow_3;
 	image_entries[image_LUT_explosion_shadow_4] = image_explosion_shadow_4;
 	image_entries[image_LUT_explosion_shadow_5] = image_explosion_shadow_5;
-	image_entries[image_LUT_particle_light] = image_particle_light;
-	image_entries[image_LUT_particle_shadow] = image_particle_shadow;
 	image_entries[image_LUT_powerslot] = image_powerslot;
 	image_entries[image_LUT_lives] = image_lives;
 	image_entries[image_LUT_bossWarning] = image_bossWarning;

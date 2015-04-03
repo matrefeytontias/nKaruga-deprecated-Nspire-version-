@@ -534,33 +534,87 @@ case Pattern_2_3:
 	}
 	break;
 case Pattern_2_4:
-	if(x < itofix(100))
+	if(x < itofix(120))
 	{
+		if(x == itofix(60))
+			bArray->fire_laser(this, polarity, 64);
 		x += 128;
 	}
-	else if(x > itofix(220))
+	else if(x > itofix(200))
 	{
+		if(x == itofix(260))
+			bArray->fire_laser(this, polarity, 64);
 		x -= 128;
 	}
-	else if(fixtoi(x) == 100 || fixtoi(x) == 220)
+	else if(fixtoi(x) == 120 || fixtoi(x) == 200)
 	{
-		if(!internal[0])
-		{
-			bArray->fire_laser(this, polarity, 64);
-			internal[0] = 1;
-		}
-		else if(internal[1] < 1024)
-		{
+		if(internal[1] < 768)
 			internal[1]++;
-		}
-		else if(internal[1] == 1024)
+		else if(internal[1] == 768)
 		{
 			bArray->stop_laser(this);
 			internal[1]++;
 		}
 		else
-		{
 			y -= 128;
-		}
 	}
 	break;
+case Pattern_2_5:
+	if(x < itofix(160))
+	{
+		if(!internal[0] && x < itofix(80 - (waveIndex % 2) * 20))
+			x += 128;
+		else
+		{
+			internal[0]++;
+			if(internal[0] > 512)
+				x -= 128;
+		}
+	}
+	else
+	{
+		if(!internal[0] && x > itofix(240 + (waveIndex % 2) * 20))
+			x -= 128;
+		else
+		{
+			internal[0]++;
+			if(internal[0] > 512)
+				x += 128;
+		}
+	}
+	rotationAngle += (waveIndex % 2) * 2 - 1;
+	break;
+case Pattern_2_6:
+	// Those are the 14th, 15th, 16th and 17th enemies of the wave (starting at 0)
+	if(!internal[0])
+		internal[0] = waveIndex - 13; // avoid having 0
+	if(!internal[1] && y < itofix(135 - (internal[0] - 1) * 30))
+		y += 128;
+	else
+	{
+		internal[1]++;
+		if(internal[1] > 512)
+			x += itofix(1) * (((internal[0] - 1) % 2) * 2 - 1);
+	}
+	rotationAngle++;
+	break;
+case Pattern_2_7:
+	// This starts at waveIndex = 18 -> odd parity
+	// Odd parity is left, even parity is right
+	if(y < itofix(135))
+	{
+		y += itofix(1);
+	}
+	else
+	{
+		if(y == itofix(135))
+			internal[1] = 128;
+		if(waveIndex % 2)
+			x -= internal[1];
+		else
+			x += internal[1];
+		internal[1] += 8;
+		y += 128;
+	}
+	break;
+	

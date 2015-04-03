@@ -695,6 +695,9 @@ enum
 	Pattern_2_2,
 	Pattern_2_3,
 	Pattern_2_4,
+	Pattern_2_5,
+	Pattern_2_6,
+	Pattern_2_7,
 	NB_CALLBACKS
 };
 

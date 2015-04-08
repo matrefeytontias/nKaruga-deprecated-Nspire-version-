@@ -123,7 +123,7 @@ public:
 	Bullet();
 	~Bullet();
 	Rect* makeRect();
-	void activate(Fixed x, Fixed y, Fixed dx, Fixed dy, int imageID, bool polarity, bool hurtsPlayer, int camRel);
+	void activate(Fixed x, Fixed y, Fixed a, Fixed r, int imageID, bool polarity, bool hurtsPlayer, int camRel);
 	bool getPolarity();
 	bool hurtsPlayer();
 	bool handle();
@@ -216,7 +216,7 @@ public:
 	BulletArray();
 	~BulletArray();
 	void handle(Player *player, BossEnemy *be);
-	void add(Fixed x, Fixed y, Fixed dx, Fixed dy, int imageID, bool polarity, bool hurtsPlayer, int camRel);
+	void add(Fixed x, Fixed y, Fixed a, Fixed r, int imageID, bool polarity, bool hurtsPlayer, int camRel);
 	void add_fragment(Fixed x, Fixed y, Fixed initialAngle, Player *target, bool polarity, bool hurtsPlayer);
 	void add_homing(Fixed x, Fixed y, Fixed initialAngle, Player *target, bool polarity);
 	void fire_laser(Enemy *origin, bool polarity, Fixed angleOffset);
@@ -474,7 +474,7 @@ class Particles
 public:
 	Particles();
 	~Particles();
-	void add(Fixed x, Fixed y, Fixed angle, bool polarity, int lifetime);
+	void add(Fixed x, Fixed y, Fixed angle, Fixed r, bool polarity, int lifetime);
 	void handle();
 private:
 	Fixed x[MAX_PARTICLE];

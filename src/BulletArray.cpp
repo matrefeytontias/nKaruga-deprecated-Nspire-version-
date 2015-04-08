@@ -276,7 +276,7 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 								for(int j = 0; j < k; j++)
 								{
 									Fixed a = cl->angle + 128 + (rand() % 64) - 32;
-									G_particles->add(p->getx(), p->gety(), a, cl->getPolarity(), 32);
+									G_particles->add(p->getx(), p->gety(), a, itofix(1), cl->getPolarity(), 32);
 								}
 							}
 						}
@@ -293,11 +293,13 @@ void BulletArray::handle(Player *p, BossEnemy *be)
 	}
 }
 
-void BulletArray::add(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, int imgID, bool _p, bool _h, int camRel)
+// Add some particles each time a bullet is fired
+
+void BulletArray::add(Fixed _x, Fixed _y, Fixed a, Fixed r, int imgID, bool _p, bool _h, int camRel)
 {
 	if(bulletCount < MAX_BULLET)
 	{
-		data[bulletCount].activate(_x, _y, _dx, _dy, imgID, _p, _h, camRel);
+		data[bulletCount].activate(_x, _y, a, r, imgID, _p, _h, camRel);
 		bulletCount++;
 	}
 }

@@ -288,7 +288,7 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 				for(int i = 0; i < 3; i++)
 				{
 					Fixed angle = 64 - be->angle - (i - 1) * 32;
-					bArray->add(itofix(pos.x), itofix(pos.y), fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_1_light, LIGHT, true, CAMREL_NONE);
+					bArray->add(itofix(pos.x), itofix(pos.y), angle, itofix(1), image_LUT_enemy_bullet_1_light, LIGHT, true, CAMREL_NONE);
 				}
 			}
 			else
@@ -296,7 +296,7 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 				for(int i = 0; i < 2; i++)
 				{
 					Fixed angle = 64 - be->angle - (i * 32 - 16);
-					bArray->add(itofix(pos.x), itofix(pos.y), fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_1_light, LIGHT, true, CAMREL_NONE);
+					bArray->add(itofix(pos.x), itofix(pos.y), angle, itofix(1), image_LUT_enemy_bullet_1_light, LIGHT, true, CAMREL_NONE);
 				}
 			}
 		}
@@ -336,7 +336,7 @@ void boss1_cb(BossEnemy *be, Player *p, BulletArray *bArray)
 					Fixed angle = j * 6 + 16 - be->angle;
 					for(int i = 0; i < 4; i++)
 					{
-						bArray->add(itofix(pos.x), itofix(pos.y), fixcos(angle), fixsin(angle), image_LUT_enemy_bullet_1_light, SHADOW, true, CAMREL_NONE);
+						bArray->add(itofix(pos.x), itofix(pos.y), angle, itofix(1), image_LUT_enemy_bullet_1_light, SHADOW, true, CAMREL_NONE);
 						angle += 21;
 					}
 					bulletFired[j]++;

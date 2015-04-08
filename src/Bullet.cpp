@@ -17,15 +17,15 @@ Rect* Bullet::makeRect()
 	return &r;
 }
 
-void Bullet::activate(Fixed _x, Fixed _y, Fixed _dx, Fixed _dy, int imgID, bool _p, bool _h, int camRel)
+void Bullet::activate(Fixed _x, Fixed _y, Fixed _a, Fixed _r, int imgID, bool _p, bool _h, int camRel)
 {
 	active = true;
 	polarity = _p;
 	hurtPlayer = _h;
 	x = fToScreenX(_x, camRel);
 	y = fToScreenY(_y, camRel);
-	dx = _dx;
-	dy = _dy;
+	dx = fixmul(fixcos(_a), _r);
+	dy = fixmul(fixsin(_a), _r);
 	img = image_entries[imgID + (_p ? 1 : 0)];
 }
 

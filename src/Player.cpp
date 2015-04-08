@@ -104,30 +104,40 @@ void Player::handle(KeyEvent kEv, BulletArray *bArray)
 			}
 		}
 		
-		if(fireDelay == 0)
+		if(KFIRE(kEv))
 		{
-			if(KFIRE(kEv))
+			if(!fireDelay)
 			{
 				G_hasFiredOnce = true;
 				if(fireRepeat)
 				{
 					// fire 2 bullets if the key is being held
-					bArray->add(x - itofix(img[0][0]) / 3, y, 0, itofix(-3), image_LUT_player_bullet_light, polarity, false, CAMREL_NONE);
-					bArray->add(x + itofix(img[0][0]) / 3, y, 0, itofix(-3), image_LUT_player_bullet_light, polarity, false, CAMREL_NONE);
+					bArray->add(x - itofix(img[0][0]) / 3, y, 192, itofix(3), image_LUT_player_bullet_light, polarity, false, CAMREL_NONE);
+					bArray->add(x + itofix(img[0][0]) / 3, y, 192, itofix(3), image_LUT_player_bullet_light, polarity, false, CAMREL_NONE);
 					fireDelay = 16;
+					int x1 = x - itofix(img[0][0]) / 3;
+					int x2 = x + itofix(img[0][0]) / 3;
+					for(int i = 0; i < 8; i++)
+					{
+						G_particles->add(x1, y, 192 + (rand() % 32) - 16, itofix(1), polarity, 16);
+						G_particles->add(x2, y, 192 + (rand() % 32) - 16, itofix(1), polarity, 16);
+					}
 				}
 				else
 				{
 					// fire 1 bullet
-					bArray->add(x, y, 0, itofix(-3), image_LUT_player_bullet_light, polarity, false, CAMREL_NONE);
+					bArray->add(x, y, 192, itofix(3), image_LUT_player_bullet_light, polarity, false, CAMREL_NONE);
 					fireDelay = 24;
 					fireRepeat = true;
+					for(int i = 0; i < 8; i++)
+						G_particles->add(x, y, 192 + (rand() % 32) - 16, itofix(1), polarity, 16);
 				}
 			}
-			else
-				fireRepeat = false;
 		}
 		else
+			fireRepeat = false;
+		
+		if(fireDelay)
 			fireDelay--;
 	}
 	else

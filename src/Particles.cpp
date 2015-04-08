@@ -12,9 +12,9 @@ Particles::~Particles()
 	
 }
 
-void Particles::add(Fixed _x, Fixed _y, Fixed _a, bool _p, int lifetime)
+void Particles::add(Fixed _x, Fixed _y, Fixed _a, Fixed _r, bool _p, int lifetime)
 {
-	int ratio = rand() % 256;
+	int ratio = (rand() % 256) - 128 + _r;
 	x[counter] = _x;
 	y[counter] = _y;
 	dx[counter] = fixmul(fixcos(_a), ratio);

@@ -111,7 +111,7 @@ void Enemy::damage(Player *_p, bool _pol, int amount, BulletArray *bArray)
 				Fixed angle = angleToEntity(this, _p);
 				int famount = _pol != polarity ? fireback / 2 : fireback;
 				for(int i = 0; i < famount; i++)
-					bArray->add(getx(), gety(), fixcos(angle + (rand() % 16) - 8) << 1, fixsin(angle + (rand() % 16) - 8) + (rand() % 256), image_LUT_enemy_bullet_0_light, polarity, true, getCamRel());
+					bArray->add(getx(), gety(), angle + (rand() % 16) - 8, itofix(2) + (rand() % 256) - 128, image_LUT_enemy_bullet_0_light, polarity, true, getCamRel());
 			}
 		}
 		diedThisFrame = true;

@@ -39,7 +39,7 @@ void Laser::draw()
 	for(int i = 0; i < j; i++)
 	{
 		Fixed a = angle + (rand() % 64) - 32;
-		G_particles->add(itofix(x), itofix(y), a, polarity, 32);
+		G_particles->add(itofix(x), itofix(y), a, itofix(1), polarity, 32);
 	}
 	
 	// A laser has an up-to 8-pixels core radius with an up-to 12-pixels aura radius (ie a laser is 24 pixels thick)

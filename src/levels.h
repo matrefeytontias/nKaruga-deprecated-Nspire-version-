@@ -495,14 +495,11 @@ const static int levelStream[] = {
 	cmd_wait(48),
 	enemy(260, -20, 1, image_LUT_enemy_ship_5_light, Pattern_2_2, LIGHT, 1, 2, 0),
 	enemy(-20, 60, 1, image_LUT_enemy_ship_5_shadow, Pattern_2_3, SHADOW, 1, 2, 0),
-	cmd_wait(96),
-	enemy(60, -20, 1, image_LUT_enemy_ship_5_light, Pattern_2_2, LIGHT, 1, 2, 0),
-	enemy(340, 60, 1, image_LUT_enemy_ship_5_shadow, Pattern_2_3, SHADOW, 1, 2, 0),
 	cmd_killed,
 	cmd_newWave,
 	// Wave 3
-	enemy(-40, 40, 20, image_LUT_enemy_ship_6_light, Pattern_2_4, LIGHT, 0, 20, 0),
-	enemy(360, 40, 20, image_LUT_enemy_ship_6_light, Pattern_2_4, LIGHT, 0, 20, 0),
+	enemy(-40, 30, 20, image_LUT_enemy_ship_6_light, Pattern_2_4, LIGHT, 0, 20, 0),
+	enemy(360, 30, 20, image_LUT_enemy_ship_6_light, Pattern_2_4, LIGHT, 0, 20, 0),
 	cmd_wait(200),
 	enemy(-10, 60, 1, image_LUT_enemy_ship_0_shadow, Pattern_2_5, SHADOW, 1, 5, 0),
 	enemy(-30, 75, 1, image_LUT_enemy_ship_0_shadow, Pattern_2_5, SHADOW, 1, 5, 0),
@@ -523,7 +520,7 @@ const static int levelStream[] = {
 	enemy(160, -20, 1, image_LUT_enemy_ship_0_light, Pattern_2_6, LIGHT, 1, 5, 0),
 	cmd_wait(30),
 	enemy(160, -20, 1, image_LUT_enemy_ship_0_light, Pattern_2_6, LIGHT, 1, 5, 0),
-	cmd_wait(256),
+	cmd_wait(384),
 	enemy(135, -20, 1, image_LUT_enemy_ship_5_shadow, Pattern_2_7, SHADOW, 0, 2, 0),
 	enemy(185, -20, 1, image_LUT_enemy_ship_5_shadow, Pattern_2_7, SHADOW, 0, 2, 0),
 	cmd_wait(30),
@@ -559,5 +556,7 @@ const static int levelStream[] = {
 	enemy(255, -30, 1, image_LUT_enemy_ship_5_light, Pattern_2_7, LIGHT, 0, 2, 0),
 	cmd_killed,
 	cmd_newWave,
+	cmd_startChapter(1),
+	cmd_newCameraPath(CameraPath_c2),
 	LVLSTR_END
 	};

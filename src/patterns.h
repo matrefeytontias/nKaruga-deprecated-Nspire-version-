@@ -548,9 +548,9 @@ case Pattern_2_4:
 	}
 	else if(fixtoi(x) == 120 || fixtoi(x) == 200)
 	{
-		if(internal[1] < 768)
+		if(internal[1] < 1024)
 			internal[1]++;
-		else if(internal[1] == 768)
+		else if(internal[1] == 1024)
 		{
 			bArray->stop_laser(this);
 			internal[1]++;
@@ -567,7 +567,7 @@ case Pattern_2_5:
 		else
 		{
 			internal[0]++;
-			if(internal[0] > 512)
+			if(internal[0] > 768)
 				x -= 128;
 		}
 	}
@@ -578,7 +578,7 @@ case Pattern_2_5:
 		else
 		{
 			internal[0]++;
-			if(internal[0] > 512)
+			if(internal[0] > 768)
 				x += 128;
 		}
 	}
@@ -593,7 +593,7 @@ case Pattern_2_6:
 	else
 	{
 		internal[1]++;
-		if(internal[1] > 512)
+		if(internal[1] > 768)
 			x += itofix(1) * (((internal[0] - 1) % 2) * 2 - 1);
 	}
 	rotationAngle++;

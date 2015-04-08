@@ -19,7 +19,16 @@ void cthIntro2(Camera *cam)
 	UNUSED(cam);
 }
 
-cameraTravelling camTrav[] = { cthIntro1, cthChap1, cthIntro2 };
+void cthChap2(Camera *cam)
+{
+	if(!(G_gpTimer % 4))
+	{
+		cam->relY--;
+		cam->absY--;
+	}
+}
+
+cameraTravelling camTrav[] = { cthIntro1, cthChap1, cthIntro2, cthChap2 };
 
 // 
 // DrawingCandidates class

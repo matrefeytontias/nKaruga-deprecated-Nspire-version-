@@ -264,7 +264,7 @@ void playGame()
 	int currentW = 0, currentH = 0, chapterNum = 0, dX = 0, dY = 0;
 	bool drawPowerSlot = true;
 	static const char *levelStrs[5] = { "Chapter 1\nIdeal", "Chapter 2\nTrial", "Chapter 3\nFaith", "Chapter 4\nReality", "Chapter 5\nMetempsychosis" };
-	static unsigned short *levelKanjis[1] = { image_kanji_1 };
+	static unsigned short *levelKanjis[2] = { image_kanji_1, image_kanji_2 };
 	
 	BulletArray* bArray = new BulletArray;
 	Player ship;
@@ -473,10 +473,10 @@ void playGame()
 			else
 				if(!(G_skipFrame % 4))
 				{
-					levelRect.x = 10;
+					levelRect.x = 30;
 					levelRect.y = 60;
 					drawString(&levelRect.x, &levelRect.y, levelRect.x, levelStrs[chapterNum], 0xffff, 0);
-					drawSprite(levelKanjis[chapterNum], 10, 80);
+					drawSprite(levelKanjis[chapterNum], 30, 80);
 				}
 			if(G_gpTimer > 768)
 			{

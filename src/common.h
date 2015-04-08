@@ -706,7 +706,8 @@ enum
 {
 	CameraPath_i1,
 	CameraPath_c1,
-	CameraPath_i2
+	CameraPath_i2,
+	CameraPath_c2
 };
 
 // Camera relations

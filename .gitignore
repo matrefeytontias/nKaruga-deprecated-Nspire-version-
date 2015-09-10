@@ -3,6 +3,7 @@
 *.elf
 *.gdb
 *.db
+*.xcf
 *.zip
 src/tags
 src/.depends*

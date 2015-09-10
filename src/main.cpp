@@ -617,7 +617,7 @@ void playGame()
 			statsRect.x = image_entries[image_LUT_lives][0] + 2;
 			statsRect.y = 226;
 			drawChar(&statsRect.x, &statsRect.y, 0, 'x', 0xffff, 0);
-			drawDecimal(&statsRect.x, &statsRect.y, ship.getLives() - 1, 0xffff, 0);
+			drawDecimal(&statsRect.x, &statsRect.y, max(0, ship.getLives() - 1), 0xffff, 0);
 			
 			// Overwrite all of that
 			if(gamePhase == PHASE_RESULTS)

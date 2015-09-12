@@ -668,12 +668,14 @@ enum
 // Enemies' patterns
 enum
 {
+	// Intro 1
 	Pattern_1_1,
 	Pattern_1_2,
 	Pattern_1_3,
 	Pattern_1_4,
 	Pattern_1_5,
 	Pattern_1_6,
+	// Chapter 1
 	Pattern_1_7,
 	Pattern_1_8,
 	Pattern_1_9,
@@ -691,6 +693,7 @@ enum
 	Pattern_1_21,
 	Pattern_1_boss,
 	Pattern_1_bossGrenade,
+	// Intro 2
 	Pattern_2_1,
 	Pattern_2_2,
 	Pattern_2_3,
@@ -698,6 +701,7 @@ enum
 	Pattern_2_5,
 	Pattern_2_6,
 	Pattern_2_7,
+	// Chapter 2
 	NB_CALLBACKS
 };
 

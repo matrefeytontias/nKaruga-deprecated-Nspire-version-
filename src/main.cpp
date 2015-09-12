@@ -128,7 +128,7 @@ int main(int argc, char **argv)
 
 	while(!donePlaying)
 	{
-		drawSprite(image_entries[image_LUT_titleScreen], 0, 0);
+		drawSprite(image_entries[image_LUT_titleScreen], 0, 0, 0, 0);
 		if(!openedMenu)
 		{
 			x = (320 - strlen(string_title) * 8) / 2;
@@ -161,7 +161,7 @@ int main(int argc, char **argv)
 				else if(parameter == 'i')
 					drawString(&x, &y, 0, string_difficulties[*(int*)optionValues[i]], 0, 0xffff);
 			}
-			drawSprite(image_cursor, (320 - (strlen(string_options[choice] + 1) + (string_options[choice][0] != 'n') * 3) * 8) / 2 - 8, choice * 8 + 120);
+			drawSprite(image_cursor, (320 - (strlen(string_options[choice] + 1) + (string_options[choice][0] != 'n') * 3) * 8) / 2 - 8, choice * 8 + 120, 0, 0);
 			
 			sleep(100);
 			
@@ -476,7 +476,7 @@ void playGame()
 					levelRect.x = 30;
 					levelRect.y = 60;
 					drawString(&levelRect.x, &levelRect.y, levelRect.x, levelStrs[chapterNum], 0xffff, 0);
-					drawSprite(levelKanjis[chapterNum], 30, 80);
+					drawSprite(levelKanjis[chapterNum], 30, 80, 0, 0);
 				}
 			if(G_gpTimer > 768)
 			{
@@ -582,7 +582,7 @@ void playGame()
 				drawStringF(&statsRect.x, &statsRect.y, 0, 0xffff, 0, "Score : %d\n\n\n\nCH %d", G_score, G_chainStatus);
 				// Draw chain count
 				for(int i = 0, j = 0; i < G_inChainCount; i++, j += 18)
-					drawSprite(image_entries[chainColor[i] == LIGHT ? image_LUT_chain_hit_light : image_LUT_chain_hit_shadow], j, 12);
+					drawSprite(image_entries[chainColor[i] == LIGHT ? image_LUT_chain_hit_light : image_LUT_chain_hit_shadow], j, 12, 0, 0);
 			}
 			else
 			{
@@ -595,7 +595,7 @@ void playGame()
 			// Draw power
 			for(int i = MAX_FRAGMENT - 1; i >= 0; i--)
 			{
-				drawSprite(image_entries[image_LUT_powerslot], 5, i * 14 + 40);
+				drawSprite(image_entries[image_LUT_powerslot], 5, i * 14 + 40, 0, 0);
 				for(int j = 0; j < 10; j++)
 				{
 					if(G_power > (MAX_FRAGMENT - 1 - i) * 10 + j)
@@ -613,7 +613,7 @@ void playGame()
 					chainNotifsArray[i].handle();
 			
 			// Draw remaining lives
-			drawSprite(image_entries[image_LUT_lives], 0, 224);
+			drawSprite(image_entries[image_LUT_lives], 0, 224, 0, 0);
 			statsRect.x = image_entries[image_LUT_lives][0] + 2;
 			statsRect.y = 226;
 			drawChar(&statsRect.x, &statsRect.y, 0, 'x', 0xffff, 0);
@@ -668,7 +668,7 @@ void playGame()
 				}
 			}
 			else if(gamePhase == PHASE_BOSSCINEMATIC)
-				drawSprite(image_entries[image_LUT_bossWarning], 0, 72);
+				drawSprite(image_entries[image_LUT_bossWarning], 0, 72, 0, 0);
 			else if(gamePhase == PHASE_BOSSEXPLODEINIT)
 			{
 				initExplosionEffect(160, 120, 500, 0);

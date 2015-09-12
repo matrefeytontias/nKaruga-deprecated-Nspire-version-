@@ -1,6 +1,6 @@
 #include "common.h"
 
-const static int levelStream[] = {
+const static int levelStream[] = {/*
 	cmd_newCameraPath(CameraPath_i1),
 	cmd_wait(256),
 	//
@@ -558,5 +558,8 @@ const static int levelStream[] = {
 	cmd_newWave,
 	cmd_startChapter(1),
 	cmd_newCameraPath(CameraPath_c2),
+	//
+	// Chapter 2
+	// 
 	LVLSTR_END
 	};

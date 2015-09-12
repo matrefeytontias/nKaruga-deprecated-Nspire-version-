@@ -42,9 +42,8 @@ void Laser::draw()
 		G_particles->add(itofix(x), itofix(y), a, itofix(1), polarity, 32);
 	}
 	
-	// A laser has an up-to 8-pixels core radius with an up-to 12-pixels aura radius (ie a laser is 24 pixels thick)
-	// I use n2DLib's drawLine algorithm, but drawing rotated laser slices instead of pixels
-	// Algorithm by pierrotdu18
+	// A laser has an up-to 8-pixels core radius with an up-to 12-pixels aura radius (ie a laser is up to 24 pixels thick)
+	// I use n2DLib's drawLine algorithm (by pierrotdu18), but drawing rotated laser slices instead of pixels
 	int x1 = x;
 	int y1 = y;
 	int x2 = fixtoi(fixcos(angle) * amplitude) + x1;
@@ -58,6 +57,8 @@ void Laser::draw()
 	Fixed sdx = fixsin(-angle);
 	Fixed sdy = fixcos(-angle);
 	Fixed phase = -G_gpTimer * 24;
+	
+	unsigned short coreColor = polarity ? 0 : 0xffff;
 	while (!(x1 == x2 && y1 == y2))
 	{
 		phase += 5; // a period is 50 pixels
@@ -71,10 +72,10 @@ void Laser::draw()
 		{
 			if(abs(i - 12) <= fixtoi(coreR)) // Core pixel
 			{
-				setPixel(fixtoi(sxp), fixtoi(syp), polarity ? 0 : 0xffff);
-				setPixel(fixtoi(sxp) + 1, fixtoi(syp), polarity ? 0 : 0xffff);
-				setPixel(fixtoi(sxp), fixtoi(syp) + 1, polarity ? 0 : 0xffff);
-				setPixel(fixtoi(sxp) + 1, fixtoi(syp) + 1, polarity ? 0 : 0xffff);
+				setPixel(fixtoi(sxp), fixtoi(syp), coreColor);
+				setPixel(fixtoi(sxp) + 1, fixtoi(syp), coreColor);
+				setPixel(fixtoi(sxp), fixtoi(syp) + 1, coreColor);
+				setPixel(fixtoi(sxp) + 1, fixtoi(syp) + 1, coreColor);
 			}
 			else if(abs(i - 12) <= fixtoi(auraR)) // Aura pixel
 				setPixel(fixtoi(sxp), fixtoi(syp),

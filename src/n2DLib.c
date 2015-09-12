@@ -442,7 +442,7 @@ void fillRect(int x, int y, int w, int h, unsigned short c)
 	}
 }
 
-void drawSprite(const unsigned short *src, int _x, int _y)
+void drawSprite(const unsigned short *src, int _x, int _y, int flash, unsigned short flashColor)
 {
 	int x, y, w = src[0] + _x, h = src[1] + _y, c = 3;
 	for(y = _y; y < h; y++)
@@ -450,13 +450,13 @@ void drawSprite(const unsigned short *src, int _x, int _y)
 		for(x = _x; x < w; x++, c++)
 		{
 			if(src[c] != src[2])
-				setPixel(x, y, src[c]);
+				setPixel(x, y, flash ? flashColor : src[c]);
 		}
 		if(y > 239) break;
 	}
 }
 
-void drawSpritePart(const unsigned short *src, int _x, int _y, const Rect* part)
+void drawSpritePart(const unsigned short *src, int _x, int _y, const Rect* part, int flash, unsigned short flashColor)
 {
 	unsigned short c;
 	int x, y, w = part->w + _x, h = part->h + _y, z = part->x, t = part->y;
@@ -466,14 +466,14 @@ void drawSpritePart(const unsigned short *src, int _x, int _y, const Rect* part)
 		{
 			c = getPixel(src, z, t);
 			if(c != src[2])
-				setPixel(x, y, c);
+				setPixel(x, y, flash ? flashColor : c);
 			if(x > 319) break;
 		}
 		if(y > 239) break;
 	}
 }
 
-void drawSpriteScaled(const unsigned short* source, const Rect* info)
+void drawSpriteScaled(const unsigned short* source, const Rect* info, int flash, unsigned short flashColor)
 {
 	Fixed dx = itofix(source[0]) / info->w;
 	Fixed dy = itofix(source[1]) / info->h;
@@ -487,14 +487,14 @@ void drawSpriteScaled(const unsigned short* source, const Rect* info)
 		{
 			c = getPixel(source, fixtoi(tx), fixtoi(ty));
 			if(c != source[2])
-				setPixel(x, y, c);
+				setPixel(x, y, flash ? flashColor : c);
 			if(x > 319) break;
 		}
 		if(y > 239) break;
 	}
 }
 
-void drawSpriteRotated(const unsigned short* source, const Rect* sr, const Rect* rc, Fixed angle)
+void drawSpriteRotated(const unsigned short* source, const Rect* sr, const Rect* rc, Fixed angle, int flash, unsigned short flashColor)
 {
 	Rect defaultRect = { source[0] / 2, source[1] / 2, 0, 0 };
 	Rect fr;
@@ -527,7 +527,7 @@ void drawSpriteRotated(const unsigned short* source, const Rect* sr, const Rect*
 				currentPixel = getPixel(source, fixtoi(cdrp.x) + rc->x, fixtoi(cdrp.y) + rc->y);
 				if(currentPixel != source[2])
 				{
-					setPixelUnsafe(cp.x, cp.y, currentPixel);
+					setPixelUnsafe(cp.x, cp.y, flash ? flashColor : currentPixel);
 				}
 			}
 			cdrp.x += dX;
@@ -840,6 +840,61 @@ inline int isKey(t_key k1, t_key k2)
 {
 	return is_touchpad ? (k1.tpad_arrow == k2.tpad_arrow ? k1.tpad_row == k2.tpad_row && k1.tpad_col == k2.tpad_col : 0 )
 						: k1.row == k2.row && k1.col == k2.col;
+}
+
+// Loads a 24-bits bitmap image into an n2DLib-compatible unsigned short* array
+unsigned short * loadBMP(const char *path, unsigned short transparency)
+{
+	int size, width, height, offset, i, j;
+	uint16_t *returnValue;
+	FILE *temp = fopen(path, "rb");
+	
+	if(!temp) return NULL;
+	// Check if the file's 2 first char are BM (indicates bitmap)
+	if(!(fgetc(temp) == 0x42 && fgetc(temp) == 0x4d))
+	{
+		printf("Image is not a bitmap\n");
+		fclose(temp);
+		return NULL;
+	}
+	
+	// Check if the file is in 24 bpp
+	fseek(temp, 0x1c, SEEK_SET);
+	if(fgetc(temp) != 24)
+	{
+		printf("Wrong format : bitmap must use 24 bpp\n");
+		fclose(temp);
+		return NULL;
+	}
+	
+	// Get the 4-bytes pixel width and height, situated respectively at 0x12 and 0x16
+	fseek(temp, 0x12, SEEK_SET);
+	width = fgetc(temp) | (fgetc(temp) << 8) | (fgetc(temp) << 16) | (fgetc(temp) << 24);
+	fseek(temp, 0x16, SEEK_SET);
+	height = fgetc(temp) | (fgetc(temp) << 8) | (fgetc(temp) << 16) | (fgetc(temp) << 24);
+	size = width * height + 3; // include header
+	
+	// Gets the 4-bytes offset to the start of the pixel table, situated at 0x0a
+	fseek(temp, 0x0a, SEEK_SET);
+	offset = fgetc(temp) | (fgetc(temp) << 8) | (fgetc(temp) << 16) | (fgetc(temp) << 24);
+	
+	fseek(temp, offset, SEEK_SET);
+	
+	returnValue = malloc(size * sizeof(unsigned short));
+	if(!returnValue)
+	{
+		printf("Couldn't allocate memory\n");
+		fclose(temp);
+		return NULL;
+	}
+	returnValue[0] = width;
+	returnValue[1] = height;
+	returnValue[2] = transparency;
+	for(j = height - 1; j >= 0; j--)
+		for(i = 0; i < width; i++)
+			returnValue[j * width + i + 3] = (unsigned short)((fgetc(temp) >> 3) | ((fgetc(temp) >> 2) << 5) | ((fgetc(temp) >> 3) << 11));
+	fclose(temp);
+	return returnValue;
 }
 
 #ifdef __cplusplus

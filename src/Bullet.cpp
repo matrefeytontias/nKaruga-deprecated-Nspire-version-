@@ -2,7 +2,6 @@
 
 Bullet::Bullet() : Entity()
 {
-	active = false;
 }
 
 Bullet::~Bullet()

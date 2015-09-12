@@ -1,7 +1,7 @@
 #ifndef INCLUDE_GRAFX
 #define INCLUDE_GRAFX
 
-#include <os.h>
+#include <libndls.h>
 #include <stdarg.h>
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
@@ -55,10 +55,10 @@ extern void setPixelRGB(unsigned int, unsigned int, unsigned char, unsigned char
 extern void drawHLine(int, int, int, unsigned short);
 extern void drawVLine(int, int, int, unsigned short);
 extern void fillRect(int, int, int, int, unsigned short);
-extern void drawSprite(const unsigned short*, int, int);
-extern void drawSpritePart(const unsigned short*, int, int, const Rect*);
-extern void drawSpriteScaled(const unsigned short*, const Rect*);
-extern void drawSpriteRotated(const unsigned short*, const Rect*, const Rect*, Fixed);
+extern void drawSprite(const unsigned short*, int, int, int, unsigned short);
+extern void drawSpritePart(const unsigned short*, int, int, const Rect*, int, unsigned short);
+extern void drawSpriteScaled(const unsigned short*, const Rect*, int, unsigned short);
+extern void drawSpriteRotated(const unsigned short*, const Rect*, const Rect*, Fixed, int, unsigned short);
 extern void drawLine(int, int, int, int, unsigned short);
 extern void drawPolygon(unsigned short, int, ...);
 extern void fillCircle(int, int, int, unsigned short);
@@ -71,6 +71,8 @@ extern int numberWidth(int);
 extern int stringWidth(const char*);
 extern int get_key_pressed(t_key*);
 extern int isKey(t_key, t_key);
+
+extern unsigned short * loadBMP(const char*, unsigned short);
 
 #define BUFF_BYTES_SIZE (320*240*2)
 extern unsigned short *BUFF_BASE_ADDRESS;
